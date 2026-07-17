@@ -46,7 +46,9 @@ nav.scrolled { box-shadow: 0 2px 20px rgba(0,0,0,0.08); }
 .nav-center { display: flex; align-items: center; gap: 0.25rem; list-style: none; position: absolute; left: 50%; transform: translateX(-50%); }
 .nav-center a { font-size: 0.78rem; font-weight: 600; letter-spacing: 0.04em; color: var(--muted); text-decoration: none; padding: 0.4rem 0.85rem; border-radius: 8px; transition: all 0.2s; }
 .nav-center a:hover { color: var(--petrol); background: var(--petrol-pale); }
-.nav-right { display: flex; align-items: center; gap: 0.75rem; }
+.nav-right { display: flex; align-items: center; gap: 1.1rem; }
+.nav-login-link { font-size: 0.78rem; font-weight: 600; color: var(--muted, #6b7280); text-decoration: none; transition: color 0.2s; }
+.nav-login-link:hover { color: var(--petrol, #2F4E5F); }
 .btn-nav { font-size: 0.78rem; font-weight: 700; color: white; padding: 0.5rem 1.2rem; border-radius: 8px; text-decoration: none; transition: all 0.2s; border: none; cursor: pointer; font-family: 'Raleway', sans-serif; letter-spacing: 0.04em; }
 .btn-nav.coral { background: var(--coral); }
 .btn-nav.coral:hover { background: var(--coral-deep); }
@@ -198,6 +200,7 @@ footer { background: var(--dark); color: rgba(255,255,255,0.45); padding: 3rem 2
   </a>
 
   <div class="nav-right" id="navRight">
+    <a href="#" class="nav-login-link" id="navLoginLink">Iniciar sesión</a>
     <a href="historia.html" class="btn-nav coral">Acerca de CSH Talent</a>
   </div>
 </nav>
@@ -341,6 +344,7 @@ footer { background: var(--dark); color: rgba(255,255,255,0.45); padding: 3rem 2
 const sb = window.getCSHSupabaseClient();
 
 window.addEventListener('scroll', () => document.getElementById('mainNav').classList.toggle('scrolled', window.scrollY > 20));
+document.getElementById('navLoginLink')?.addEventListener('click', (e) => { e.preventDefault(); window.CSHAuth.open('login'); });
 
 (async () => {
   const { data: { user } } = await sb.auth.getUser();
