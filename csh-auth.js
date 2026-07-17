@@ -97,6 +97,18 @@
       .csh-auth-status { font-size: 0.78rem; line-height: 1.5; text-align: center; min-height: 1px; }
       .csh-auth-status.error { color: var(--brand-red, #b5404a); }
       .csh-auth-status.ok { color: var(--petrol, #2F4E5F); }
+      .csh-auth-callout {
+        display: flex; flex-direction: column; align-items: center; gap: 0.6rem;
+        text-align: center; padding: 1.5rem 1.25rem; border-radius: 16px;
+        background: var(--petrol-pale, #e6ecef); border: 1.5px solid var(--petrol, #2F4E5F);
+      }
+      .csh-auth-callout-icon {
+        width: 44px; height: 44px; border-radius: 50%; background: var(--petrol, #2F4E5F);
+        display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+      }
+      .csh-auth-callout-title { font-size: 0.95rem; font-weight: 800; color: var(--petrol-dark, #1e3340); }
+      .csh-auth-callout-text { font-size: 0.82rem; color: var(--text, #1f2937); line-height: 1.6; }
+      .csh-auth-callout-text strong { color: var(--petrol-dark, #1e3340); }
       .csh-auth-switch { font-size: 0.78rem; text-align: center; color: var(--muted, #6b7280); }
       .csh-auth-switch a { color: var(--petrol, #2F4E5F); font-weight: 700; text-decoration: none; cursor: pointer; }
       .csh-auth-switch a:hover { text-decoration: underline; }
@@ -118,22 +130,33 @@
 
             <!-- CREAR CUENTA -->
             <div class="csh-auth-view active" id="cshAuthViewSignup">
-              <div class="csh-auth-label">Nombre completo</div>
-              <input type="text" class="csh-auth-input" id="cshAuthSignupName" placeholder="Ej. Carolina Salazar" autocomplete="name">
-              <div class="csh-auth-label">Correo electrónico</div>
-              <input type="email" class="csh-auth-input" id="cshAuthSignupEmail" placeholder="tu@correo.com" autocomplete="email">
-              <div class="csh-auth-label">Contraseña</div>
-              <input type="password" class="csh-auth-input" id="cshAuthSignupPassword" placeholder="Mínimo 8 caracteres" autocomplete="new-password">
-              <div class="csh-auth-label">Confirmar contraseña</div>
-              <input type="password" class="csh-auth-input" id="cshAuthSignupPassword2" placeholder="Repite tu contraseña" autocomplete="new-password">
-              <label class="csh-auth-check-row">
-                <input type="checkbox" id="cshAuthAcceptTerms">
-                <span>Acepto los <a href="terminos-condiciones.html" target="_blank">Términos y Condiciones</a> y la <a href="politica-privacidad.html" target="_blank">Política de Privacidad</a> de CSH Talent.</span>
-              </label>
-              <button class="csh-auth-btn" id="cshAuthSignupSubmit">Crear mi cuenta</button>
-              <div class="csh-auth-status" id="cshAuthStatusSignup"></div>
-              <div class="csh-auth-switch">¿Ya tienes cuenta? <a id="cshAuthGoLogin">Inicia sesión</a></div>
+              <div id="cshAuthSignupForm" style="display:flex; flex-direction:column; gap:0.85rem;">
+                <div class="csh-auth-label">Nombre completo</div>
+                <input type="text" class="csh-auth-input" id="cshAuthSignupName" placeholder="Ej. Carolina Salazar" autocomplete="name">
+                <div class="csh-auth-label">Correo electrónico</div>
+                <input type="email" class="csh-auth-input" id="cshAuthSignupEmail" placeholder="tu@correo.com" autocomplete="email">
+                <div class="csh-auth-label">Contraseña</div>
+                <input type="password" class="csh-auth-input" id="cshAuthSignupPassword" placeholder="Mínimo 8 caracteres" autocomplete="new-password">
+                <div class="csh-auth-label">Confirmar contraseña</div>
+                <input type="password" class="csh-auth-input" id="cshAuthSignupPassword2" placeholder="Repite tu contraseña" autocomplete="new-password">
+                <label class="csh-auth-check-row">
+                  <input type="checkbox" id="cshAuthAcceptTerms">
+                  <span>Acepto los <a href="terminos-condiciones.html" target="_blank">Términos y Condiciones</a> y la <a href="politica-privacidad.html" target="_blank">Política de Privacidad</a> de CSH Talent.</span>
+                </label>
+                <button class="csh-auth-btn" id="cshAuthSignupSubmit">Crear mi cuenta</button>
+                <div class="csh-auth-status" id="cshAuthStatusSignup"></div>
+                <div class="csh-auth-switch">¿Ya tienes cuenta? <a id="cshAuthGoLogin">Inicia sesión</a></div>
+              </div>
+              <div class="csh-auth-callout" id="cshAuthSignupSuccess" style="display:none;">
+                <div class="csh-auth-callout-icon">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z" opacity="0"/><path d="M22 6l-10 7L2 6"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
+                </div>
+                <div class="csh-auth-callout-title">Revisa tu correo</div>
+                <div class="csh-auth-callout-text" id="cshAuthSignupSuccessText"></div>
+                <div class="csh-auth-switch" style="margin-top:0.4rem;">¿Ya confirmaste? <a id="cshAuthGoLoginFromSuccess">Inicia sesión</a></div>
+              </div>
             </div>
+
 
             <!-- INICIAR SESIÓN -->
             <div class="csh-auth-view" id="cshAuthViewLogin">
@@ -206,6 +229,8 @@
   function openModal(view) {
     ensureBuilt();
     setView(view || 'signup');
+    document.getElementById('cshAuthSignupForm').style.display = 'flex';
+    document.getElementById('cshAuthSignupSuccess').style.display = 'none';
     document.getElementById('cshAuthOverlay').classList.add('open');
   }
 
@@ -221,6 +246,13 @@
       pendingCallback = null;
       cb(user);
     }
+  }
+
+  function showSignupSuccess(email) {
+    document.getElementById('cshAuthSignupForm').style.display = 'none';
+    document.getElementById('cshAuthSignupSuccessText').innerHTML =
+      'Creamos tu cuenta. Te enviamos un enlace a <strong>' + email + '</strong> — ábrelo para confirmarla antes de iniciar sesión.';
+    document.getElementById('cshAuthSignupSuccess').style.display = 'flex';
   }
 
   async function handleSignup() {
@@ -250,7 +282,7 @@
       } else if (data.session) {
         resolvePending(data.user);
       } else {
-        setStatus('cshAuthStatusSignup', 'Cuenta creada. Revisa tu correo (' + email + ') para confirmarla antes de iniciar sesión.', 'ok');
+        showSignupSuccess(email);
       }
     } catch (e) {
       setStatus('cshAuthStatusSignup', 'No pudimos crear tu cuenta. Intenta de nuevo.', 'error');
@@ -346,6 +378,7 @@
     document.getElementById('cshAuthResetSubmit').addEventListener('click', handleReset);
 
     document.getElementById('cshAuthGoLogin').addEventListener('click', () => setView('login'));
+    document.getElementById('cshAuthGoLoginFromSuccess').addEventListener('click', () => setView('login'));
     document.getElementById('cshAuthGoSignup').addEventListener('click', () => setView('signup'));
     document.getElementById('cshAuthGoForgot').addEventListener('click', () => setView('forgot'));
     document.getElementById('cshAuthBackToLogin').addEventListener('click', () => setView('login'));
