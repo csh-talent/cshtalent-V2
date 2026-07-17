@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Términos y Condiciones — CSH Talent</title>
+<link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --petrol: #2F4E5F; --petrol-soft: #4A90A4; --petrol-pale: #e6ecef; --petrol-dark: #1e3340;
+  --coral: #E87B6F; --coral-deep: #d26359; --coral-pale: #fdece9;
+  --brand-red: #b5404a; --dark: #111827; --text: #1f2937; --muted: #6b7280;
+  --border: #e5e7eb; --surface: #f9fafb; --white: #ffffff;
+}
+html { scroll-behavior: smooth; }
+body { font-family: 'Raleway', sans-serif; background: var(--white); color: var(--text); line-height: 1.75; overflow-x: hidden; }
+
+/* NAV */
+nav { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; background: rgba(255,255,255,0.97); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); height: 60px; padding: 0 2rem; display: flex; align-items: center; justify-content: space-between; transition: box-shadow 0.3s; }
+nav.scrolled { box-shadow: 0 2px 20px rgba(0,0,0,0.08); }
+.nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+.nav-logo-mark { display: flex; flex-direction: column; }
+.nav-logo-name { font-size: 0.95rem; font-weight: 800; letter-spacing: 0.18em; color: var(--dark); line-height: 1; }
+.nav-logo-line { height: 1.5px; background: var(--brand-red); margin: 2px 0; }
+.nav-logo-sub { font-size: 0.42rem; font-weight: 500; letter-spacing: 0.2em; color: var(--muted); text-transform: uppercase; }
+.nav-right { display: flex; align-items: center; gap: 0.75rem; }
+.btn-nav { font-size: 0.78rem; font-weight: 700; color: white; padding: 0.5rem 1.2rem; border-radius: 8px; text-decoration: none; transition: all 0.2s; border: none; cursor: pointer; font-family: 'Raleway', sans-serif; letter-spacing: 0.04em; }
+.btn-nav.coral { background: var(--coral); }
+.btn-nav.coral:hover { background: var(--coral-deep); }
+
+/* HEADER DE PÁGINA */
+.page-header { padding: 7.5rem 2rem 3rem; background: var(--petrol-pale); border-bottom: 1px solid var(--border); }
+.page-header .label { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--petrol-soft); margin-bottom: 0.75rem; }
+.page-header h1 { font-size: clamp(1.8rem, 4vw, 2.6rem); font-weight: 800; color: var(--dark); line-height: 1.2; margin-bottom: 0.75rem; letter-spacing: -0.01em; }
+.page-header .meta { font-size: 0.78rem; color: var(--muted); font-weight: 500; }
+
+/* CONTENIDO */
+.content { max-width: 760px; margin: 0 auto; padding: 4rem 2rem 6rem; }
+.content h2 { font-size: 1.08rem; font-weight: 800; color: var(--dark); margin: 2.5rem 0 1rem; padding-bottom: 0.5rem; border-bottom: 1.5px solid var(--border); }
+.content h2:first-child { margin-top: 0; }
+.content p { font-size: 0.92rem; color: var(--muted); margin-bottom: 1rem; }
+.content ul { list-style: none; margin: 0.5rem 0 1rem; display: flex; flex-direction: column; gap: 0.5rem; }
+.content ul li { font-size: 0.92rem; color: var(--muted); padding-left: 1.25rem; position: relative; }
+.content ul li::before { content: '→'; position: absolute; left: 0; color: var(--coral); font-weight: 700; }
+.content strong { color: var(--dark); font-weight: 700; }
+.alert-box { background: #fff8f0; border-left: 3px solid #e07b2a; border-radius: 0 12px 12px 0; padding: 1.25rem 1.5rem; margin: 1.5rem 0; }
+.alert-box p { color: var(--text); margin: 0; font-size: 0.88rem; }
+.highlight-box { background: var(--coral-pale); border-left: 3px solid var(--coral); border-radius: 0 12px 12px 0; padding: 1.25rem 1.5rem; margin: 1.5rem 0; }
+.highlight-box p { color: var(--text); margin: 0; font-size: 0.88rem; }
+.contact-box { background: var(--surface); border: 1.5px solid var(--border); border-radius: 16px; padding: 2rem; margin-top: 3rem; text-align: center; }
+.contact-box p { font-size: 0.88rem; margin-bottom: 0.5rem; }
+.contact-box a { color: var(--petrol); font-weight: 600; text-decoration: none; }
+.contact-box a:hover { text-decoration: underline; }
+
+/* FOOTER */
+footer.csh-footer { background: var(--petrol-dark); color: rgba(255,255,255,0.45); padding: 3rem 2rem; }
+.csh-footer-inner { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 3rem; }
+.csh-footer-brand-name { font-size: 1rem; font-weight: 800; letter-spacing: 0.2em; color: white; line-height: 1; }
+.csh-footer-brand-line { height: 1.5px; background: var(--brand-red); margin: 3px 0; width: 60px; }
+.csh-footer-brand-sub { font-size: 0.45rem; font-weight: 500; letter-spacing: 0.2em; color: rgba(255,255,255,0.35); text-transform: uppercase; }
+.csh-footer-brand-desc { font-size: 0.78rem; color: rgba(255,255,255,0.4); line-height: 1.7; margin-top: 1rem; max-width: 260px; }
+.csh-footer-col-title { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.6); margin-bottom: 1rem; }
+.csh-footer-links { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; }
+.csh-footer-links a { font-size: 0.78rem; color: rgba(255,255,255,0.4); text-decoration: none; transition: color 0.2s; }
+.csh-footer-links a:hover { color: rgba(255,255,255,0.8); }
+.csh-footer-social { display: flex; gap: 0.5rem; margin-top: 1.25rem; }
+.csh-footer-social a { width: 34px; height: 34px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.12); display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.4); text-decoration: none; font-size: 0.7rem; font-weight: 700; transition: all 0.2s; }
+.csh-footer-social a:hover { border-color: rgba(255,255,255,0.4); color: white; }
+.csh-footer-bottom { max-width: 1100px; margin: 2rem auto 0; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.08); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; font-size: 0.72rem; }
+
+@media(max-width: 900px) { .csh-footer-inner { grid-template-columns: 1fr; gap: 2rem; } }
+@media(max-width: 768px) { .content { padding: 3rem 1.5rem 4rem; } }
+</style>
+</head>
+<body>
+
+<nav id="mainNav">
+  <a href="index.html" class="nav-logo">
+    <div class="nav-logo-mark">
+      <div class="nav-logo-name">CSH TALENT</div>
+      <div class="nav-logo-line"></div>
+      <div class="nav-logo-sub">Capital Sostenible y Humano</div>
+    </div>
+  </a>
+  <div class="nav-right" id="navRight">
+    <a href="historia.html" class="btn-nav coral">Acerca de CSH Talent</a>
+  </div>
+</nav>
+
+<div class="page-header">
+  <div class="content" style="padding:0;">
+    <div class="label">Legal</div>
+    <h1>Términos y Condiciones de Uso</h1>
+    <p class="meta">Última actualización: julio de 2026 · CSH Talent — Capital Sostenible y Humano</p>
+  </div>
+</div>
+
+<div class="content">
+
+  <div class="alert-box">
+    <p><strong>Importante:</strong> Al usar CSH Talent, usted acepta que todas las herramientas disponibles en esta plataforma son de carácter orientativo. Los resultados obtenidos no constituyen asesoría legal, laboral ni contable, y no reemplazan la consulta con un profesional calificado.</p>
+  </div>
+
+  <h2>1. Aceptación de los términos</h2>
+  <p>Al registrarse, acceder o utilizar cualquier herramienta o servicio de <strong>CSH Talent</strong> (en adelante "la plataforma"), usted declara haber leído, comprendido y aceptado en su totalidad estos Términos y Condiciones de Uso.</p>
+  <p>Si no está de acuerdo con alguna de las condiciones aquí establecidas, le pedimos que se abstenga de usar la plataforma.</p>
+
+  <h2>2. Naturaleza orientativa de las herramientas</h2>
+
+  <div class="alert-box">
+    <p><strong>Las herramientas de CSH Talent son únicamente de carácter orientativo.</strong> Los cálculos, resultados, documentos e informes generados por la plataforma no constituyen asesoría jurídica, laboral, contable ni de ninguna otra naturaleza profesional.</p>
+  </div>
+
+  <p>CSH Talent no se responsabiliza por decisiones tomadas con base en los resultados de sus herramientas. En particular:</p>
+  <ul>
+    <li>Los cálculos son aproximaciones basadas en la información ingresada por el usuario. Un error en los datos ingresados producirá un resultado incorrecto.</li>
+    <li>Las herramientas aplican únicamente a contratos de trabajo privados regidos por el <strong>Código Sustantivo del Trabajo (CST) de Colombia</strong>, incluyendo la Ley 2466 de 2025. No aplican al sector público, docentes, militares, trabajadores oficiales ni regímenes especiales.</li>
+    <li>La legislación laboral colombiana puede cambiar. CSH Talent procura mantener sus herramientas actualizadas, pero no garantiza que reflejen en todo momento la normativa vigente más reciente.</li>
+    <li>El Asistente CSH es un apoyo conversacional: cuando una respuesta dependa de la legislación laboral colombiana, se fundamenta en fuentes oficiales, y si no hay certeza suficiente, lo indicará expresamente en vez de improvisar.</li>
+    <li>Ante cualquier duda sobre una situación laboral concreta, le recomendamos consultar con un abogado laboral o contador calificado.</li>
+  </ul>
+
+  <div class="highlight-box">
+    <p>Recuerde: CSH Talent es una herramienta de apoyo, no un reemplazo del criterio profesional. Úsela como punto de partida, no como decisión final.</p>
+  </div>
+
+  <h2>3. Descripción del servicio</h2>
+  <p>CSH Talent es un único ecosistema con una cuenta —no perfiles separados por tipo de usuario— organizado en tres puertas de navegación:</p>
+  <ul>
+    <li><strong>Empresas:</strong> Diagnóstico CIMA®, Calculadora de liquidaciones con IA, Simulador de tiempo suplementario, Simulador de turnos, Modelo de comprobantes de nómina y Presupuesto de gastos de personal.</li>
+    <li><strong>Profesionales de Gestión Humana:</strong> Curso de Indicadores de GH, Calculadora de liquidaciones completa, y próximamente las metodologías CRECE® y PULSO®.</li>
+    <li><strong>Trabajadores:</strong> Calculadora de liquidación pública y el Asistente CSH para consultas laborales.</li>
+    <li><strong>Asistente CSH:</strong> disponible en todo el ecosistema, no en una sola puerta, especializado en legislación laboral colombiana, Gestión Humana, nómina, compensación, seguridad social y administración de personal.</li>
+  </ul>
+  <p>CSH Talent podrá incorporar nuevas herramientas al ecosistema en cualquier momento, bajo los mismos principios de esta sección.</p>
+
+  <h2>4. Registro y cuenta de usuario</h2>
+  <p>CSH Talent utiliza una <strong>única cuenta por persona</strong>, válida en las tres puertas del ecosistema. Para registrarse, el usuario debe indicar su nombre completo, correo electrónico y una contraseña (o, cuando estén disponibles, iniciar sesión con Google o Microsoft), y aceptar estos Términos y la Política de Privacidad. El usuario es responsable de:</p>
+  <ul>
+    <li>Proporcionar información veraz, completa y actualizada.</li>
+    <li>Mantener la confidencialidad de su contraseña.</li>
+    <li>Todas las actividades realizadas desde su cuenta.</li>
+    <li>Notificar de inmediato cualquier uso no autorizado a carolina@cshtalent.com.</li>
+  </ul>
+
+  <h2>5. Herramientas gratuitas, Premium y Membresía CSH Talent</h2>
+  <p>El acceso a las herramientas de CSH Talent funciona de la siguiente manera:</p>
+  <ul>
+    <li><strong>Herramientas gratuitas:</strong> disponibles sin costo para cualquier usuario registrado.</li>
+    <li><strong>Herramientas Premium individuales:</strong> pueden adquirirse por un período de acceso de <strong>30 días</strong>.</li>
+    <li><strong>Membresía CSH Talent:</strong> desbloquea todas las herramientas Premium disponibles mientras se mantenga activa.</li>
+  </ul>
+  <p>Cuando una compra individual o la Membresía CSH Talent expira, el usuario <strong>conserva todo su historial e información generada</strong> (simulaciones, liquidaciones, presupuestos, documentos y conversaciones con el Asistente CSH), y únicamente pierde el acceso a las funciones Premium hasta que renueve.</p>
+  <p>Los precios vigentes se publican en la plataforma y pueden modificarse con previo aviso de al menos <strong>15 días calendario</strong>. Los pagos realizados no son reembolsables, salvo que la plataforma presente fallas técnicas que impidan el acceso al servicio contratado por más de <strong>72 horas continuas</strong>.</p>
+
+  <h2>6. Propiedad intelectual</h2>
+  <p>Todos los contenidos de CSH Talent — incluyendo textos, diseños, herramientas, metodologías, modelos y marcas como <strong>CIMA®, PULSO® y CRECE®</strong> — son propiedad exclusiva de Carolina Salazar Hernández y están protegidos por las leyes de propiedad intelectual colombianas e internacionales.</p>
+  <p>Queda expresamente prohibido:</p>
+  <ul>
+    <li>Reproducir, copiar o distribuir cualquier contenido de la plataforma sin autorización escrita.</li>
+    <li>Usar las metodologías, modelos o herramientas con fines comerciales sin licencia.</li>
+    <li>Realizar ingeniería inversa sobre las herramientas de la plataforma.</li>
+  </ul>
+
+  <h2>7. Limitación de responsabilidad</h2>
+  <p>En la máxima medida permitida por la ley colombiana, CSH Talent no será responsable por:</p>
+  <ul>
+    <li>Pérdidas económicas, sanciones o demandas derivadas del uso de los resultados de las herramientas o del Asistente CSH.</li>
+    <li>Decisiones laborales, contractuales o administrativas tomadas con base en los cálculos, respuestas o documentos generados.</li>
+    <li>Interrupciones del servicio por causas ajenas a su control (fuerza mayor, fallas de terceros proveedores, etc.).</li>
+    <li>Errores derivados de información incorrecta ingresada por el usuario.</li>
+  </ul>
+
+  <div class="alert-box">
+    <p><strong>Recuerde:</strong> Los resultados de CSH Talent son orientativos. La responsabilidad sobre cualquier decisión laboral recae exclusivamente en quien la toma. CSH Talent es una guía, no una garantía.</p>
+  </div>
+
+  <h2>8. Uso aceptable</h2>
+  <p>El usuario se compromete a usar la plataforma de manera responsable y legal. Está prohibido:</p>
+  <ul>
+    <li>Usar la plataforma para actividades fraudulentas o ilegales.</li>
+    <li>Intentar acceder a cuentas de otros usuarios.</li>
+    <li>Compartir credenciales de acceso con terceros.</li>
+    <li>Sobrecargar o interferir con el funcionamiento de la plataforma.</li>
+    <li>Utilizar o intentar canjear códigos de regalo o promocionales fuera de los términos con los que fueron emitidos.</li>
+  </ul>
+
+  <h2>9. Modificaciones al servicio</h2>
+  <p>CSH Talent se reserva el derecho de modificar, suspender o discontinuar cualquier funcionalidad de la plataforma en cualquier momento, con o sin previo aviso. Los cambios que afecten significativamente el servicio contratado serán notificados por correo electrónico con al menos <strong>10 días de anticipación</strong>.</p>
+
+  <h2>10. Ley aplicable y jurisdicción</h2>
+  <p>Estos Términos y Condiciones se rigen por las leyes de la <strong>República de Colombia</strong>. Cualquier controversia derivada del uso de la plataforma se resolverá ante los jueces competentes de la ciudad de <strong>Cali, Valle del Cauca</strong>.</p>
+
+  <h2>11. Vigencia</h2>
+  <p>Estos Términos y Condiciones rigen a partir de su fecha de publicación y permanecerán vigentes hasta que sean modificados o reemplazados por una versión actualizada.</p>
+
+  <div class="contact-box">
+    <p><strong>¿Preguntas sobre estos términos?</strong></p>
+    <p>Escríbenos a <a href="mailto:carolina@cshtalent.com">carolina@cshtalent.com</a></p>
+    <p style="margin-top:0.5rem;font-size:0.78rem;">Respondemos en máximo 15 días hábiles.</p>
+  </div>
+
+</div>
+
+<footer class="csh-footer">
+  <div class="csh-footer-inner">
+    <div>
+      <div class="csh-footer-brand-name">CSH TALENT</div>
+      <div class="csh-footer-brand-line"></div>
+      <div class="csh-footer-brand-sub">Capital Sostenible y Humano</div>
+      <p class="csh-footer-brand-desc">Herramientas profesionales de Gestión Humana para empresas colombianas que están creciendo.</p>
+      <div class="csh-footer-social">
+        <a href="https://www.linkedin.com/in/carosalazarhdez" target="_blank" title="LinkedIn">in</a>
+        <a href="https://www.instagram.com/cshtalent" target="_blank" title="Instagram">ig</a>
+        <a href="mailto:carolina@cshtalent.com" title="Correo">@</a>
+      </div>
+    </div>
+    <div>
+      <div class="csh-footer-col-title">Plataforma</div>
+      <ul class="csh-footer-links">
+        <li><a href="empresas.html">Para empresas</a></li>
+        <li><a href="profesionales.html">Para profesionales</a></li>
+        <li><a href="trabajadores.html">Para trabajadores</a></li>
+        <li><a href="historia.html">Historia de CSH Talent</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="csh-footer-col-title">Legal y contacto</div>
+      <ul class="csh-footer-links">
+        <li><a href="politica-privacidad.html">Política de privacidad</a></li>
+        <li><a href="terminos-condiciones.html">Términos de uso</a></li>
+        <li><a href="mailto:carolina@cshtalent.com">Contacto</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="csh-footer-bottom">
+    <span>Colombia · CST y Ley 2466 de 2025</span>
+    <span>© 2026 CSH Talent · Carolina Salazar Hernández</span>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="csh-auth.js"></script>
+<script src="assistant.js"></script>
+<script>
+const sb = window.getCSHSupabaseClient();
+window.addEventListener('scroll', () => document.getElementById('mainNav').classList.toggle('scrolled', window.scrollY > 20));
+(async () => {
+  const { data: { user } } = await sb.auth.getUser();
+  if (user) {
+    const name = (user.user_metadata?.full_name || user.email.split('@')[0]).split(' ')[0];
+    document.getElementById('navRight').innerHTML = `
+      <a href="dashboard.html" style="font-size:0.78rem;font-weight:600;color:var(--muted);text-decoration:none;">Hola, ${name}</a>
+      <button onclick="(async()=>{await sb.auth.signOut();window.location.reload();})()" class="btn-nav coral" style="cursor:pointer;">Salir</button>`;
+  }
+})();
+</script>
+</body>
+</html>

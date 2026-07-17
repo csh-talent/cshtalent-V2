@@ -8,32 +8,39 @@
 
      window.CSHAuth.requireAuth(function (user) {
        // esta función solo se ejecuta si hay sesión activa;
-       // si no la hay, primero se abre el modal y se ejecuta
-       // automáticamente al autenticarse.
+       // si no la hay, primero se abre el modal (registro o login)
+       // y se ejecuta automáticamente al autenticarse.
      });
 
-   Solo Magic Link está activo en esta primera versión. Google y
-   Microsoft están listados en AUTH_PROVIDERS con enabled:false —
-   activarlos más adelante es cambiar ese flag y agregar el botón
-   correspondiente, no reconstruir el modal.
+   Experiencia principal: correo + contraseña (registro y login).
+   - Registro pide nombre completo (obligatorio, para personalizar
+     saludos como "Hola, Carolina" en vez del correo).
+   - Login: correo + contraseña, con "¿Olvidaste tu contraseña?"
+     usando el flujo de recuperación nativo de Supabase.
+   - Google y Microsoft siguen listados en AUTH_PROVIDERS con
+     enabled:false — activarlos es un flag, no una reconstrucción.
+   - Magic Link se conserva internamente (sendMagicLinkFallback,
+     no conectado a ningún botón visible) por si se necesita más
+     adelante como mecanismo alterno.
 
-   Limitación conocida: si el enlace mágico se abre en la misma
-   pestaña, el navegador recarga la página al volver, por lo que la
-   acción pendiente (ej. "enviar este mensaje al Asistente CSH") no
-   se reanuda automáticamente tras ese reload — el usuario sí queda
-   autenticado, pero deberá repetir la acción una vez. Si se abre en
-   otra pestaña, la pestaña original si retoma la acción sin reload.
+   Nota: si tu proyecto de Supabase tiene activado "Confirm email"
+   (Authentication → Providers → Email), un usuario nuevo deberá
+   confirmar su correo antes de tener sesión activa; este componente
+   detecta ambos casos (sesión inmediata o confirmación pendiente)
+   y muestra el mensaje correspondiente automáticamente.
    ═══════════════════════════════════════════════════════════════ */
 (function () {
 
   const AUTH_PROVIDERS = {
-    magicLink: { enabled: true },
+    emailPassword: { enabled: true },
+    magicLink: { enabled: false }, // conservado internamente, sin UI
     google: { enabled: false },
     microsoft: { enabled: false }
   };
 
   let pendingCallback = null;
   let built = false;
+  let currentView = 'signup';
 
   function injectStyles() {
     const style = document.createElement('style');
@@ -47,9 +54,10 @@
       }
       .csh-auth-overlay.open { opacity: 1; pointer-events: auto; }
       .csh-auth-card {
-        width: 100%; max-width: 380px; background: var(--white, #fff);
+        width: 100%; max-width: 400px; max-height: calc(100vh - 3rem); overflow-y: auto;
+        background: var(--white, #fff);
         border-radius: 20px; box-shadow: 0 24px 70px rgba(17,24,39,0.28);
-        overflow: hidden; transform: translateY(10px) scale(0.98);
+        transform: translateY(10px) scale(0.98);
         transition: transform 0.2s ease;
       }
       .csh-auth-overlay.open .csh-auth-card { transform: translateY(0) scale(1); }
@@ -63,13 +71,22 @@
       }
       .csh-auth-close:hover { color: white; }
       .csh-auth-title { font-size: 1.05rem; font-weight: 800; }
-      .csh-auth-sub { font-size: 0.78rem; color: rgba(255,255,255,0.6); margin-top: 4px; }
-      .csh-auth-body { padding: 1.5rem; display: flex; flex-direction: column; gap: 0.9rem; }
+      .csh-auth-sub { font-size: 0.78rem; color: rgba(255,255,255,0.6); margin-top: 4px; line-height: 1.5; }
+      .csh-auth-body { padding: 1.5rem; }
+      .csh-auth-view { display: none; flex-direction: column; gap: 0.85rem; }
+      .csh-auth-view.active { display: flex; }
+      .csh-auth-label { font-size: 0.72rem; font-weight: 700; color: var(--muted, #6b7280); letter-spacing: 0.03em; text-transform: uppercase; margin-bottom: -0.4rem; }
       .csh-auth-input {
         width: 100%; border: 1.5px solid var(--border, #e5e7eb); border-radius: 10px;
         padding: 0.7rem 0.9rem; font-family: 'Raleway', sans-serif; font-size: 0.85rem; outline: none;
       }
       .csh-auth-input:focus { border-color: var(--petrol, #2F4E5F); }
+      .csh-auth-check-row { display: flex; align-items: flex-start; gap: 0.55rem; font-size: 0.74rem; color: var(--muted, #6b7280); line-height: 1.5; }
+      .csh-auth-check-row input { margin-top: 3px; flex-shrink: 0; }
+      .csh-auth-check-row a { color: var(--petrol, #2F4E5F); font-weight: 600; text-decoration: none; }
+      .csh-auth-check-row a:hover { text-decoration: underline; }
+      .csh-auth-forgot { align-self: flex-end; font-size: 0.74rem; color: var(--petrol, #2F4E5F); cursor: pointer; font-weight: 600; margin-top: -0.4rem; }
+      .csh-auth-forgot:hover { text-decoration: underline; }
       .csh-auth-btn {
         width: 100%; border: none; border-radius: 10px; padding: 0.75rem; cursor: pointer;
         font-family: 'Raleway', sans-serif; font-size: 0.82rem; font-weight: 700; letter-spacing: 0.02em;
@@ -77,10 +94,12 @@
       }
       .csh-auth-btn:hover { background: var(--coral-deep, #d26359); }
       .csh-auth-btn:disabled { opacity: 0.6; cursor: default; }
-      .csh-auth-status { font-size: 0.78rem; line-height: 1.5; text-align: center; }
+      .csh-auth-status { font-size: 0.78rem; line-height: 1.5; text-align: center; min-height: 1px; }
       .csh-auth-status.error { color: var(--brand-red, #b5404a); }
       .csh-auth-status.ok { color: var(--petrol, #2F4E5F); }
-      .csh-auth-note { font-size: 0.68rem; color: var(--muted, #6b7280); text-align: center; margin-top: 0.2rem; }
+      .csh-auth-switch { font-size: 0.78rem; text-align: center; color: var(--muted, #6b7280); }
+      .csh-auth-switch a { color: var(--petrol, #2F4E5F); font-weight: 700; text-decoration: none; cursor: pointer; }
+      .csh-auth-switch a:hover { text-decoration: underline; }
     `;
     document.head.appendChild(style);
   }
@@ -92,19 +111,82 @@
         <div class="csh-auth-card">
           <div class="csh-auth-head">
             <button class="csh-auth-close" id="cshAuthClose" aria-label="Cerrar">✕</button>
-            <div class="csh-auth-title">Crea tu cuenta CSH Talent</div>
-            <div class="csh-auth-sub">Una sola cuenta para todo el ecosistema — sin contraseñas.</div>
+            <div class="csh-auth-title" id="cshAuthTitle">Crea tu cuenta en CSH Talent</div>
+            <div class="csh-auth-sub" id="cshAuthSub">Una sola cuenta para todo el ecosistema: empresas, profesionales y trabajadores.</div>
           </div>
           <div class="csh-auth-body">
-            <input type="email" class="csh-auth-input" id="cshAuthEmail" placeholder="tu@correo.com" autocomplete="email">
-            <button class="csh-auth-btn" id="cshAuthSubmit">Continuar con correo</button>
-            <div class="csh-auth-status" id="cshAuthStatus"></div>
-            <div class="csh-auth-note">Próximamente también podrás continuar con Google y Microsoft.</div>
+
+            <!-- CREAR CUENTA -->
+            <div class="csh-auth-view active" id="cshAuthViewSignup">
+              <div class="csh-auth-label">Nombre completo</div>
+              <input type="text" class="csh-auth-input" id="cshAuthSignupName" placeholder="Ej. Carolina Salazar" autocomplete="name">
+              <div class="csh-auth-label">Correo electrónico</div>
+              <input type="email" class="csh-auth-input" id="cshAuthSignupEmail" placeholder="tu@correo.com" autocomplete="email">
+              <div class="csh-auth-label">Contraseña</div>
+              <input type="password" class="csh-auth-input" id="cshAuthSignupPassword" placeholder="Mínimo 8 caracteres" autocomplete="new-password">
+              <div class="csh-auth-label">Confirmar contraseña</div>
+              <input type="password" class="csh-auth-input" id="cshAuthSignupPassword2" placeholder="Repite tu contraseña" autocomplete="new-password">
+              <label class="csh-auth-check-row">
+                <input type="checkbox" id="cshAuthAcceptTerms">
+                <span>Acepto los <a href="terminos-condiciones.html" target="_blank">Términos y Condiciones</a> y la <a href="politica-privacidad.html" target="_blank">Política de Privacidad</a> de CSH Talent.</span>
+              </label>
+              <button class="csh-auth-btn" id="cshAuthSignupSubmit">Crear mi cuenta</button>
+              <div class="csh-auth-status" id="cshAuthStatusSignup"></div>
+              <div class="csh-auth-switch">¿Ya tienes cuenta? <a id="cshAuthGoLogin">Inicia sesión</a></div>
+            </div>
+
+            <!-- INICIAR SESIÓN -->
+            <div class="csh-auth-view" id="cshAuthViewLogin">
+              <div class="csh-auth-label">Correo electrónico</div>
+              <input type="email" class="csh-auth-input" id="cshAuthLoginEmail" placeholder="tu@correo.com" autocomplete="email">
+              <div class="csh-auth-label">Contraseña</div>
+              <input type="password" class="csh-auth-input" id="cshAuthLoginPassword" placeholder="Tu contraseña" autocomplete="current-password">
+              <div class="csh-auth-forgot" id="cshAuthGoForgot">¿Olvidaste tu contraseña?</div>
+              <button class="csh-auth-btn" id="cshAuthLoginSubmit">Iniciar sesión</button>
+              <div class="csh-auth-status" id="cshAuthStatusLogin"></div>
+              <div class="csh-auth-switch">¿No tienes cuenta? <a id="cshAuthGoSignup">Crea una gratis</a></div>
+            </div>
+
+            <!-- OLVIDÉ MI CONTRASEÑA -->
+            <div class="csh-auth-view" id="cshAuthViewForgot">
+              <div class="csh-auth-label">Correo electrónico</div>
+              <input type="email" class="csh-auth-input" id="cshAuthForgotEmail" placeholder="tu@correo.com" autocomplete="email">
+              <button class="csh-auth-btn" id="cshAuthForgotSubmit">Enviar enlace de recuperación</button>
+              <div class="csh-auth-status" id="cshAuthStatusForgot"></div>
+              <div class="csh-auth-switch"><a id="cshAuthBackToLogin">Volver a iniciar sesión</a></div>
+            </div>
+
+            <!-- NUEVA CONTRASEÑA (llega desde el enlace de recuperación) -->
+            <div class="csh-auth-view" id="cshAuthViewReset">
+              <div class="csh-auth-label">Nueva contraseña</div>
+              <input type="password" class="csh-auth-input" id="cshAuthResetPassword" placeholder="Mínimo 8 caracteres" autocomplete="new-password">
+              <div class="csh-auth-label">Confirmar nueva contraseña</div>
+              <input type="password" class="csh-auth-input" id="cshAuthResetPassword2" placeholder="Repite la contraseña" autocomplete="new-password">
+              <button class="csh-auth-btn" id="cshAuthResetSubmit">Guardar nueva contraseña</button>
+              <div class="csh-auth-status" id="cshAuthStatusReset"></div>
+            </div>
+
           </div>
         </div>
       </div>
     `;
     document.body.appendChild(wrap);
+  }
+
+  const VIEW_COPY = {
+    signup: { title: 'Crea tu cuenta en CSH Talent', sub: 'Una sola cuenta para todo el ecosistema: empresas, profesionales y trabajadores.' },
+    login: { title: 'Inicia sesión en CSH Talent', sub: 'Accede con tu correo y tu contraseña.' },
+    forgot: { title: 'Recupera tu contraseña', sub: 'Te enviaremos un enlace a tu correo para crear una nueva.' },
+    reset: { title: 'Crea una nueva contraseña', sub: 'Ya casi terminas — define la contraseña con la que vas a acceder de ahora en adelante.' }
+  };
+
+  function setView(view) {
+    currentView = view;
+    document.querySelectorAll('.csh-auth-view').forEach(v => v.classList.remove('active'));
+    const map = { signup: 'cshAuthViewSignup', login: 'cshAuthViewLogin', forgot: 'cshAuthViewForgot', reset: 'cshAuthViewReset' };
+    document.getElementById(map[view]).classList.add('active');
+    document.getElementById('cshAuthTitle').textContent = VIEW_COPY[view].title;
+    document.getElementById('cshAuthSub').textContent = VIEW_COPY[view].sub;
   }
 
   function ensureBuilt() {
@@ -115,16 +197,15 @@
     built = true;
   }
 
-  function setStatus(msg, kind) {
-    const el = document.getElementById('cshAuthStatus');
+  function setStatus(elId, msg, kind) {
+    const el = document.getElementById(elId);
     el.textContent = msg || '';
     el.className = 'csh-auth-status' + (kind ? ' ' + kind : '');
   }
 
-  function openModal() {
+  function openModal(view) {
     ensureBuilt();
-    setStatus('', '');
-    document.getElementById('cshAuthEmail').value = '';
+    setView(view || 'signup');
     document.getElementById('cshAuthOverlay').classList.add('open');
   }
 
@@ -133,31 +214,124 @@
     document.getElementById('cshAuthOverlay').classList.remove('open');
   }
 
-  async function handleSubmit() {
-    const emailInput = document.getElementById('cshAuthEmail');
-    const email = emailInput.value.trim();
-    if (!email || !email.includes('@')) {
-      setStatus('Escribe un correo válido.', 'error');
-      return;
+  function resolvePending(user) {
+    closeModal();
+    if (pendingCallback) {
+      const cb = pendingCallback;
+      pendingCallback = null;
+      cb(user);
     }
-    const btn = document.getElementById('cshAuthSubmit');
+  }
+
+  async function handleSignup() {
+    const fullName = document.getElementById('cshAuthSignupName').value.trim();
+    const email = document.getElementById('cshAuthSignupEmail').value.trim();
+    const password = document.getElementById('cshAuthSignupPassword').value;
+    const password2 = document.getElementById('cshAuthSignupPassword2').value;
+    const accepted = document.getElementById('cshAuthAcceptTerms').checked;
+
+    if (!fullName) return setStatus('cshAuthStatusSignup', 'Escribe tu nombre completo.', 'error');
+    if (!email || !email.includes('@')) return setStatus('cshAuthStatusSignup', 'Escribe un correo válido.', 'error');
+    if (password.length < 8) return setStatus('cshAuthStatusSignup', 'La contraseña debe tener al menos 8 caracteres.', 'error');
+    if (password !== password2) return setStatus('cshAuthStatusSignup', 'Las contraseñas no coinciden.', 'error');
+    if (!accepted) return setStatus('cshAuthStatusSignup', 'Debes aceptar los Términos y la Política de Privacidad.', 'error');
+
+    const btn = document.getElementById('cshAuthSignupSubmit');
     btn.disabled = true;
-    setStatus('Enviando enlace...', '');
+    setStatus('cshAuthStatusSignup', 'Creando tu cuenta...', '');
     try {
       const client = window.getCSHSupabaseClient();
-      const { error } = await client.auth.signInWithOtp({
-        email,
-        options: { emailRedirectTo: window.location.href }
+      const { data, error } = await client.auth.signUp({
+        email, password,
+        options: { data: { full_name: fullName } }
       });
       if (error) {
-        setStatus(error.message, 'error');
+        setStatus('cshAuthStatusSignup', error.message, 'error');
+      } else if (data.session) {
+        resolvePending(data.user);
       } else {
-        setStatus('Listo. Revisa tu correo (' + email + ') y haz clic en el enlace para continuar.', 'ok');
+        setStatus('cshAuthStatusSignup', 'Cuenta creada. Revisa tu correo (' + email + ') para confirmarla antes de iniciar sesión.', 'ok');
       }
     } catch (e) {
-      setStatus('No pudimos enviar el enlace. Intenta de nuevo.', 'error');
+      setStatus('cshAuthStatusSignup', 'No pudimos crear tu cuenta. Intenta de nuevo.', 'error');
     }
     btn.disabled = false;
+  }
+
+  async function handleLogin() {
+    const email = document.getElementById('cshAuthLoginEmail').value.trim();
+    const password = document.getElementById('cshAuthLoginPassword').value;
+    if (!email || !password) return setStatus('cshAuthStatusLogin', 'Escribe tu correo y tu contraseña.', 'error');
+
+    const btn = document.getElementById('cshAuthLoginSubmit');
+    btn.disabled = true;
+    setStatus('cshAuthStatusLogin', 'Verificando...', '');
+    try {
+      const client = window.getCSHSupabaseClient();
+      const { data, error } = await client.auth.signInWithPassword({ email, password });
+      if (error) {
+        setStatus('cshAuthStatusLogin', 'Correo o contraseña incorrectos.', 'error');
+      } else {
+        resolvePending(data.user);
+      }
+    } catch (e) {
+      setStatus('cshAuthStatusLogin', 'No pudimos iniciar sesión. Intenta de nuevo.', 'error');
+    }
+    btn.disabled = false;
+  }
+
+  async function handleForgot() {
+    const email = document.getElementById('cshAuthForgotEmail').value.trim();
+    if (!email || !email.includes('@')) return setStatus('cshAuthStatusForgot', 'Escribe un correo válido.', 'error');
+
+    const btn = document.getElementById('cshAuthForgotSubmit');
+    btn.disabled = true;
+    setStatus('cshAuthStatusForgot', 'Enviando...', '');
+    try {
+      const client = window.getCSHSupabaseClient();
+      const { error } = await client.auth.resetPasswordForEmail(email, {
+        redirectTo: window.location.href
+      });
+      if (error) {
+        setStatus('cshAuthStatusForgot', error.message, 'error');
+      } else {
+        setStatus('cshAuthStatusForgot', 'Listo. Revisa tu correo (' + email + ') y sigue el enlace para crear una nueva contraseña.', 'ok');
+      }
+    } catch (e) {
+      setStatus('cshAuthStatusForgot', 'No pudimos enviar el enlace. Intenta de nuevo.', 'error');
+    }
+    btn.disabled = false;
+  }
+
+  async function handleReset() {
+    const p1 = document.getElementById('cshAuthResetPassword').value;
+    const p2 = document.getElementById('cshAuthResetPassword2').value;
+    if (p1.length < 8) return setStatus('cshAuthStatusReset', 'La contraseña debe tener al menos 8 caracteres.', 'error');
+    if (p1 !== p2) return setStatus('cshAuthStatusReset', 'Las contraseñas no coinciden.', 'error');
+
+    const btn = document.getElementById('cshAuthResetSubmit');
+    btn.disabled = true;
+    setStatus('cshAuthStatusReset', 'Guardando...', '');
+    try {
+      const client = window.getCSHSupabaseClient();
+      const { data, error } = await client.auth.updateUser({ password: p1 });
+      if (error) {
+        setStatus('cshAuthStatusReset', error.message, 'error');
+      } else {
+        setStatus('cshAuthStatusReset', 'Contraseña actualizada correctamente.', 'ok');
+        setTimeout(() => resolvePending(data.user), 900);
+      }
+    } catch (e) {
+      setStatus('cshAuthStatusReset', 'No pudimos actualizar tu contraseña. Intenta de nuevo.', 'error');
+    }
+    btn.disabled = false;
+  }
+
+  /* Conservado internamente (sin botón visible) para uso futuro,
+     tal como se pidió: puede reactivarse como método alterno. */
+  async function sendMagicLinkFallback(email) {
+    const client = window.getCSHSupabaseClient();
+    return client.auth.signInWithOtp({ email, options: { emailRedirectTo: window.location.href } });
   }
 
   function wireEvents() {
@@ -165,10 +339,23 @@
     document.getElementById('cshAuthOverlay').addEventListener('click', (e) => {
       if (e.target.id === 'cshAuthOverlay') closeModal();
     });
-    document.getElementById('cshAuthSubmit').addEventListener('click', handleSubmit);
-    document.getElementById('cshAuthEmail').addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') handleSubmit();
+
+    document.getElementById('cshAuthSignupSubmit').addEventListener('click', handleSignup);
+    document.getElementById('cshAuthLoginSubmit').addEventListener('click', handleLogin);
+    document.getElementById('cshAuthForgotSubmit').addEventListener('click', handleForgot);
+    document.getElementById('cshAuthResetSubmit').addEventListener('click', handleReset);
+
+    document.getElementById('cshAuthGoLogin').addEventListener('click', () => setView('login'));
+    document.getElementById('cshAuthGoSignup').addEventListener('click', () => setView('signup'));
+    document.getElementById('cshAuthGoForgot').addEventListener('click', () => setView('forgot'));
+    document.getElementById('cshAuthBackToLogin').addEventListener('click', () => setView('login'));
+
+    ['cshAuthSignupPassword2', 'cshAuthSignupEmail', 'cshAuthSignupName'].forEach(id => {
+      document.getElementById(id).addEventListener('keydown', (e) => { if (e.key === 'Enter') handleSignup(); });
     });
+    document.getElementById('cshAuthLoginPassword').addEventListener('keydown', (e) => { if (e.key === 'Enter') handleLogin(); });
+    document.getElementById('cshAuthForgotEmail').addEventListener('keydown', (e) => { if (e.key === 'Enter') handleForgot(); });
+    document.getElementById('cshAuthResetPassword2').addEventListener('keydown', (e) => { if (e.key === 'Enter') handleReset(); });
   }
 
   window.CSHAuth = {
@@ -185,20 +372,19 @@
         }
       } catch (e) { /* sin sesión */ }
       pendingCallback = onSuccess;
-      openModal();
+      openModal('signup');
     }
   };
 
   function watchAuthState() {
     const client = window.getCSHSupabaseClient();
     client.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_IN' && session?.user) {
-        closeModal();
-        if (pendingCallback) {
-          const cb = pendingCallback;
-          pendingCallback = null;
-          cb(session.user);
-        }
+      if (event === 'PASSWORD_RECOVERY') {
+        ensureBuilt();
+        openModal('reset');
+      }
+      if (event === 'SIGNED_IN' && session?.user && currentView !== 'reset') {
+        resolvePending(session.user);
       }
     });
   }

@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Política de Privacidad — CSH Talent</title>
+<link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --petrol: #2F4E5F; --petrol-soft: #4A90A4; --petrol-pale: #e6ecef; --petrol-dark: #1e3340;
+  --coral: #E87B6F; --coral-deep: #d26359; --coral-pale: #fdece9;
+  --brand-red: #b5404a; --dark: #111827; --text: #1f2937; --muted: #6b7280;
+  --border: #e5e7eb; --surface: #f9fafb; --white: #ffffff;
+}
+html { scroll-behavior: smooth; }
+body { font-family: 'Raleway', sans-serif; background: var(--white); color: var(--text); line-height: 1.75; overflow-x: hidden; }
+
+/* NAV */
+nav { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; background: rgba(255,255,255,0.97); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); height: 60px; padding: 0 2rem; display: flex; align-items: center; justify-content: space-between; transition: box-shadow 0.3s; }
+nav.scrolled { box-shadow: 0 2px 20px rgba(0,0,0,0.08); }
+.nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+.nav-logo-mark { display: flex; flex-direction: column; }
+.nav-logo-name { font-size: 0.95rem; font-weight: 800; letter-spacing: 0.18em; color: var(--dark); line-height: 1; }
+.nav-logo-line { height: 1.5px; background: var(--brand-red); margin: 2px 0; }
+.nav-logo-sub { font-size: 0.42rem; font-weight: 500; letter-spacing: 0.2em; color: var(--muted); text-transform: uppercase; }
+.nav-right { display: flex; align-items: center; gap: 0.75rem; }
+.btn-nav { font-size: 0.78rem; font-weight: 700; color: white; padding: 0.5rem 1.2rem; border-radius: 8px; text-decoration: none; transition: all 0.2s; border: none; cursor: pointer; font-family: 'Raleway', sans-serif; letter-spacing: 0.04em; }
+.btn-nav.coral { background: var(--coral); }
+.btn-nav.coral:hover { background: var(--coral-deep); }
+
+/* HEADER DE PÁGINA */
+.page-header { padding: 7.5rem 2rem 3rem; background: var(--petrol-pale); border-bottom: 1px solid var(--border); }
+.page-header .label { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--petrol-soft); margin-bottom: 0.75rem; }
+.page-header h1 { font-size: clamp(1.8rem, 4vw, 2.6rem); font-weight: 800; color: var(--dark); line-height: 1.2; margin-bottom: 0.75rem; letter-spacing: -0.01em; }
+.page-header .meta { font-size: 0.78rem; color: var(--muted); font-weight: 500; }
+
+/* CONTENIDO */
+.content { max-width: 760px; margin: 0 auto; padding: 4rem 2rem 6rem; }
+.content h2 { font-size: 1.08rem; font-weight: 800; color: var(--dark); margin: 2.5rem 0 1rem; padding-bottom: 0.5rem; border-bottom: 1.5px solid var(--border); }
+.content h2:first-child { margin-top: 0; }
+.content p { font-size: 0.92rem; color: var(--muted); margin-bottom: 1rem; }
+.content ul { list-style: none; margin: 0.5rem 0 1rem; display: flex; flex-direction: column; gap: 0.5rem; }
+.content ul li { font-size: 0.92rem; color: var(--muted); padding-left: 1.25rem; position: relative; }
+.content ul li::before { content: '→'; position: absolute; left: 0; color: var(--coral); font-weight: 700; }
+.content strong { color: var(--dark); font-weight: 700; }
+.highlight-box { background: var(--coral-pale); border-left: 3px solid var(--coral); border-radius: 0 12px 12px 0; padding: 1.25rem 1.5rem; margin: 1.5rem 0; }
+.highlight-box p { color: var(--text); margin: 0; font-size: 0.88rem; }
+.contact-box { background: var(--surface); border: 1.5px solid var(--border); border-radius: 16px; padding: 2rem; margin-top: 3rem; text-align: center; }
+.contact-box p { font-size: 0.88rem; margin-bottom: 0.5rem; }
+.contact-box a { color: var(--petrol); font-weight: 600; text-decoration: none; }
+.contact-box a:hover { text-decoration: underline; }
+
+/* FOOTER */
+footer.csh-footer { background: var(--petrol-dark); color: rgba(255,255,255,0.45); padding: 3rem 2rem; }
+.csh-footer-inner { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 3rem; }
+.csh-footer-brand-name { font-size: 1rem; font-weight: 800; letter-spacing: 0.2em; color: white; line-height: 1; }
+.csh-footer-brand-line { height: 1.5px; background: var(--brand-red); margin: 3px 0; width: 60px; }
+.csh-footer-brand-sub { font-size: 0.45rem; font-weight: 500; letter-spacing: 0.2em; color: rgba(255,255,255,0.35); text-transform: uppercase; }
+.csh-footer-brand-desc { font-size: 0.78rem; color: rgba(255,255,255,0.4); line-height: 1.7; margin-top: 1rem; max-width: 260px; }
+.csh-footer-col-title { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.6); margin-bottom: 1rem; }
+.csh-footer-links { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; }
+.csh-footer-links a { font-size: 0.78rem; color: rgba(255,255,255,0.4); text-decoration: none; transition: color 0.2s; }
+.csh-footer-links a:hover { color: rgba(255,255,255,0.8); }
+.csh-footer-social { display: flex; gap: 0.5rem; margin-top: 1.25rem; }
+.csh-footer-social a { width: 34px; height: 34px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.12); display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.4); text-decoration: none; font-size: 0.7rem; font-weight: 700; transition: all 0.2s; }
+.csh-footer-social a:hover { border-color: rgba(255,255,255,0.4); color: white; }
+.csh-footer-bottom { max-width: 1100px; margin: 2rem auto 0; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.08); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; font-size: 0.72rem; }
+
+@media(max-width: 900px) { .csh-footer-inner { grid-template-columns: 1fr; gap: 2rem; } }
+@media(max-width: 768px) { .content { padding: 3rem 1.5rem 4rem; } }
+</style>
+</head>
+<body>
+
+<nav id="mainNav">
+  <a href="index.html" class="nav-logo">
+    <div class="nav-logo-mark">
+      <div class="nav-logo-name">CSH TALENT</div>
+      <div class="nav-logo-line"></div>
+      <div class="nav-logo-sub">Capital Sostenible y Humano</div>
+    </div>
+  </a>
+  <div class="nav-right" id="navRight">
+    <a href="historia.html" class="btn-nav coral">Acerca de CSH Talent</a>
+  </div>
+</nav>
+
+<div class="page-header">
+  <div class="content" style="padding:0;">
+    <div class="label">Legal</div>
+    <h1>Política de Privacidad y Tratamiento de Datos Personales</h1>
+    <p class="meta">Última actualización: julio de 2026 · CSH Talent — Capital Sostenible y Humano</p>
+  </div>
+</div>
+
+<div class="content">
+
+  <div class="highlight-box">
+    <p>Esta política aplica exclusivamente a contratos de trabajo privados regidos por el Código Sustantivo del Trabajo (CST) de Colombia. Las herramientas de CSH Talent son orientativas y no constituyen asesoría legal.</p>
+  </div>
+
+  <h2>1. Responsable del tratamiento</h2>
+  <p>El responsable del tratamiento de sus datos personales es <strong>Carolina Salazar Hernández</strong>, fundadora de CSH Talent (Capital Sostenible y Humano), con domicilio en la ciudad de Cali, Colombia.</p>
+  <p>Para cualquier consulta relacionada con sus datos personales puede contactarnos a través de: <strong>carolina@cshtalent.com</strong></p>
+
+  <h2>2. Marco legal</h2>
+  <p>CSH Talent da cumplimiento a la <strong>Ley Estatutaria 1581 de 2012</strong> de Protección de Datos Personales y su Decreto Reglamentario 1377 de 2013, así como a las demás normas que la modifiquen, adicionen o complementen en Colombia.</p>
+
+  <h2>3. Datos que recopilamos</h2>
+  <p>Según cómo utilice la plataforma, podemos recopilar los siguientes datos:</p>
+  <ul>
+    <li><strong>Registro de cuenta:</strong> nombre completo, correo electrónico y contraseña (almacenada de forma encriptada, nunca en texto plano).</li>
+    <li><strong>Autenticación con Google o Microsoft</strong> (cuando estas opciones estén disponibles): nombre y correo electrónico proporcionados por el proveedor correspondiente.</li>
+    <li><strong>Uso de herramientas:</strong> datos ingresados para calcular liquidaciones, tiempo suplementario, turnos, presupuestos u otras herramientas (salario, fechas, tipo de contrato, etc.), así como las consultas realizadas al Asistente CSH.</li>
+    <li><strong>Historial y espacio personal:</strong> las simulaciones, liquidaciones, presupuestos, documentos generados y demás registros que usted cree dentro de la plataforma, asociados de forma permanente a su cuenta.</li>
+    <li><strong>Compras y membresía:</strong> el estado de su Membresía CSH Talent y de las herramientas Premium adquiridas individualmente.</li>
+    <li><strong>Datos de navegación:</strong> dirección IP, tipo de dispositivo y navegador, páginas visitadas.</li>
+  </ul>
+
+  <h2>4. Finalidad del tratamiento</h2>
+  <p>Sus datos personales serán utilizados para:</p>
+  <ul>
+    <li>Crear y gestionar su única cuenta de CSH Talent, válida en todo el ecosistema (Empresas, Profesionales de Gestión Humana y Trabajadores).</li>
+    <li>Prestar los servicios contratados: herramientas gratuitas, herramientas Premium adquiridas individualmente o la Membresía CSH Talent.</li>
+    <li>Conservar su espacio personal (historial, simulaciones, documentos y demás registros) de forma permanente, incluso si una compra o membresía llega a expirar.</li>
+    <li>Enviarle comunicaciones relacionadas con su cuenta o los servicios solicitados.</li>
+    <li>Enviarle comunicaciones comerciales y promocionales, <strong>únicamente si usted autorizó expresamente</strong> esta finalidad al momento del registro.</li>
+    <li>Mejorar la plataforma y desarrollar nuevas funcionalidades.</li>
+    <li>Cumplir con obligaciones legales.</li>
+  </ul>
+
+  <h2>5. Autorización y consentimiento</h2>
+  <p>Al registrarse en CSH Talent, usted otorga su consentimiento libre, previo, expreso e informado para el tratamiento de sus datos personales de acuerdo con esta política.</p>
+  <p>La autorización para recibir comunicaciones comerciales es <strong>opcional y separada</strong> del registro. Puede revocarla en cualquier momento escribiéndonos a carolina@cshtalent.com.</p>
+
+  <h2>6. Derechos del titular</h2>
+  <p>Como titular de sus datos personales, usted tiene derecho a:</p>
+  <ul>
+    <li>Conocer, actualizar y rectificar sus datos personales.</li>
+    <li>Solicitar prueba de la autorización otorgada.</li>
+    <li>Ser informado sobre el uso que se ha dado a sus datos.</li>
+    <li>Revocar la autorización y solicitar la supresión de sus datos.</li>
+    <li>Acceder de forma gratuita a sus datos personales.</li>
+    <li>Presentar quejas ante la Superintendencia de Industria y Comercio (SIC).</li>
+  </ul>
+  <p>Para ejercer estos derechos, escríbanos a: <strong>carolina@cshtalent.com</strong>. Atenderemos su solicitud en un plazo máximo de <strong>15 días hábiles</strong>.</p>
+
+  <h2>7. Seguridad de los datos</h2>
+  <p>CSH Talent implementa medidas técnicas y organizativas para proteger sus datos personales, incluyendo el uso de <strong>Supabase</strong> como proveedor de base de datos y autenticación, con cifrado en tránsito y en reposo, contraseñas almacenadas de forma encriptada, y reglas de seguridad a nivel de fila que garantizan que cada usuario solo pueda acceder a su propia información.</p>
+  <p>Sin embargo, ningún sistema de transmisión de datos por internet es 100% seguro. Le recomendamos proteger su contraseña y no compartirla con terceros.</p>
+
+  <h2>8. Transferencia de datos</h2>
+  <p>Sus datos pueden ser procesados por terceros proveedores de servicios tecnológicos necesarios para el funcionamiento de la plataforma, entre ellos:</p>
+  <ul>
+    <li><strong>Supabase Inc.</strong> — base de datos y autenticación.</li>
+    <li><strong>Vercel Inc.</strong> — alojamiento web.</li>
+    <li><strong>Google LLC y Microsoft Corporation</strong> — únicamente si usted elige iniciar sesión con alguno de estos proveedores, cuando esa opción esté disponible.</li>
+  </ul>
+  <p>Estos proveedores actúan como encargados del tratamiento y están obligados a mantener la confidencialidad de sus datos.</p>
+
+  <h2>9. Conservación de datos</h2>
+  <p>Sus datos serán conservados mientras mantenga una cuenta activa en CSH Talent o mientras sea necesario para cumplir con las finalidades descritas en esta política. Su espacio personal (historial, simulaciones y documentos) se conserva de forma permanente aunque una compra o membresía expire — únicamente pierde acceso a las funciones Premium hasta renovar. Si solicita la eliminación de su cuenta, procederemos a suprimir sus datos en un plazo de <strong>30 días hábiles</strong>.</p>
+
+  <h2>10. Modificaciones a esta política</h2>
+  <p>CSH Talent se reserva el derecho de modificar esta política en cualquier momento. Las modificaciones serán notificadas a través del correo electrónico registrado o mediante un aviso visible en la plataforma con al menos <strong>10 días de anticipación</strong>.</p>
+
+  <h2>11. Vigencia</h2>
+  <p>Esta política rige a partir de su fecha de publicación y permanecerá vigente hasta que sea modificada o reemplazada por una versión actualizada.</p>
+
+  <div class="contact-box">
+    <p><strong>¿Preguntas sobre tus datos?</strong></p>
+    <p>Escríbenos a <a href="mailto:carolina@cshtalent.com">carolina@cshtalent.com</a></p>
+    <p style="margin-top:0.5rem;font-size:0.78rem;">Respondemos en máximo 15 días hábiles.</p>
+  </div>
+
+</div>
+
+<footer class="csh-footer">
+  <div class="csh-footer-inner">
+    <div>
+      <div class="csh-footer-brand-name">CSH TALENT</div>
+      <div class="csh-footer-brand-line"></div>
+      <div class="csh-footer-brand-sub">Capital Sostenible y Humano</div>
+      <p class="csh-footer-brand-desc">Herramientas profesionales de Gestión Humana para empresas colombianas que están creciendo.</p>
+      <div class="csh-footer-social">
+        <a href="https://www.linkedin.com/in/carosalazarhdez" target="_blank" title="LinkedIn">in</a>
+        <a href="https://www.instagram.com/cshtalent" target="_blank" title="Instagram">ig</a>
+        <a href="mailto:carolina@cshtalent.com" title="Correo">@</a>
+      </div>
+    </div>
+    <div>
+      <div class="csh-footer-col-title">Plataforma</div>
+      <ul class="csh-footer-links">
+        <li><a href="empresas.html">Para empresas</a></li>
+        <li><a href="profesionales.html">Para profesionales</a></li>
+        <li><a href="trabajadores.html">Para trabajadores</a></li>
+        <li><a href="historia.html">Historia de CSH Talent</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="csh-footer-col-title">Legal y contacto</div>
+      <ul class="csh-footer-links">
+        <li><a href="politica-privacidad.html">Política de privacidad</a></li>
+        <li><a href="terminos-condiciones.html">Términos de uso</a></li>
+        <li><a href="mailto:carolina@cshtalent.com">Contacto</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="csh-footer-bottom">
+    <span>Colombia · CST y Ley 2466 de 2025</span>
+    <span>© 2026 CSH Talent · Carolina Salazar Hernández</span>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="csh-auth.js"></script>
+<script src="assistant.js"></script>
+<script>
+const sb = window.getCSHSupabaseClient();
+window.addEventListener('scroll', () => document.getElementById('mainNav').classList.toggle('scrolled', window.scrollY > 20));
+(async () => {
+  const { data: { user } } = await sb.auth.getUser();
+  if (user) {
+    const name = (user.user_metadata?.full_name || user.email.split('@')[0]).split(' ')[0];
+    document.getElementById('navRight').innerHTML = `
+      <a href="dashboard.html" style="font-size:0.78rem;font-weight:600;color:var(--muted);text-decoration:none;">Hola, ${name}</a>
+      <button onclick="(async()=>{await sb.auth.signOut();window.location.reload();})()" class="btn-nav coral" style="cursor:pointer;">Salir</button>`;
+  }
+})();
+</script>
+</body>
+</html>
