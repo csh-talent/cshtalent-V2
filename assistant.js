@@ -19,7 +19,7 @@
      conecte la IA real.
    - window.CSHAssistantAPI.getResponse(message, user, config) →
      punto único donde se conectará más adelante la API de IA real.
-     Por ahora devuelve una respuesta de marcador de posición.
+     Conectado a Claude Haiku 4.5 vía /api/chat (ver carpeta /api).
    - window.CSHAssistant.open()/close() → control externo opcional.
 
    No implementa cobros ni límites de uso: solo deja la estructura
@@ -91,16 +91,56 @@
     ]
   };
 
-  /* ─── Punto de conexión futuro con la API de IA ───
-     TODO: reemplazar esta función por la llamada real a la API de IA
-     de CSH Talent, usando window.CSHAssistantConfig como contexto/
-     system prompt. Debe recibir el mensaje y el usuario autenticado,
-     y devolver un string (o Promise<string>) con la respuesta.
-     Aquí NO se implementa lógica de cobro ni límites de uso. */
+  /* ─── Conexión real con la IA (Claude Haiku 4.5, vía /api/chat) ───
+     El endpoint /api/chat es un simple puente seguro hacia la API de
+     Anthropic: la API key vive como variable de entorno en Vercel,
+     nunca en este archivo ni en el navegador. Aquí solo se arma el
+     contexto (system prompt) a partir de CSHAssistantConfig y se
+     mantiene la memoria de la conversación en memoria (no persiste
+     entre recargas de página todavía — eso llegará con user_workspace). */
+  const MODEL_NAME = 'claude-haiku-4-5-20251001';
+  const MAX_TOKENS = 1024;
+  let conversationHistory = [];
+
+  function buildSystemPrompt(config) {
+    return [
+      'Eres el ' + config.name + ', el asistente conversacional oficial de CSH Talent.',
+      'Alcance: ' + config.scope,
+      'Especialidades: ' + config.specialties.join(', ') + '.',
+      'La persona está actualmente en la puerta "' + config.currentPage + '" del sitio, así que prioriza cuando sea pertinente: ' + config.pagePriority + '. Sin dejar de conocer y poder recomendar cualquier otra herramienta del ecosistema si aplica.',
+      'Regla de oro: ' + config.goldenRule,
+      'Fuentes oficiales permitidas para fundamentar temas legales: ' + config.officialSources.join(', ') + '.',
+      'Responde siempre en español, de forma clara, cálida y profesional, en el contexto de la legislación laboral colombiana.'
+    ].join('\n');
+  }
+
   window.CSHAssistantAPI = window.CSHAssistantAPI || {
     getResponse: async function (message, user, config) {
-      await new Promise(r => setTimeout(r, 600));
-      return 'Gracias por tu mensaje. Esta conexión con la IA se habilitará muy pronto — por ahora estoy en preparación para ayudarte con legislación laboral colombiana, nómina, compensación y ' + (config?.pagePriority || 'las herramientas de la plataforma') + '. Cuando la respuesta dependa de una norma, siempre se fundamentará en fuentes oficiales.';
+      conversationHistory.push({ role: 'user', content: message });
+      try {
+        const res = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            model: MODEL_NAME,
+            max_tokens: MAX_TOKENS,
+            system: buildSystemPrompt(config),
+            messages: conversationHistory.slice(-20)
+          })
+        });
+        const data = await res.json();
+        if (data.error) {
+          return 'No pude procesar tu consulta en este momento (' + (data.error.message || 'error desconocido') + '). Intenta de nuevo en unos segundos.';
+        }
+        const text = (data.content || [])
+          .filter(block => block.type === 'text')
+          .map(block => block.text)
+          .join('\n');
+        conversationHistory.push({ role: 'assistant', content: text });
+        return text || 'No pude generar una respuesta. Intenta reformular tu pregunta.';
+      } catch (e) {
+        return 'No pude conectar con el Asistente CSH en este momento. Revisa tu conexión e intenta de nuevo.';
+      }
     }
   };
 
