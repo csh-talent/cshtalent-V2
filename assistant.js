@@ -27,8 +27,8 @@
    ═══════════════════════════════════════════════════════════════ */
 (function () {
 
-  const SUPABASE_URL = 'https://wrgmpudxccvorjdgqrsg.supabase.co';
-  const SUPABASE_KEY = 'sb_publishable_5--4_rdrjzexW5xYrSOUXQ_C8DsOM4D';
+  const SUPABASE_URL = 'https://eiauimhrybdamjpntdwh.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_xAJpeRsaWAukGtwoLaYPwg_krPVnKat';
 
   /* ─── Cliente Supabase compartido (evita instancias duplicadas) ─── */
   window.getCSHSupabaseClient = function () {
