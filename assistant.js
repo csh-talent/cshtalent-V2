@@ -88,6 +88,23 @@
       'Corte Suprema de Justicia',
       'Corte Constitucional',
       'Leyes y decretos vigentes'
+    ],
+    /* Catálogo real de productos y metodologías propias de CSH Talent.
+       Existe para que el modelo nunca confunda estos nombres con
+       términos externos no relacionados (ej. CIMA no es un trámite
+       de tránsito) ni invente qué hace cada herramienta. */
+    ownProducts: [
+      { nombre: 'Diagnóstico CIMA®', puerta: 'Empresas', descripcion: 'Metodología propia de CSH Talent (marca de Carolina Salazar Hernández) que evalúa de forma integral el estado de la gestión humana de una organización.' },
+      { nombre: 'Calculadora de liquidaciones con IA', puerta: 'Empresas', descripcion: 'Liquida contratos conforme a la legislación laboral colombiana con apoyo de inteligencia artificial.' },
+      { nombre: 'Simulador de tiempo suplementario', puerta: 'Empresas', descripcion: 'Calcula horas extras, recargos y trabajo suplementario.' },
+      { nombre: 'Simulador de turnos', puerta: 'Empresas', descripcion: 'Diseña y valida esquemas de turnos cumpliendo la normatividad laboral.' },
+      { nombre: 'Modelo de comprobantes de nómina', puerta: 'Empresas', descripcion: 'Genera comprobantes de nómina claros y listos para entregar a colaboradores.' },
+      { nombre: 'Presupuesto de gastos de personal', puerta: 'Empresas', descripcion: 'Proyecta y controla el costo de la planta de personal.' },
+      { nombre: 'Curso de Indicadores de GH', puerta: 'Profesionales de GH', descripcion: 'Curso para diseñar, calcular e interpretar indicadores clave de gestión humana.' },
+      { nombre: 'Calculadora de liquidación completa', puerta: 'Profesionales de GH', descripcion: 'Versión completa de la calculadora de liquidación, con el detalle que necesita un profesional de GH.' },
+      { nombre: 'Metodología CRECE®', puerta: 'Profesionales de GH', descripcion: 'Metodología propia de CSH Talent (marca de Carolina Salazar Hernández) para estructurar el crecimiento de las personas en una organización. Próximamente.' },
+      { nombre: 'Metodología PULSO®', puerta: 'Profesionales de GH', descripcion: 'Metodología propia de CSH Talent (marca de Carolina Salazar Hernández) para tomar el pulso al clima y la salud de la gestión humana. Próximamente.' },
+      { nombre: 'Calculadora de liquidación pública', puerta: 'Trabajadores', descripcion: 'Versión gratuita de la calculadora de liquidación, orientada a trabajadores.' }
     ]
   };
 
@@ -103,14 +120,21 @@
   let conversationHistory = [];
 
   function buildSystemPrompt(config) {
+    const catalogo = config.ownProducts
+      .map(p => '- ' + p.nombre + ' (puerta ' + p.puerta + '): ' + p.descripcion)
+      .join('\n');
     return [
       'Eres el ' + config.name + ', el asistente conversacional oficial de CSH Talent.',
       'Alcance: ' + config.scope,
       'Especialidades: ' + config.specialties.join(', ') + '.',
       'La persona está actualmente en la puerta "' + config.currentPage + '" del sitio, así que prioriza cuando sea pertinente: ' + config.pagePriority + '. Sin dejar de conocer y poder recomendar cualquier otra herramienta del ecosistema si aplica.',
+      'Catálogo real de productos y metodologías propias de CSH Talent (única fuente de verdad sobre qué son y qué hacen):',
+      catalogo,
+      'IMPORTANTE: CIMA®, CRECE® y PULSO® son marcas y metodologías propias de Carolina Salazar Hernández dentro de CSH Talent, definidas únicamente como se describe arriba. Nunca las confundas con trámites, certificados o significados externos no relacionados (ej. CIMA no tiene nada que ver con tránsito, licencias de conducción ni ningún otro trámite gubernamental). Si te preguntan por un producto o funcionalidad que no está en este catálogo, dilo explícitamente en vez de inventar qué podría ser.',
       'Regla de oro: ' + config.goldenRule,
       'Fuentes oficiales permitidas para fundamentar temas legales: ' + config.officialSources.join(', ') + '.',
-      'Responde siempre en español, de forma clara, cálida y profesional, en el contexto de la legislación laboral colombiana.'
+      'Responde siempre en español, de forma clara, cálida y profesional, en el contexto de la legislación laboral colombiana.',
+      'Formato: responde siempre en texto plano, sin ningún formato Markdown. No uses asteriscos para negrita ni cursiva, no uses # para títulos, no uses guiones ni viñetas para listas. Si necesitas enumerar algo, hazlo con números seguidos de punto (1. 2. 3.) en líneas separadas, o simplemente en prosa. El panel de chat solo muestra texto plano, así que cualquier símbolo de formato aparecería literal y se vería mal.'
     ].join('\n');
   }
 
