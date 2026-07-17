@@ -134,7 +134,8 @@
       'Regla de oro: ' + config.goldenRule,
       'Fuentes oficiales permitidas para fundamentar temas legales: ' + config.officialSources.join(', ') + '.',
       'Responde siempre en español, de forma clara, cálida y profesional, en el contexto de la legislación laboral colombiana.',
-      'Formato: responde siempre en texto plano, sin ningún formato Markdown. No uses asteriscos para negrita ni cursiva, no uses # para títulos, no uses guiones ni viñetas para listas. Si necesitas enumerar algo, hazlo con números seguidos de punto (1. 2. 3.) en líneas separadas, o simplemente en prosa. El panel de chat solo muestra texto plano, así que cualquier símbolo de formato aparecería literal y se vería mal.'
+      'Formato: el panel de chat SÍ interpreta **texto** como negrita real, así que puedes usarlo con naturalidad para dar énfasis. Pero no uses ningún otro símbolo de Markdown: nada de # para títulos, nada de guiones ni viñetas para listas, nada de cursiva con asteriscos simples. Si necesitas enumerar algo, hazlo con números seguidos de punto (1. 2. 3.) en líneas separadas, o simplemente en prosa.',
+      'Los emojis SÍ están permitidos y son bienvenidos: úsalos con naturalidad para hacer la conversación más amena y cercana, igual que lo harías en un chat normal.'
     ].join('\n');
   }
 
@@ -296,12 +297,29 @@
     document.body.appendChild(wrap);
   }
 
+  function escapeHtml(str) {
+    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  /* Convierte **negrita** en <strong> real, después de escapar HTML
+     por seguridad. Solo se usa para mensajes del asistente; los
+     mensajes del usuario se muestran siempre como texto plano. */
+  function formatAssistantText(text) {
+    const escaped = escapeHtml(text);
+    return escaped.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  }
+
   function addMessage(role, text) {
     const body = document.getElementById('cshAssistantBody');
     const row = document.createElement('div');
     row.className = 'csh-a-msg' + (role === 'user' ? ' user' : '');
     row.innerHTML = `<div class="csh-a-avatar">${role === 'user' ? 'Tú' : 'CSH'}</div><div class="csh-a-bubble"></div>`;
-    row.querySelector('.csh-a-bubble').textContent = text;
+    const bubble = row.querySelector('.csh-a-bubble');
+    if (role === 'assistant') {
+      bubble.innerHTML = formatAssistantText(text);
+    } else {
+      bubble.textContent = text;
+    }
     body.appendChild(row);
     body.scrollTop = body.scrollHeight;
   }
