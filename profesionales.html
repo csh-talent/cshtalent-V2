@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Para empresas — CSH Talent</title>
+<title>Para profesionales de GH — CSH Talent</title>
 <link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,700;1,800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
@@ -93,30 +93,23 @@ nav.scrolled { box-shadow: 0 2px 20px rgba(0,0,0,0.08); }
   transition: all 0.3s; position: relative; overflow: hidden;
   background: var(--white);
 }
-.puerta-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: var(--petrol); transition: background 0.3s; }
+.puerta-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: var(--coral); transition: background 0.3s; }
 .puerta-card:hover { box-shadow: 0 12px 40px rgba(47,78,95,0.1); transform: translateY(-4px); border-color: transparent; }
-.puerta-icon { width: 52px; height: 52px; border-radius: 14px; display: flex; align-items: center; justify-content: center; background: var(--petrol-pale); }
+.puerta-icon { width: 52px; height: 52px; border-radius: 14px; display: flex; align-items: center; justify-content: center; background: var(--coral-pale); }
 .puerta-badge { position: absolute; top: 16px; right: 16px; font-size: 0.6rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; padding: 0.3rem 0.65rem; border-radius: 20px; background: var(--coral-pale); color: var(--coral-deep); }
 
 /* ═══ DISPONIBLE AHORA (destacado) ═══ */
 .featured-section { padding: 4rem 2rem 1rem; background: var(--white); }
 .featured-inner { max-width: 1100px; margin: 0 auto; }
-.featured-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.75rem; margin-top: 2.25rem; }
-.featured-card { border-radius: 24px; padding: 2.5rem; display: flex; flex-direction: column; gap: 1.1rem; text-decoration: none; color: inherit; position: relative; overflow: hidden; background: var(--white); border: 2px solid var(--border); transition: all 0.3s; cursor: pointer; }
+.featured-grid { display: grid; grid-template-columns: 1fr; max-width: 560px; margin: 2.25rem auto 0; gap: 1.75rem; }
+.featured-card { border-radius: 24px; padding: 2.5rem; display: flex; flex-direction: column; gap: 1.1rem; text-decoration: none; color: inherit; position: relative; overflow: hidden; background: var(--white); border: 2px solid var(--petrol-dark); transition: all 0.3s; cursor: pointer; }
 .featured-card:hover { transform: translateY(-4px); box-shadow: 0 16px 44px rgba(17,24,39,0.1); }
-.featured-card.accent-assistant { border-color: var(--petrol-dark); }
-.featured-card.accent-door { border-color: var(--petrol); }
 .featured-badge { position: absolute; top: 22px; right: 22px; font-size: 0.62rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; padding: 0.35rem 0.8rem; border-radius: 20px; background: var(--petrol-pale); color: var(--petrol); }
-.featured-icon { width: 58px; height: 58px; border-radius: 16px; display: flex; align-items: center; justify-content: center; }
-.featured-icon.assistant { background: var(--petrol-dark); }
-.featured-icon.door { background: var(--petrol-pale); }
+.featured-icon { width: 58px; height: 58px; border-radius: 16px; display: flex; align-items: center; justify-content: center; background: var(--petrol-dark); }
 .featured-title { font-size: 1.35rem; font-weight: 900; color: var(--dark); letter-spacing: -0.01em; line-height: 1.2; }
 .featured-desc { font-size: 0.92rem; color: var(--muted); line-height: 1.75; flex: 1; }
-.featured-cta { display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.76rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; padding: 0.8rem 1.5rem; border-radius: 10px; width: fit-content; color: white; border: none; cursor: pointer; font-family: 'Raleway', sans-serif; transition: all 0.2s; }
-.featured-cta.assistant { background: var(--petrol-dark); }
-.featured-cta.assistant:hover { background: var(--petrol); }
-.featured-cta.door { background: var(--petrol); }
-.featured-cta.door:hover { background: var(--petrol-soft); }
+.featured-cta { display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.76rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; padding: 0.8rem 1.5rem; border-radius: 10px; width: fit-content; color: white; border: none; cursor: pointer; font-family: 'Raleway', sans-serif; transition: all 0.2s; background: var(--petrol-dark); }
+.featured-cta:hover { background: var(--petrol); }
 
 /* ═══ PRÓXIMAMENTE (atenuado) ═══ */
 .soon-section { padding: 3rem 2rem 5rem; background: var(--surface); border-top: 1px solid var(--border); }
@@ -129,12 +122,10 @@ nav.scrolled { box-shadow: 0 2px 20px rgba(0,0,0,0.08); }
 .soon-title { font-size: 0.9rem; font-weight: 800; color: var(--muted); }
 .soon-desc { font-size: 0.76rem; color: var(--muted2); line-height: 1.6; }
 .soon-badge { align-self: flex-start; font-size: 0.6rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; padding: 0.28rem 0.6rem; border-radius: 20px; background: var(--border); color: var(--muted); }
-
-@media(max-width: 900px) { .featured-grid { grid-template-columns: 1fr; } }
 .puerta-title { font-size: 1.2rem; font-weight: 800; color: var(--dark); line-height: 1.2; letter-spacing: -0.01em; }
 .puerta-desc { font-size: 0.85rem; color: var(--muted); line-height: 1.7; flex: 1; }
-.puerta-cta { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 0.65rem 1.25rem; border-radius: 8px; margin-top: 0.5rem; transition: all 0.2s; width: fit-content; background: var(--petrol); color: white; }
-.puerta-cta:hover { background: var(--petrol-soft); }
+.puerta-cta { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 0.65rem 1.25rem; border-radius: 8px; margin-top: 0.5rem; transition: all 0.2s; width: fit-content; background: var(--coral); color: white; }
+.puerta-cta:hover { background: var(--coral-deep); }
 
 /* ═══ CONTACTO ═══ */
 .contacto { padding: 6rem 2rem; background: var(--surface); border-top: 1px solid var(--border); text-align: center; }
@@ -194,8 +185,8 @@ footer { background: var(--dark); color: rgba(255,255,255,0.45); padding: 3rem 2
   <div class="hero-glow"></div>
   <div class="hero-glow-2"></div>
   <div class="hero-inner">
-    <h1>Soluciones para fortalecer <em>la Gestión Humana.</em></h1>
-    <p class="hero-sub">Diagnósticos, herramientas, inteligencia artificial y recursos para apoyar la gestión de personas en tu organización.</p>
+    <h1>Cursos y metodologías <em>para tu crecimiento.</em></h1>
+    <p class="hero-sub">Indicadores, plantillas e inteligencia artificial para fortalecer tu criterio como profesional de Gestión Humana.</p>
   </div>
 </section>
 
@@ -207,26 +198,15 @@ footer { background: var(--dark); color: rgba(255,255,255,0.45); padding: 3rem 2
     <div class="featured-grid">
 
       <!-- ASISTENTE CSH -->
-      <div class="featured-card accent-assistant" onclick="window.CSHAssistant && window.CSHAssistant.open()">
+      <div class="featured-card" onclick="window.CSHAssistant && window.CSHAssistant.open()">
         <div class="featured-badge">Disponible</div>
-        <div class="featured-icon assistant">
+        <div class="featured-icon">
           <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
         </div>
         <div class="featured-title">Asistente CSH</div>
-        <div class="featured-desc">Resuelve tus dudas sobre legislación laboral colombiana, nómina y gestión humana, y te ayuda a encontrar la herramienta correcta dentro de CSH Talent — disponible en cualquier página.</div>
-        <button class="featured-cta assistant" type="button">Hablar con el Asistente CSH →</button>
+        <div class="featured-desc">Resuelve tus dudas sobre indicadores, metodologías y legislación laboral colombiana, y te ayuda a encontrar el curso o la herramienta correcta dentro de CSH Talent.</div>
+        <button class="featured-cta" type="button">Hablar con el Asistente CSH →</button>
       </div>
-
-      <!-- DIAGNÓSTICO CIMA -->
-      <a href="#" class="featured-card accent-door">
-        <div class="featured-badge">Próximo lanzamiento</div>
-        <div class="featured-icon door">
-          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#2F4E5F" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>
-        </div>
-        <div class="featured-title">Diagnóstico CIMA®</div>
-        <div class="featured-desc">Nuestra metodología propia para evaluar de forma integral el estado de la gestión humana de tu organización — el primer gran lanzamiento de CSH Talent.</div>
-        <button class="featured-cta door" type="button">Conocer el Diagnóstico CIMA® →</button>
-      </a>
 
     </div>
   </div>
@@ -238,52 +218,43 @@ footer { background: var(--dark); color: rgba(255,255,255,0.45); padding: 3rem 2
     <div class="soon-header">
       <div class="section-eyebrow center">Próximamente</div>
       <h2 class="section-h" style="text-align:center;">Seguimos <em>construyendo</em></h2>
-      <p>Estamos lanzando nuevas herramientas de forma progresiva. Esto es lo que viene para empresas.</p>
+      <p>Estamos lanzando nuevas herramientas de forma progresiva. Esto es lo que viene para profesionales de GH.</p>
     </div>
     <div class="soon-grid">
 
       <div class="soon-card">
         <div class="soon-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+        </div>
+        <div class="soon-title">Curso de Indicadores de GH</div>
+        <div class="soon-desc">Diseña, calcula e interpreta los indicadores clave de la gestión humana con criterio profesional.</div>
+        <div class="soon-badge">Próximamente</div>
+      </div>
+
+      <div class="soon-card">
+        <div class="soon-icon">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="11" x2="10" y2="11"/><line x1="14" y1="11" x2="16" y2="11"/><line x1="8" y1="15" x2="10" y2="15"/><line x1="14" y1="15" x2="16" y2="15"/></svg>
         </div>
-        <div class="soon-title">Calculadora de liquidaciones con IA</div>
-        <div class="soon-desc">Liquida contratos conforme a la legislación laboral colombiana con apoyo de inteligencia artificial.</div>
+        <div class="soon-title">Calculadora de liquidación completa</div>
+        <div class="soon-desc">La versión completa de la calculadora, pensada para el detalle que necesita un profesional de GH.</div>
         <div class="soon-badge">Próximamente</div>
       </div>
 
       <div class="soon-card">
         <div class="soon-icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/></svg>
         </div>
-        <div class="soon-title">Simulador de tiempo suplementario</div>
-        <div class="soon-desc">Calcula horas extras, recargos y trabajo suplementario de forma rápida y precisa.</div>
+        <div class="soon-title">Metodología CRECE®</div>
+        <div class="soon-desc">Un modelo propio para estructurar el crecimiento de las personas dentro de una organización.</div>
         <div class="soon-badge">Próximamente</div>
       </div>
 
       <div class="soon-card">
         <div class="soon-icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="8" y1="4" x2="8" y2="9"/><line x1="16" y1="4" x2="16" y2="9"/><rect x="6.5" y="12" width="4" height="4" rx="0.5"/><rect x="13.5" y="12" width="4" height="4" rx="0.5"/></svg>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
         </div>
-        <div class="soon-title">Simulador de turnos</div>
-        <div class="soon-desc">Diseña y valida esquemas de turnos cumpliendo la normatividad laboral.</div>
-        <div class="soon-badge">Próximamente</div>
-      </div>
-
-      <div class="soon-card">
-        <div class="soon-icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/></svg>
-        </div>
-        <div class="soon-title">Modelo de comprobantes de nómina</div>
-        <div class="soon-desc">Genera comprobantes claros y listos para entregar a tus colaboradores.</div>
-        <div class="soon-badge">Próximamente</div>
-      </div>
-
-      <div class="soon-card">
-        <div class="soon-icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-        </div>
-        <div class="soon-title">Presupuesto de gastos de personal</div>
-        <div class="soon-desc">Proyecta y controla el costo de tu planta de personal.</div>
+        <div class="soon-title">Metodología PULSO®</div>
+        <div class="soon-desc">Un modelo propio para tomar el pulso al clima y la salud de la gestión humana en tu organización.</div>
         <div class="soon-badge">Próximamente</div>
       </div>
 
@@ -296,7 +267,7 @@ footer { background: var(--dark); color: rgba(255,255,255,0.45); padding: 3rem 2
   <div class="contacto-inner">
     <div class="section-eyebrow center">¿No encuentras lo que buscas?</div>
     <h2 class="section-h">¿No encuentras la <em>solución</em> que necesitas?</h2>
-    <p>Cuéntanos qué necesita tu organización y te ayudamos a encontrar la herramienta o el acompañamiento adecuado.</p>
+    <p>Cuéntanos qué necesitas para tu desarrollo profesional y te ayudamos a encontrar el curso o la herramienta adecuada.</p>
     <a href="mailto:carolina@cshtalent.com" class="btn-nav petrol">Contáctanos</a>
   </div>
 </section>
