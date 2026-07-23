@@ -596,6 +596,11 @@ async function generarInformeCIMA(scores, total, pct, nivel) {
         .replace(/^---+$/gm, '')
         .replace(/^___+$/gm, '')
         .replace(/\[b\](.*?)\[\/b\]/g, '<strong>$1</strong>')
+        .split('\n').filter(function(linea){
+          var l = linea.trim();
+          // Filtra filas de tabla markdown: | col | col | ... o separadores |---|---|
+          return !(l.startsWith('|') && l.endsWith('|'));
+        }).join('\n')
         .trim();
 
       const parrafos = texto.split(/\n\n+/).map(p => {
