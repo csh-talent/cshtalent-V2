@@ -77,7 +77,7 @@ export default async function handler(req, res) {
 
   if (!acceso.allowed) {
     return res.status(403).json({
-      error: 'Ya generaste tus diagnósticos gratuitos con esta cuenta. Escríbenos si necesitas uno adicional.',
+      error: 'Ya generaste tus diagnósticos gratuitos con esta cuenta.',
       limite_alcanzado: true
     });
   }
