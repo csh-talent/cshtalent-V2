@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulador de Tiempo Suplementario — CSH Talent</title>
+<link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --petrol: #2F4E5F; --petrol-soft: #4A90A4; --petrol-pale: #e6ecef; --petrol-dark: #1e3340;
+  --coral: #E87B6F; --coral-deep: #d26359; --coral-pale: #fdece9;
+  --brand-red: #b5404a; --dark: #111827; --text: #1f2937; --muted: #6b7280; --muted2: #9ca3af;
+  --border: #e5e7eb; --surface: #f9fafb; --white: #ffffff;
+}
+body{font-family:'Raleway',sans-serif;background:var(--surface);color:var(--text);min-height:100vh;}
+
+/* ═══ NAV — mismo patrón del ecosistema ═══ */
+nav{position:sticky;top:0;left:0;right:0;z-index:1000;background:rgba(255,255,255,0.97);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);height:60px;padding:0 2rem;display:flex;align-items:center;justify-content:space-between;transition:box-shadow .3s;}
+nav.scrolled{box-shadow:0 2px 20px rgba(0,0,0,.08);}
+.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none;}
+.nav-logo-mark{display:flex;flex-direction:column;}
+.nav-logo-name{font-size:.95rem;font-weight:800;letter-spacing:.18em;color:var(--dark);line-height:1;}
+.nav-logo-line{height:1.5px;background:var(--brand-red);margin:2px 0;}
+.nav-logo-sub{font-size:.42rem;font-weight:500;letter-spacing:.2em;color:var(--muted);text-transform:uppercase;}
+.nav-right{display:flex;align-items:center;gap:1.1rem;}
+.nav-login-link{font-size:.78rem;font-weight:600;color:var(--muted);text-decoration:none;transition:color .2s;}
+.nav-login-link:hover{color:var(--petrol);}
+.btn-nav{font-size:.78rem;font-weight:700;color:white;padding:.5rem 1.2rem;border-radius:8px;text-decoration:none;transition:all .2s;border:none;cursor:pointer;font-family:'Raleway',sans-serif;letter-spacing:.04em;}
+.btn-nav.coral{background:var(--coral);}
+.btn-nav.coral:hover{background:var(--coral-deep);}
+.btn-nav.dark{background:var(--dark);}
+.btn-nav.dark:hover{background:#000;}
+
+.main{max-width:820px;margin:0 auto;padding:2rem 1.5rem 4rem;}
+
+/* ═══ HERO ═══ */
+.sim-hero-split{display:flex;align-items:center;gap:2.5rem;padding:2.25rem 1rem 2rem;}
+.sim-hero-text{flex:1.3;text-align:left;}
+.door-tag{display:inline-block;background:rgba(17,24,39,0.08);color:var(--dark);font-size:.65rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;padding:.35rem 1rem;border-radius:99px;margin-bottom:1rem;}
+.sim-hero-text h1{font-size:clamp(1.7rem,3.5vw,2.5rem);font-weight:900;color:var(--dark);line-height:1.15;letter-spacing:-.02em;margin-bottom:.7rem;}
+.sim-hero-text h1 em{font-style:italic;color:var(--coral);}
+.sim-hero-text p{font-size:.92rem;color:var(--muted);line-height:1.7;max-width:440px;}
+.sim-hero-illus{flex:1;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+@media(max-width:760px){.sim-hero-split{flex-direction:column;gap:1.5rem;padding:1.5rem 1rem .5rem;text-align:center;}.sim-hero-text{text-align:center;}.sim-hero-text p{margin:0 auto;}}
+
+.sim-marquee-caption{text-align:center;font-size:.66rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--petrol);margin:.5rem 0 .75rem;}
+.sim-marquee{overflow:hidden;position:relative;padding:.25rem 0 1.5rem;-webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);}
+.sim-marquee-track{display:flex;gap:.6rem;width:max-content;animation:simMarqueeScroll 24s linear infinite;}
+.sim-marquee-pill{flex-shrink:0;background:var(--petrol-pale);color:var(--petrol);font-size:.78rem;font-weight:700;padding:.5rem 1.1rem;border-radius:99px;white-space:nowrap;}
+.sim-marquee-pill.alt{background:var(--coral-pale);color:var(--coral-deep);}
+@keyframes simMarqueeScroll{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+
+/* ═══ GATE DE LOGIN ═══ */
+.gate-card{background:var(--petrol-dark);border-radius:20px;padding:2.5rem 2rem;text-align:center;color:white;margin:0 1rem 2rem;}
+.gate-card h2{font-size:1.25rem;font-weight:800;margin-bottom:.6rem;}
+.gate-card p{font-size:.85rem;color:rgba(255,255,255,.65);max-width:420px;margin:0 auto 1.5rem;line-height:1.6;}
+
+/* ═══ TARJETA DE SALARIO ═══ */
+.salary-card{background:var(--petrol-pale);border-radius:16px;padding:1.5rem 1.75rem;margin-bottom:1.5rem;border:1px solid rgba(47,78,95,.15);}
+.salary-row{display:flex;align-items:flex-start;gap:14px;flex-wrap:wrap;}
+.salary-label{font-size:.8rem;font-weight:700;color:var(--petrol);min-width:140px;padding-top:10px;}
+.salary-input{font-size:1.05rem;font-weight:700;color:var(--petrol);border:1.5px solid rgba(47,78,95,.35);border-radius:10px;padding:.6rem .9rem;width:190px;background:white;font-family:'Raleway',sans-serif;}
+.salary-input:focus{outline:none;border-color:var(--petrol);box-shadow:0 0 0 3px rgba(47,78,95,.12);}
+.salary-hint{font-size:.72rem;color:var(--muted);margin-top:.4rem;}
+.vh-box{margin-top:12px;font-size:.8rem;color:var(--text);background:white;border-radius:10px;padding:.7rem .9rem;border:1px solid rgba(47,78,95,.15);line-height:1.6;}
+.vh-box strong{color:var(--petrol);}
+
+/* ═══ SECCIONES / TABLAS ═══ */
+.section-label{font-size:.72rem;font-weight:800;color:var(--petrol);text-transform:uppercase;letter-spacing:.09em;margin:0 0 .6rem;display:flex;align-items:center;gap:.5rem;}
+.section-label::before{content:'';width:16px;height:2px;background:var(--coral);}
+.tabla-wrap{background:white;border-radius:14px;border:1px solid var(--border);overflow:hidden;margin-bottom:1.5rem;box-shadow:0 2px 12px rgba(0,0,0,.03);}
+.tabla-wrap table{width:100%;border-collapse:collapse;font-size:.78rem;table-layout:fixed;}
+.tabla-wrap thead tr{background:var(--petrol-dark);}
+.tabla-wrap th{color:white;padding:.6rem .7rem;text-align:left;font-weight:600;font-size:.68rem;letter-spacing:.03em;}
+.tabla-wrap th.r{text-align:right;}
+.tabla-wrap td{padding:.6rem .7rem;border-bottom:1px solid var(--border);color:var(--text);vertical-align:top;}
+.tabla-wrap td.r{text-align:right;vertical-align:middle;}
+.tabla-wrap tr:last-child td{border-bottom:none;}
+.tabla-wrap tr:nth-child(even) td{background:var(--surface);}
+.c-nombre{font-size:.78rem;font-weight:700;color:var(--dark);display:flex;align-items:center;gap:5px;flex-wrap:wrap;}
+.c-formula{font-size:.68rem;color:var(--muted);margin-top:2px;}
+.hm-wrap{display:flex;align-items:center;gap:3px;}
+.horas-input,.min-input{text-align:center;border:1px solid var(--border);border-radius:6px;padding:4px 4px;font-size:.78rem;background:white;font-family:'Raleway',sans-serif;}
+.horas-input{width:44px;}
+.min-input{width:36px;}
+.horas-input:focus,.min-input:focus{outline:none;border-color:var(--petrol);}
+.hm-sep{font-size:.62rem;color:var(--muted2);}
+.calculo-line{font-size:.66rem;color:var(--muted);margin-top:.4rem;line-height:1.6;display:none;}
+.calculo-line .dec,.calculo-line .result{color:var(--petrol);font-weight:700;}
+.v-cell{font-weight:700;color:var(--dark);font-size:.85rem;}
+
+/* tooltip "i" */
+.tip-btn{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;background:var(--petrol-pale);color:var(--petrol);font-size:.6rem;font-weight:800;cursor:pointer;border:none;flex-shrink:0;line-height:1;}
+.tip-btn:hover{background:var(--petrol);color:white;}
+.tip-panel{display:none;margin-top:.5rem;background:var(--petrol-pale);border-radius:8px;padding:.6rem .7rem;font-size:.68rem;color:var(--text);line-height:1.6;}
+.tip-panel.open{display:block;}
+.tip-panel strong{color:var(--petrol);}
+.tip-ejemplo{margin-top:.4rem;background:white;border-radius:6px;padding:.45rem .6rem;font-size:.65rem;color:var(--muted);}
+.tip-ejemplo span{color:var(--petrol);font-weight:700;}
+
+.cst-tag{font-size:.58rem;color:var(--muted2);border:1px solid var(--border);border-radius:4px;padding:1px 5px;cursor:default;white-space:nowrap;position:relative;display:inline-block;}
+.cst-tag:hover{color:var(--petrol);border-color:var(--petrol-soft);background:var(--petrol-pale);}
+.cst-tag .cst-tooltip{display:none;position:absolute;right:0;top:18px;width:230px;background:var(--dark);color:#eee;font-size:.65rem;border-radius:8px;padding:.55rem .65rem;line-height:1.55;z-index:10;font-weight:400;box-shadow:0 4px 16px rgba(0,0,0,.2);}
+.cst-tag .cst-tooltip::before{content:'';position:absolute;right:8px;top:-5px;border-width:0 5px 5px;border-style:solid;border-color:transparent transparent var(--dark);}
+.cst-tag:hover .cst-tooltip{display:block;}
+
+/* ═══ RESUMEN ═══ */
+.resumen-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.75rem;margin-bottom:1.5rem;}
+.metric-card{background:white;border:1px solid var(--border);border-radius:12px;padding:.9rem 1rem;text-align:center;}
+.metric-label{font-size:.66rem;color:var(--muted);margin-bottom:.3rem;font-weight:600;}
+.metric-value{font-size:1.15rem;font-weight:800;color:var(--petrol);}
+.metric-card.total{background:var(--dark);border-color:var(--dark);}
+.metric-card.total .metric-label{color:rgba(255,255,255,.55);font-size:.6rem;}
+.metric-card.total .metric-value{color:white;}
+
+.nota-legal{font-size:.72rem;color:#7a5c10;background:#fff8e0;border:1px solid #f0d090;border-radius:10px;padding:.85rem 1.1rem;line-height:1.6;margin-bottom:1.25rem;}
+.nota-legal strong{color:#7a5c10;}
+.disclaimer{font-size:.72rem;color:var(--muted);padding:.7rem 1rem;border-left:3px solid var(--petrol-soft);background:var(--petrol-pale);border-radius:0 8px 8px 0;margin-bottom:2rem;}
+
+/* ═══ GUARDAR ═══ */
+.guardar-box{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;background:white;border:1px solid var(--border);border-radius:14px;padding:1.1rem 1.4rem;margin-bottom:2rem;}
+.guardar-txt{font-size:.8rem;color:var(--muted);}
+.guardar-txt strong{color:var(--dark);}
+.guardar-msg{font-size:.75rem;color:#2e7d32;font-weight:700;margin-top:.4rem;display:none;}
+
+/* ═══ RECOMENDACIONES ═══ */
+.recom-section{margin-top:1.5rem;border-top:1.5px solid var(--border);padding-top:1.5rem;}
+.recom-header{display:flex;align-items:center;gap:.7rem;margin-bottom:1rem;}
+.recom-icon{width:32px;height:32px;background:var(--petrol);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.recom-icon svg{width:16px;height:16px;fill:white;}
+.recom-title{font-size:.85rem;font-weight:800;color:var(--dark);}
+.recom-subtitle{font-size:.72rem;color:var(--muted);margin-top:1px;}
+.recom-list{display:flex;flex-direction:column;gap:.6rem;}
+.recom-item{display:flex;align-items:flex-start;gap:.7rem;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:.7rem .9rem;}
+.recom-num{width:20px;height:20px;background:var(--coral);color:white;border-radius:50%;font-size:.68rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+.recom-text{font-size:.78rem;color:var(--text);line-height:1.55;}
+
+/* ═══ FOOTER (idéntico al resto del sitio) ═══ */
+footer{background:var(--dark);color:rgba(255,255,255,0.45);padding:3rem 2rem;}
+.footer-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:3rem;}
+.footer-brand-name{font-size:1rem;font-weight:800;letter-spacing:0.2em;color:white;line-height:1;}
+.footer-brand-line{height:1.5px;background:var(--brand-red);margin:3px 0;width:60px;}
+.footer-brand-sub{font-size:0.45rem;font-weight:500;letter-spacing:0.2em;color:rgba(255,255,255,0.35);text-transform:uppercase;}
+.footer-brand-desc{font-size:0.78rem;color:rgba(255,255,255,0.4);line-height:1.7;margin-top:1rem;max-width:260px;}
+.footer-col-title{font-size:0.7rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.6);margin-bottom:1rem;}
+.footer-links{list-style:none;display:flex;flex-direction:column;gap:0.5rem;}
+.footer-links a{font-size:0.78rem;color:rgba(255,255,255,0.4);text-decoration:none;transition:color 0.2s;}
+.footer-links a:hover{color:rgba(255,255,255,0.8);}
+.footer-social{display:flex;gap:0.5rem;margin-top:1.25rem;}
+.footer-social a{width:34px;height:34px;border-radius:8px;border:1px solid rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.4);text-decoration:none;font-size:0.7rem;font-weight:700;transition:all 0.2s;}
+.footer-social a:hover{border-color:rgba(255,255,255,0.4);color:white;}
+.footer-bottom{max-width:1100px;margin:2rem auto 0;padding-top:1.5rem;border-top:1px solid rgba(255,255,255,0.08);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;font-size:0.72rem;}
+
+@media(max-width:640px){
+  .resumen-grid{grid-template-columns:1fr;}
+  .footer-inner{grid-template-columns:1fr;gap:2rem;}
+}
+</style>
+</head>
+<body>
+
+<nav id="mainNav">
+  <a href="index.html" class="nav-logo">
+    <div class="nav-logo-mark">
+      <div class="nav-logo-name">CSH TALENT</div>
+      <div class="nav-logo-line"></div>
+      <div class="nav-logo-sub">Capital Sostenible y Humano</div>
+    </div>
+  </a>
+  <div class="nav-right" id="navRight">
+    <a href="#" class="nav-login-link" id="navLoginLink">Iniciar sesión</a>
+    <a href="historia.html" class="btn-nav coral">Acerca de CSH Talent</a>
+  </div>
+</nav>
+
+<div class="main">
+
+  <!-- HERO (visible siempre, es solo información) -->
+  <div class="sim-hero-split">
+    <div class="sim-hero-text">
+      <div class="door-tag">Trabajadores</div>
+      <h1>Simulador de <em>Tiempo Suplementario</em></h1>
+      <p>Calcula cuánto deberías recibir por tus horas extra y recargos, según lo que exige la legislación laboral colombiana vigente.</p>
+    </div>
+    <div class="sim-hero-illus">
+      <svg viewBox="0 0 220 220" width="100%" style="max-width:210px;">
+        <circle cx="110" cy="110" r="88" fill="none" stroke="#e6ecef" stroke-width="10"/>
+        <circle cx="110" cy="110" r="88" fill="none" stroke="#E87B6F" stroke-width="10" stroke-linecap="round" stroke-dasharray="414" stroke-dashoffset="140" transform="rotate(-90 110 110)"/>
+        <circle cx="110" cy="110" r="62" fill="#1e3340"/>
+        <line x1="110" y1="110" x2="110" y2="70" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
+        <line x1="110" y1="110" x2="138" y2="122" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
+        <circle cx="110" cy="110" r="5" fill="#E87B6F"/>
+        <circle cx="110" cy="34" r="14" fill="#2F4E5F"/>
+        <text x="110" y="39" text-anchor="middle" font-family="Raleway,sans-serif" font-size="14" font-weight="800" fill="#fff">$</text>
+      </svg>
+    </div>
+  </div>
+
+  <div class="sim-marquee-caption">Lo que este simulador calcula</div>
+  <div class="sim-marquee">
+    <div class="sim-marquee-track">
+      <span class="sim-marquee-pill">Hora extra diurna</span>
+      <span class="sim-marquee-pill alt">Hora extra nocturna</span>
+      <span class="sim-marquee-pill">Recargo dominical</span>
+      <span class="sim-marquee-pill alt">Recargo festivo</span>
+      <span class="sim-marquee-pill">Recargo nocturno</span>
+      <span class="sim-marquee-pill alt">Extra dominical/festiva</span>
+      <span class="sim-marquee-pill">Hora extra diurna</span>
+      <span class="sim-marquee-pill alt">Hora extra nocturna</span>
+      <span class="sim-marquee-pill">Recargo dominical</span>
+      <span class="sim-marquee-pill alt">Recargo festivo</span>
+      <span class="sim-marquee-pill">Recargo nocturno</span>
+      <span class="sim-marquee-pill alt">Extra dominical/festiva</span>
+    </div>
+  </div>
+
+  <!-- GATE DE LOGIN: el simulador no se muestra sin cuenta -->
+  <div id="simGate" style="display:none;">
+    <div class="gate-card">
+      <h2>Inicia sesión para usar el simulador</h2>
+      <p>Es gratis e ilimitado. Solo necesitas una cuenta para poder guardar tus simulaciones en tu Mi Espacio.</p>
+      <button class="btn-nav coral" onclick="window.CSHAuth.open('login')">Iniciar sesión o crear cuenta</button>
+    </div>
+  </div>
+
+  <!-- HERRAMIENTA (solo visible con sesión activa) -->
+  <div id="simTool" style="display:none;">
+
+    <div class="salary-card">
+      <div class="salary-row">
+        <span class="salary-label">Tu salario mensual</span>
+        <div>
+          <input class="salary-input" type="number" id="salario" placeholder="Ej: 1755905" min="0" step="1000" oninput="calcular()">
+          <div class="salary-hint">Ingresa el salario que aparece en tu comprobante de pago</div>
+        </div>
+      </div>
+      <div class="vh-box" id="vh-box">Ingresa tu salario para ver el valor de tu hora.</div>
+    </div>
+
+    <p class="section-label">Horas extras</p>
+    <div class="tabla-wrap">
+      <table>
+        <thead><tr>
+          <th style="width:36%">Concepto</th>
+          <th style="width:9%" class="r">Factor</th>
+          <th style="width:28%">Horas / Min</th>
+          <th style="width:27%" class="r">Valor</th>
+        </tr></thead>
+        <tbody id="tbody-extras"></tbody>
+      </table>
+    </div>
+
+    <p class="section-label">Recargos</p>
+    <div class="tabla-wrap">
+      <table>
+        <thead><tr>
+          <th style="width:36%">Concepto</th>
+          <th style="width:9%" class="r">Factor</th>
+          <th style="width:28%">Horas / Min</th>
+          <th style="width:27%" class="r">Valor</th>
+        </tr></thead>
+        <tbody id="tbody-recargos"></tbody>
+      </table>
+    </div>
+
+    <div class="resumen-grid">
+      <div class="metric-card">
+        <div class="metric-label">Total extras</div>
+        <div class="metric-value" id="tot-extras">$0</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Total recargos</div>
+        <div class="metric-value" id="tot-recargos">$0</div>
+      </div>
+      <div class="metric-card total">
+        <div class="metric-label">Total a recibir</div>
+        <div class="metric-value" id="tot-total">$0</div>
+      </div>
+    </div>
+
+    <div class="nota-legal">
+      <strong>Marco legal vigente:</strong> recargo dominical/festivo del 90% desde el 1 de julio de 2026 (Ley 2466 de 2025 — subirá a 100% desde julio de 2027); jornada nocturna desde las 7:00 p.m.; divisor de 210 horas mensuales, según la jornada máxima legal de 42 horas semanales (Ley 2101 de 2021, vigente desde el 15 de julio de 2026).
+    </div>
+
+    <div class="disclaimer">
+      Este simulador te da una referencia de cuánto deberías recibir según la ley. Los tiempos y ciclos de pago del tiempo suplementario dependen de la nómina de cada empresa — si tienes dudas sobre tu comprobante, consúltalo primero con tu área de Gestión Humana.
+    </div>
+
+    <div class="guardar-box">
+      <div>
+        <div class="guardar-txt"><strong>¿Quieres conservar este cálculo?</strong> Se guarda en tu Mi Espacio.</div>
+        <div class="guardar-msg" id="guardarMsg">✓ Simulación guardada en tu Mi Espacio.</div>
+      </div>
+      <button class="btn-nav dark" id="btnGuardar" onclick="guardarSimulacion()">Guardar en Mi Espacio</button>
+    </div>
+
+    <div class="recom-section">
+      <div class="recom-header">
+        <div class="recom-icon">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        </div>
+        <div>
+          <div class="recom-title">Antes de reclamar una diferencia, verifica esto</div>
+          <div class="recom-subtitle">Errores comunes que explican una diferencia en tu pago</div>
+        </div>
+      </div>
+      <div class="recom-list">
+        <div class="recom-item"><div class="recom-num">1</div><div class="recom-text">Compara las horas que reportas aquí con tus <strong>marcaciones reales</strong> de entrada y salida.</div></div>
+        <div class="recom-item"><div class="recom-num">2</div><div class="recom-text">Revisa si tu turno incluye <strong>descanso de almuerzo</strong> — ese tiempo generalmente no se remunera.</div></div>
+        <div class="recom-item"><div class="recom-num">3</div><div class="recom-text">Confirma si el domingo trabajado fue <strong>ocasional u habitual</strong> — cambia el porcentaje aplicable.</div></div>
+        <div class="recom-item"><div class="recom-num">4</div><div class="recom-text">Si trabajaste un festivo, verifica que tu empresa lo haya identificado como tal en la nómina.</div></div>
+        <div class="recom-item"><div class="recom-num">5</div><div class="recom-text">Guarda tus comprobantes de pago mes a mes para poder comparar y detectar diferencias a tiempo.</div></div>
+        <div class="recom-item"><div class="recom-num">6</div><div class="recom-text">Si encuentras una inconsistencia, repórtala primero a tu área de nómina o Gestión Humana.</div></div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div>
+      <div class="footer-brand-name">CSH TALENT</div>
+      <div class="footer-brand-line"></div>
+      <div class="footer-brand-sub">Capital Sostenible y Humano</div>
+      <p class="footer-brand-desc">Herramientas profesionales de Gestión Humana para empresas colombianas que están creciendo.</p>
+      <div class="footer-social">
+        <a href="https://www.linkedin.com/in/carolina-salazar-gh" target="_blank" title="LinkedIn">in</a>
+        <a href="https://www.instagram.com/cshtalent" target="_blank" title="Instagram">ig</a>
+        <a href="contacto.html" title="Correo">@</a>
+      </div>
+    </div>
+    <div>
+      <div class="footer-col-title">Plataforma</div>
+      <ul class="footer-links">
+        <li><a href="empresas.html">Para empresas</a></li>
+        <li><a href="profesionales.html">Para profesionales</a></li>
+        <li><a href="trabajadores.html">Para trabajadores</a></li>
+        <li><a href="historia.html">Historia de CSH Talent</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title">Legal y contacto</div>
+      <ul class="footer-links">
+        <li><a href="politica-privacidad.html">Política de privacidad</a></li>
+        <li><a href="terminos-condiciones.html">Términos de uso</a></li>
+        <li><a href="contacto.html">Contacto</a></li>
+        <li><a href="verificar.html">Verificar certificado</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div style="display:flex;align-items:center;gap:0.4rem;">
+      <svg width="20" height="14" viewBox="0 0 20 14" style="border-radius:2px;flex-shrink:0;"><rect width="20" height="14" fill="#FCD116"/><rect y="7" width="20" height="3.5" fill="#003893"/><rect y="10.5" width="20" height="3.5" fill="#CE1126"/></svg>
+      <span>Colombia · CST y Ley 2466 de 2025</span>
+    </div>
+    <span>© 2026 CSH Talent · Carolina Salazar Hernández</span>
+  </div>
+</footer>
+
+<script src="csh-auth.js"></script>
+<script src="assistant.js"></script>
+<script>
+const sb = window.getCSHSupabaseClient();
+const JORNADA = 210;
+
+// ══ Definición de conceptos (fórmulas y porcentajes legales vigentes desde jul. 2026) ══
+const tooltips = {
+  e1: { cuando: 'Trabajas más horas de las de tu turno normal, durante el día (entre 6 a.m. y 7 p.m.).', ejemplo: 'Tu turno termina a las 5 p.m. y te quedas hasta las 7 p.m. Esas 2 horas son extra diurnas.' },
+  e2: { cuando: 'Trabajas más horas de las de tu turno normal y esas horas caen en la noche (después de las 7 p.m.).', ejemplo: 'Tu turno termina a las 9 p.m. y te quedas hasta las 11 p.m. Esas 2 horas son extra nocturnas.' },
+  e3: { cuando: 'Ya cumpliste tu jornada normal y te quedas horas adicionales de día, y encima es domingo.', ejemplo: 'Trabajas tu turno completo un domingo y además te quedas 2 horas extra de día.' },
+  e4: { cuando: 'Ya cumpliste tu jornada normal y te quedas horas adicionales de día, y encima es festivo.', ejemplo: 'Trabajas tu turno completo un 1 de enero y además te quedas 2 horas extra de día.' },
+  e6: { cuando: 'Ya cumpliste tu jornada normal y te quedas horas adicionales de noche en un domingo o festivo. Es la combinación más alta.', ejemplo: 'Tu turno termina a las 10 p.m. un domingo y te quedas 2 horas más hasta la medianoche.' },
+  r1: { cuando: 'Tu día de descanso semanal pactado es el domingo, pero trabajas ese día. Como no descansas cuando te corresponde, se paga la hora completa más el recargo.', ejemplo: 'Tu contrato dice que descansas los domingos, pero trabajas un domingo. Cada hora vale el 190% de tu hora base.' },
+  r2: { cuando: 'Trabajas un domingo o festivo de forma ocasional (hasta 2 en el mes), pero tu día de descanso asignado es otro día. El descanso se disfruta después.', ejemplo: 'Tu día libre es el lunes, pero trabajas un domingo. Recibes el recargo y luego tomas el descanso compensatorio.' },
+  r3: { cuando: 'Trabajas de noche (desde las 7 p.m.) dentro de tu jornada ordinaria pactada. No son horas extra, tu turno normal simplemente es nocturno.', ejemplo: 'Tu turno es de 7 p.m. a 3 a.m. Todas esas horas llevan el recargo nocturno del 35%.' },
+  r4: { cuando: 'Tu jornada ordinaria (no extra) cae de noche en un domingo o festivo. Se suman el recargo nocturno y el dominical/festivo.', ejemplo: 'Tu turno normal es de 8 p.m. a 4 a.m. y ese día es festivo. Cada hora lleva 35% nocturno + 90% festivo.' },
+};
+
+const extras = [
+  {id:'e1', label:'Hora Extra Diurna Ordinaria',           formula:'25% extra diurna + 100% hora base',                            pct:1.25, cst:'Art. 168 CST — El trabajo extra diurno se remunera con un recargo del 25% sobre el valor del trabajo ordinario diurno.'},
+  {id:'e2', label:'Hora Extra Nocturna',                   formula:'75% extra nocturna + 100% hora base',                          pct:1.75, cst:'Art. 168 CST — El trabajo extra nocturno se remunera con un recargo del 75% sobre el valor del trabajo ordinario diurno.'},
+  {id:'e3', label:'Hora Extra Diurna Dominical',           formula:'25% extra + 90% dominical + 100% hora base',                   pct:2.15, cst:'Arts. 168 + 179 CST — Se acumula el recargo de hora extra diurna (25%) con el recargo dominical (90% desde jul. 2026, Ley 2466/2025).'},
+  {id:'e4', label:'Hora Extra Diurna Festiva',             formula:'25% extra + 90% festivo + 100% hora base',                     pct:2.15, cst:'Arts. 168 + 179 CST — Se acumula el recargo de hora extra diurna (25%) con el recargo festivo (90% desde jul. 2026, Ley 2466/2025).'},
+  {id:'e6', label:'Hora Extra Nocturna Dominical/Festiva', formula:'75% extra nocturna + 90% dominical/festivo + 100% hora base',  pct:2.65, cst:'Arts. 168 + 179 CST — Se acumula el recargo de hora extra nocturna (75%) con el recargo dominical/festivo (90% desde jul. 2026, Ley 2466/2025).'},
+];
+const recargos = [
+  {id:'r1', label:'Hora Recargo Diurno Dominical Habitual',  formula:'100% hora base + 90% recargo dominical = 190%', pct:1.90, cst:'Art. 179 CST mod. Ley 2466/2025 — Recargo dominical habitual: 90% desde jul. 2026, 100% desde jul. 2027.'},
+  {id:'r2', label:'Hora Recargo Diurno Dominical/Festivo Ocasional', formula:'Solo el recargo (90%) — el descanso se toma en disfrute', pct:0.90, cst:'Art. 179 CST — El trabajo dominical u festivo ocasional (hasta 2 al mes) se remunera con el recargo del 90% (desde jul. 2026). El trabajador tiene derecho a un descanso compensatorio.'},
+  {id:'r3', label:'Hora Recargo Nocturno',                   formula:'Trabajas de noche (desde las 7 p.m.) en día ordinario', pct:0.35, cst:'Art. 168 CST — El trabajo nocturno (desde las 7 p.m. según Ley 2466 de 2025) se remunera con un recargo del 35% sobre el valor del trabajo ordinario diurno.'},
+  {id:'r4', label:'Hora Recargo Nocturno Dominical/Festivo', formula:'35% nocturno + 90% dominical/festivo', pct:1.25, cst:'Arts. 168 + 179 CST — Se acumulan el recargo nocturno (35%) y el recargo dominical/festivo (90% desde jul. 2026, Ley 2466/2025).'},
+];
+
+function fmt(n){ return '$' + Math.round(n).toLocaleString('es-CO'); }
+function fmtPct(p){ return Math.round(p * 100) + '%'; }
+function n2(n){ return n.toFixed(2).replace('.', ','); }
+function n4(n){ return parseFloat(n.toFixed(4)).toString().replace('.', ','); }
+
+function getHM(id){
+  const h = parseFloat(document.getElementById('h-' + id)?.value) || 0;
+  const m = parseFloat(document.getElementById('m-' + id)?.value) || 0;
+  return { h, m, dec: h + (m / 60) };
+}
+function toggleTip(id){
+  const panel = document.getElementById('tip-' + id);
+  if (panel) panel.classList.toggle('open');
+}
+
+function renderFila(item, tbodyId){
+  const tip = tooltips[item.id];
+  const tipBtn = tip ? `<button class="tip-btn" onclick="toggleTip('${item.id}')" title="¿Cuándo aplica?">i</button>` : '';
+  const cstTag = item.cst ? `<span class="cst-tag">CST<span class="cst-tooltip">${item.cst}</span></span>` : '';
+  const tipPanel = tip ? `
+    <div class="tip-panel" id="tip-${item.id}">
+      <strong>¿Cuándo aplica?</strong> ${tip.cuando}
+      <div class="tip-ejemplo">📌 <strong>Ejemplo:</strong> <span>${tip.ejemplo}</span></div>
+    </div>` : '';
+
+  const tr = document.createElement('tr');
+  tr.innerHTML = `
+    <td>
+      <div class="c-nombre" style="justify-content:space-between">${item.label} ${tipBtn} ${cstTag}</div>
+      <div class="c-formula">${item.formula}</div>
+      ${tipPanel}
+    </td>
+    <td class="r">${fmtPct(item.pct)}</td>
+    <td>
+      <div class="hm-wrap">
+        <input class="horas-input" type="number" id="h-${item.id}" value="0" min="0" max="300" step="1" oninput="calcular()">
+        <span class="hm-sep">h</span>
+        <input class="min-input" type="number" id="m-${item.id}" value="0" min="0" max="59" step="1" oninput="calcular()">
+        <span class="hm-sep">m</span>
+      </div>
+      <div class="calculo-line" id="cl-${item.id}"></div>
+    </td>
+    <td class="r"><div class="v-cell" id="v-${item.id}">$0</div></td>`;
+  document.getElementById(tbodyId).appendChild(tr);
+}
+
+function calcular(){
+  const salario = parseFloat(document.getElementById('salario').value) || 0;
+  const vh = salario / JORNADA;
+
+  document.getElementById('vh-box').innerHTML = salario > 0
+    ? `<strong>Valor hora</strong> = $${Math.round(salario).toLocaleString('es-CO')} ÷ ${JORNADA} horas = <strong style="color:var(--petrol)">${fmt(vh)}</strong>`
+    : 'Ingresa tu salario para ver el valor de tu hora.';
+
+  let te = 0, tr_ = 0;
+  [...extras, ...recargos].forEach(item => {
+    const { h, m, dec } = getHM(item.id);
+    const val = dec * vh * item.pct;
+    if (extras.includes(item)) te += val; else tr_ += val;
+    document.getElementById('v-' + item.id).textContent = dec > 0 ? fmt(val) : '$0';
+
+    const cl = document.getElementById('cl-' + item.id);
+    if (dec > 0 && m > 0){
+      const md = m / 60;
+      cl.style.display = 'block';
+      cl.innerHTML =
+        `<span class="dec">${n2(dec)} horas</span> <span style="color:var(--muted2)">(${m} ÷ 60 = ${n4(md)}, entonces ${h} + ${n4(md)} = ${n2(dec)})</span><br>` +
+        `<span>${n2(dec)} × ${fmtPct(item.pct)} × ${fmt(vh)} = </span><span class="result">${fmt(val)}</span>`;
+    } else if (dec > 0){
+      cl.style.display = 'block';
+      cl.innerHTML =
+        `<span class="dec">${n2(dec)} horas</span><br>` +
+        `<span>${n2(dec)} × ${fmtPct(item.pct)} × ${fmt(vh)} = </span><span class="result">${fmt(val)}</span>`;
+    } else {
+      cl.style.display = 'none';
+    }
+  });
+
+  document.getElementById('tot-extras').textContent = fmt(te);
+  document.getElementById('tot-recargos').textContent = fmt(tr_);
+  document.getElementById('tot-total').textContent = fmt(te + tr_);
+
+  document.getElementById('guardarMsg').style.display = 'none';
+}
+
+extras.forEach(i => renderFila(i, 'tbody-extras'));
+recargos.forEach(i => renderFila(i, 'tbody-recargos'));
+
+// ══ Guardar en Mi Espacio: tabla propia `simulaciones_tiempo` + puntero en `user_workspace` ══
+async function guardarSimulacion(){
+  const btn = document.getElementById('btnGuardar');
+  const { data: { user } } = await sb.auth.getUser();
+  if(!user){ window.CSHAuth.open('login'); return; }
+
+  const salario = parseFloat(document.getElementById('salario').value) || 0;
+  if(salario <= 0){ alert('Ingresa tu salario antes de guardar.'); return; }
+
+  const detalle = {};
+  [...extras, ...recargos].forEach(item => {
+    const { h, m } = getHM(item.id);
+    if (h > 0 || m > 0) detalle[item.id] = { horas: h, minutos: m };
+  });
+
+  const totalExtras = parseFloat(document.getElementById('tot-extras').textContent.replace(/[^0-9]/g,'')) || 0;
+  const totalRecargos = parseFloat(document.getElementById('tot-recargos').textContent.replace(/[^0-9]/g,'')) || 0;
+  const totalGeneral = totalExtras + totalRecargos;
+
+  btn.disabled = true; btn.textContent = 'Guardando...';
+  try{
+    const { data: sim, error } = await sb.from('simulaciones_tiempo').insert({
+      user_id: user.id,
+      user_email: user.email,
+      salario_mensual: salario,
+      detalle_horas: detalle,
+      total_extras: totalExtras,
+      total_recargos: totalRecargos,
+      total_general: totalGeneral
+    }).select('id').single();
+
+    if(error) throw error;
+
+    const fechaTitulo = new Date().toLocaleDateString('es-CO', { day:'2-digit', month:'short', year:'numeric' });
+    await sb.from('user_workspace').insert({
+      user_id: user.id,
+      tool_slug: 'tiempo-suplementario',
+      record_type: 'simulacion',
+      record_id: sim.id,
+      title: `Simulación del ${fechaTitulo}`
+    });
+
+    document.getElementById('guardarMsg').style.display = 'block';
+  }catch(e){
+    console.error('No se pudo guardar la simulación:', e);
+    alert('No se pudo guardar la simulación. Intenta de nuevo en un momento.');
+  } finally {
+    btn.disabled = false; btn.textContent = 'Guardar en Mi Espacio';
+  }
+}
+
+// ══ Gate de acceso: el simulador exige cuenta antes de mostrarse ══
+async function inicializar(){
+  const { data: { user } } = await sb.auth.getUser();
+  if(user){
+    document.getElementById('simGate').style.display = 'none';
+    document.getElementById('simTool').style.display = 'block';
+    calcular();
+  } else {
+    document.getElementById('simGate').style.display = 'block';
+    document.getElementById('simTool').style.display = 'none';
+  }
+}
+
+window.addEventListener('scroll', () => document.getElementById('mainNav').classList.toggle('scrolled', window.scrollY > 20));
+document.getElementById('navLoginLink')?.addEventListener('click', (e) => { e.preventDefault(); window.CSHAuth.open('login'); });
+
+sb.auth.onAuthStateChange(() => inicializar());
+
+(async () => {
+  const { data: { user } } = await sb.auth.getUser();
+  if (user) {
+    const name = (user.user_metadata?.full_name || user.email.split('@')[0]).split(' ')[0];
+    document.getElementById('navRight').innerHTML = `
+      <span style="font-size:.78rem;color:var(--muted);">Hola, ${name}</span>
+      <a href="mi-espacio.html" class="btn-nav" style="background:var(--petrol, #2F4E5F);">Mi Espacio</a>
+      <button onclick="(async()=>{await sb.auth.signOut();window.location.reload();})()" class="btn-nav coral" style="cursor:pointer;">Salir</button>`;
+  }
+  // Le damos contexto al Asistente CSH sobre este producto, si el config lo admite.
+  if (window.CSHAssistantConfig && window.CSHAssistantConfig.ownProducts) {
+    window.CSHAssistantConfig.ownProducts.push({
+      slug: 'tiempo-suplementario',
+      nombre: 'Simulador de Tiempo Suplementario',
+      descripcion: 'Calcula horas extra y recargos según el CST y la Ley 2466 de 2025.'
+    });
+  }
+  inicializar();
+})();
+</script>
+</body>
+</html>

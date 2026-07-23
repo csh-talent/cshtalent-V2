@@ -127,7 +127,8 @@ const sb = window.getCSHSupabaseClient();
 document.getElementById('navLoginLink')?.addEventListener('click', (e) => { e.preventDefault(); window.CSHAuth.open('login'); });
 
 const NOMBRES_MODULO = {
-  'cima': { nombre: 'Diagnóstico CIMA®', icono: 'CIMA' }
+  'cima': { nombre: 'Diagnóstico CIMA®', icono: 'CIMA' },
+  'tiempo-suplementario': { nombre: 'Simulador de Tiempo Suplementario', icono: '⏱' }
 };
 
 function formatearFecha(iso){
@@ -222,6 +223,19 @@ async function verDetalle(slug, recordId, descargarDirecto){
       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
       .replace(/\*(.*?)\*/g, '$1');
     body.innerHTML = texto.split(/\n\n+/).map(p => `<p style="margin-bottom:1rem;">${p.replace(/\n/g,'<br>')}</p>`).join('');
+  }
+
+  if(slug === 'tiempo-suplementario'){
+    const { data: d } = await sb.from('simulaciones_tiempo').select('*').eq('id', recordId).maybeSingle();
+    if(!d){ body.innerHTML = 'No se pudo cargar este registro.'; return; }
+    document.getElementById('modalTitulo').textContent = 'Simulación de Tiempo Suplementario';
+    document.getElementById('modalSub').textContent = `${formatearFecha(d.created_at)} · Salario base: $${Number(d.salario_mensual).toLocaleString('es-CO')}`;
+    const fmt = (n) => '$' + Math.round(n).toLocaleString('es-CO');
+    body.innerHTML = `
+      <p style="margin-bottom:.75rem;"><strong>Total extras:</strong> ${fmt(d.total_extras)}</p>
+      <p style="margin-bottom:.75rem;"><strong>Total recargos:</strong> ${fmt(d.total_recargos)}</p>
+      <p style="margin-bottom:.75rem;"><strong>Total a recibir:</strong> ${fmt(d.total_general)}</p>
+      <p style="font-size:.78rem;color:var(--muted);margin-top:1rem;">Este cálculo es una referencia según el CST y la Ley 2466 de 2025 — los tiempos de pago dependen del ciclo de nómina de tu empresa.</p>`;
   }
 
   if(descargarDirecto) setTimeout(() => window.print(), 400);
