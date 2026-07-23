@@ -239,6 +239,22 @@
     });
   }
 
+  function protegerContraAutofill() {
+    // Bloquea el campo como "solo lectura" hasta que la persona haga clic ahí —
+    // así el navegador no tiene nada que autocompletar. En cuanto lo toca,
+    // se libera y funciona como un campo normal.
+    const campos = ['cshAuthLoginPassword', 'cshAuthSignupPassword', 'cshAuthResetPassword'];
+    campos.forEach(id => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.value = '';
+      el.setAttribute('readonly', 'readonly');
+      const liberar = () => { el.removeAttribute('readonly'); };
+      el.addEventListener('focus', liberar, { once: true });
+      el.addEventListener('mousedown', liberar, { once: true });
+    });
+  }
+
   function openModal(view) {
     ensureBuilt();
     setView(view || 'signup');
@@ -246,9 +262,10 @@
     document.getElementById('cshAuthSignupSuccess').style.display = 'none';
     document.getElementById('cshAuthOverlay').classList.add('open');
     limpiarCampos();
+    protegerContraAutofill();
     // Chrome a veces autocompleta después de que el modal ya se muestra —
     // lo volvemos a limpiar un instante después, por si acaso.
-    setTimeout(limpiarCampos, 60);
+    setTimeout(() => { limpiarCampos(); protegerContraAutofill(); }, 60);
   }
 
   function closeModal() {
