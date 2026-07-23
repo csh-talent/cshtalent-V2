@@ -131,6 +131,16 @@ nav.scrolled { box-shadow: 0 2px 20px rgba(0,0,0,0.08); }
 .soon-badge { align-self: flex-start; font-size: 0.6rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; padding: 0.28rem 0.6rem; border-radius: 20px; background: var(--border); color: var(--muted); }
 
 @media(max-width: 900px) { .featured-grid { grid-template-columns: 1fr; } }
+
+/* ═══ BARRA DELGADA DEL ASISTENTE CSH (no compite con los productos) ═══ */
+.assistant-banner { display: flex; align-items: center; gap: 1rem; background: var(--petrol-dark); border-radius: 16px; padding: 1.1rem 1.5rem; cursor: pointer; transition: background 0.2s; text-decoration: none; margin-bottom: 2rem; }
+.assistant-banner:hover { background: var(--petrol); }
+.assistant-banner-icon { width: 38px; height: 38px; border-radius: 10px; background: rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.assistant-banner-text { flex: 1; min-width: 0; }
+.assistant-banner-title { color: white; font-weight: 800; font-size: 0.85rem; }
+.assistant-banner-desc { color: rgba(255,255,255,0.6); font-size: 0.76rem; margin-top: 2px; }
+.assistant-banner-arrow { color: white; font-size: 1.2rem; flex-shrink: 0; }
+@media(max-width: 560px) { .assistant-banner-desc { display: none; } }
 .puerta-title { font-size: 1.2rem; font-weight: 800; color: var(--dark); line-height: 1.2; letter-spacing: -0.01em; }
 .puerta-desc { font-size: 0.85rem; color: var(--muted); line-height: 1.7; flex: 1; }
 .puerta-cta { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 0.65rem 1.25rem; border-radius: 8px; margin-top: 0.5rem; transition: all 0.2s; width: fit-content; background: var(--petrol); color: white; }
@@ -202,30 +212,32 @@ footer { background: var(--dark); color: rgba(255,255,255,0.45); padding: 3rem 2
 <!-- DISPONIBLE AHORA -->
 <section class="featured-section" id="soluciones">
   <div class="featured-inner">
+
+    <!-- ASISTENTE CSH: barra delgada, ya vive flotando en el sitio -->
+    <div class="assistant-banner" onclick="window.CSHAssistant && window.CSHAssistant.open()">
+      <div class="assistant-banner-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+      </div>
+      <div class="assistant-banner-text">
+        <div class="assistant-banner-title">Asistente CSH</div>
+        <div class="assistant-banner-desc">Resuelve tus dudas de legislación laboral, nómina y gestión humana — abajo a la derecha, en cualquier página.</div>
+      </div>
+      <div class="assistant-banner-arrow">→</div>
+    </div>
+
     <div class="section-eyebrow center">Disponible ahora</div>
     <h2 class="section-h" style="text-align:center;">Lo que ya puedes <em>usar</em></h2>
-    <div class="featured-grid">
-
-      <!-- ASISTENTE CSH -->
-      <div class="featured-card accent-assistant" onclick="window.CSHAssistant && window.CSHAssistant.open()">
-        <div class="featured-badge">Disponible</div>
-        <div class="featured-icon assistant">
-          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
-        </div>
-        <div class="featured-title">Asistente CSH</div>
-        <div class="featured-desc">Resuelve tus dudas sobre legislación laboral colombiana, nómina y gestión humana, y te ayuda a encontrar la herramienta correcta dentro de CSH Talent — disponible en cualquier página.</div>
-        <button class="featured-cta assistant" type="button">Hablar con el Asistente CSH →</button>
-      </div>
+    <div class="featured-grid" style="grid-template-columns: 1fr; max-width: 620px; margin-left: auto; margin-right: auto;">
 
       <!-- DIAGNÓSTICO CIMA -->
-      <a href="#" class="featured-card accent-door">
-        <div class="featured-badge">Próximo lanzamiento</div>
+      <a href="diagnostico-cima.html" class="featured-card accent-door">
+        <div class="featured-badge">Disponible</div>
         <div class="featured-icon door">
           <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#2F4E5F" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>
         </div>
         <div class="featured-title">Diagnóstico CIMA®</div>
-        <div class="featured-desc">Nuestra metodología propia para evaluar de forma integral el estado de la gestión humana de tu organización — el primer gran lanzamiento de CSH Talent.</div>
-        <button class="featured-cta door" type="button">Conocer el Diagnóstico CIMA® →</button>
+        <div class="featured-desc">Nuestra metodología propia para evaluar de forma integral el estado de la gestión humana de tu organización.</div>
+        <button class="featured-cta door" type="button">Comenzar el Diagnóstico CIMA® →</button>
       </a>
 
     </div>

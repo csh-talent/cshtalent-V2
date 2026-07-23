@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Diagnóstico CIMA® — CSH Talent</title>
+<link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --petrol: #2F4E5F; --petrol-soft: #4A90A4; --petrol-pale: #e6ecef; --petrol-dark: #1e3340;
+  --coral: #E87B6F; --coral-deep: #d26359; --coral-pale: #fdece9;
+  --brand-red: #b5404a; --dark: #111827; --text: #1f2937; --muted: #6b7280; --muted2: #9ca3af;
+  --border: #e5e7eb; --surface: #f9fafb; --white: #ffffff;
+  --bg: var(--surface); --gray-light: var(--border);
+}
+body{font-family:'Raleway',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+
+/* NAV — mismo patrón del ecosistema */
+nav{position:sticky;top:0;left:0;right:0;z-index:1000;background:rgba(255,255,255,0.97);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);height:60px;padding:0 2rem;display:flex;align-items:center;justify-content:space-between;transition:box-shadow .3s;}
+nav.scrolled{box-shadow:0 2px 20px rgba(0,0,0,.08);}
+.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none;}
+.nav-logo-mark{display:flex;flex-direction:column;}
+.nav-logo-name{font-size:.95rem;font-weight:800;letter-spacing:.18em;color:var(--dark);line-height:1;}
+.nav-logo-line{height:1.5px;background:var(--brand-red);margin:2px 0;}
+.nav-logo-sub{font-size:.42rem;font-weight:500;letter-spacing:.2em;color:var(--muted);text-transform:uppercase;}
+.nav-right{display:flex;align-items:center;gap:1.1rem;}
+.nav-login-link{font-size:.78rem;font-weight:600;color:var(--muted);text-decoration:none;transition:color .2s;}
+.nav-login-link:hover{color:var(--petrol);}
+.btn-nav{font-size:.78rem;font-weight:700;color:white;padding:.5rem 1.2rem;border-radius:8px;text-decoration:none;transition:all .2s;border:none;cursor:pointer;font-family:'Raleway',sans-serif;letter-spacing:.04em;}
+.btn-nav.coral{background:var(--coral);}
+.btn-nav.coral:hover{background:var(--coral-deep);}
+
+.progress-bar{height:4px;background:var(--gray-light);position:sticky;top:60px;z-index:99;}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--coral),var(--brand-red));transition:width .4s ease;width:0%;}
+.main{max-width:780px;margin:0 auto;padding:2rem 1.5rem;}
+.screen{display:none;animation:fadeUp .4s ease both;}
+.screen.active{display:block;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.diag-hero{text-align:center;padding:3rem 1rem 2rem;}
+.diag-hero .dh-tag{display:inline-block;background:var(--coral-pale);color:var(--coral-deep);font-size:.65rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:.3rem .9rem;border-radius:99px;margin-bottom:1.25rem;}
+.diag-hero h1{font-size:clamp(1.6rem,3.5vw,2.4rem);font-weight:800;color:var(--dark);line-height:1.2;margin-bottom:.75rem;}
+.diag-hero h1 span{color:var(--coral);font-style:italic;}
+.diag-hero p{font-size:.9rem;color:var(--muted);max-width:520px;margin:0 auto 2rem;line-height:1.7;}
+.diag-sections{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;margin:1.5rem 0 2rem;text-align:left;}
+.ds-item{background:#fff;border:1px solid var(--border);border-radius:10px;padding:.9rem 1rem;}
+.ds-num{font-size:.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--petrol);margin-bottom:.25rem;}
+.ds-name{font-size:.75rem;font-weight:600;color:var(--dark);line-height:1.3;}
+.card{background:#fff;border:1px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.04);margin-bottom:1.5rem;}
+.card-head{background:#fff;border-bottom:1px solid var(--border);padding:1.25rem 1.5rem;display:flex;align-items:center;gap:1rem;}
+.ch-num{width:36px;height:36px;border-radius:50%;background:var(--petrol-pale);color:var(--petrol);font-size:.8rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.ch-title{font-size:1rem;font-weight:700;color:var(--dark);}
+.ch-sub{font-size:.7rem;color:var(--muted);margin-top:.1rem;}
+.card-body{padding:1.5rem;}
+.field{margin-bottom:1.25rem;}
+.field label{display:block;font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:.4rem;}
+.field input,.field select{width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:8px;padding:.7rem .9rem;font-family:'Raleway',sans-serif;font-size:.88rem;color:var(--text);outline:none;transition:border-color .2s,box-shadow .2s;-webkit-appearance:none;}
+.field input:focus,.field select:focus{border-color:var(--petrol);box-shadow:0 0 0 3px rgba(47,78,95,.1);}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+.question{margin-bottom:1.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border);}
+.question:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0;}
+.q-text{font-size:.88rem;font-weight:600;color:var(--dark);margin-bottom:.75rem;line-height:1.5;}
+.q-options{display:flex;flex-direction:column;gap:.5rem;}
+.q-option{display:flex;align-items:flex-start;gap:.75rem;padding:.65rem .9rem;border:1.5px solid var(--border);border-radius:8px;cursor:pointer;transition:all .2s;background:#fff;}
+.q-option:hover{border-color:var(--petrol);background:var(--petrol-pale);}
+.q-option.selected{border-color:var(--petrol);background:var(--petrol-pale);}
+.q-radio{width:18px;height:18px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;margin-top:1px;transition:all .2s;display:flex;align-items:center;justify-content:center;}
+.q-option.selected .q-radio{border-color:var(--petrol);background:var(--petrol);}
+.q-option.selected .q-radio::after{content:'';width:7px;height:7px;border-radius:50%;background:#fff;}
+.q-label{font-size:.82rem;color:var(--text);line-height:1.4;}
+.q-scale{display:flex;gap:.5rem;flex-wrap:wrap;}
+.q-scale-btn{padding:.5rem 1.1rem;border:1.5px solid var(--border);border-radius:8px;cursor:pointer;font-family:'Raleway',sans-serif;font-size:.88rem;font-weight:700;color:var(--muted);transition:all .2s;background:#fff;}
+.q-scale-btn:hover,.q-scale-btn.selected{border-color:var(--petrol);background:var(--petrol-pale);color:var(--petrol);}
+.q-help{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:var(--coral-pale);color:var(--coral-deep);font-size:.6rem;font-weight:800;cursor:help;margin-left:.5rem;flex-shrink:0;position:relative;vertical-align:middle;}
+.q-tooltip{visibility:hidden;opacity:0;position:fixed;background:var(--petrol-dark);color:#fff;font-size:.72rem;line-height:1.6;padding:.7rem 1rem;border-radius:8px;width:260px;max-width:90vw;z-index:9999;pointer-events:none;transition:opacity .2s;font-weight:400;text-align:left;box-shadow:0 4px 16px rgba(0,0,0,.25);}
+.q-tooltip::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:var(--petrol-dark);}
+.q-help:hover .q-tooltip{visibility:visible;opacity:1;}
+.alert{background:rgba(181,64,74,.08);border:1px solid rgba(181,64,74,.25);border-radius:8px;padding:.7rem 1rem;font-size:.75rem;color:var(--brand-red);margin-bottom:1rem;display:none;}
+.alert.show{display:block;}
+.btn-row{display:flex;gap:.75rem;margin-top:1.5rem;}
+.btn-primary{background:var(--petrol-dark);color:#fff;font-family:'Raleway',sans-serif;font-size:.82rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;border:none;border-radius:10px;padding:.85rem 2rem;cursor:pointer;transition:all .2s;box-shadow:0 4px 16px rgba(30,51,64,.18);flex:1;}
+.btn-primary:hover{background:var(--petrol);}
+.btn-secondary{background:transparent;color:var(--muted);font-family:'Raleway',sans-serif;font-size:.78rem;font-weight:600;border:1.5px solid var(--border);border-radius:10px;padding:.85rem 1.5rem;cursor:pointer;transition:all .2s;}
+.btn-secondary:hover{border-color:var(--petrol);color:var(--petrol);}
+.result-hero{background:var(--petrol-dark);color:#fff;border-radius:16px;padding:2rem;margin-bottom:1.5rem;position:relative;overflow:hidden;}
+.result-hero::before{content:'CSH';position:absolute;right:1rem;top:50%;transform:translateY(-50%);font-size:5rem;font-weight:800;letter-spacing:.2em;opacity:.08;}
+.result-company{font-size:1.4rem;font-weight:800;margin-bottom:.25rem;}
+.result-sub{font-size:.7rem;opacity:.7;letter-spacing:.1em;text-transform:uppercase;}
+.result-score-big{margin-top:1.25rem;display:flex;align-items:baseline;gap:.5rem;flex-wrap:wrap;}
+.score-num{font-size:3rem;font-weight:800;color:var(--coral);line-height:1;}
+.score-label{font-size:.8rem;opacity:.8;}
+.score-nivel{font-size:1rem;font-weight:700;opacity:.9;margin-left:.5rem;}
+.chart-wrap{background:#fff;border:1px solid var(--border);border-radius:16px;padding:1.5rem;margin-bottom:1.5rem;}
+.chart-title{font-size:.8rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:1rem;}
+.chart-container{position:relative;height:380px;max-width:480px;margin:0 auto;}
+.section-result{background:#fff;border:1px solid var(--border);border-radius:14px;padding:1.25rem 1.5rem;margin-bottom:1rem;}
+.sr-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem;gap:1rem;}
+.sr-name{font-size:.88rem;font-weight:700;color:var(--dark);}
+.sr-score{font-size:1rem;font-weight:800;color:var(--petrol);}
+.sr-bar-track{height:8px;background:var(--gray-light);border-radius:99px;margin-bottom:.75rem;}
+.sr-bar-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--coral),var(--brand-red));}
+.sr-diag{font-size:.78rem;color:var(--muted);line-height:1.6;}
+.sr-nivel{display:inline-block;font-size:.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:.2rem .6rem;border-radius:99px;margin-right:.5rem;}
+.nivel-bajo{background:#fceaeb;color:#b5404a;}
+.nivel-medio{background:#fff8e0;color:#a07800;}
+.nivel-alto{background:#eaf5ea;color:#2e7d32;}
+.rec-card{background:var(--petrol-pale);border:1px solid rgba(47,78,95,.2);border-radius:12px;padding:1.25rem;margin-bottom:.75rem;}
+.rec-section{font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--petrol);margin-bottom:.4rem;}
+.rec-text{font-size:.82rem;color:var(--text);line-height:1.6;}
+.legal-note{background:#fff8e0;border:1px solid #f0d090;border-radius:10px;padding:1rem 1.25rem;font-size:.72rem;color:#7a5c10;line-height:1.6;margin-top:1.5rem;}
+.limite-note{background:var(--coral-pale);border:1px solid rgba(232,123,111,.3);border-radius:12px;padding:1.25rem 1.5rem;font-size:.85rem;color:var(--dark);line-height:1.7;}
+.limite-note a{color:var(--petrol);font-weight:700;}
+.restantes-tag{display:inline-block;font-size:.68rem;font-weight:700;letter-spacing:.05em;color:var(--petrol);background:var(--petrol-pale);padding:.3rem .8rem;border-radius:99px;margin-top:.75rem;}
+.informe-loader{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2.5rem 1rem;gap:1rem;}
+.informe-loader .dots{display:flex;gap:.5rem;}
+.informe-loader .dots span{width:8px;height:8px;border-radius:50%;background:var(--coral);animation:dotPulse 1.4s ease-in-out infinite;}
+.informe-loader .dots span:nth-child(2){animation-delay:.2s;}
+.informe-loader .dots span:nth-child(3){animation-delay:.4s;}
+@keyframes dotPulse{0%,80%,100%{opacity:.2;transform:scale(.8);}40%{opacity:1;transform:scale(1);}}
+.informe-loader p{font-size:.82rem;color:var(--muted);font-weight:500;text-align:center;}
+.print-footer{display:none;text-align:center;margin-top:2rem;padding-top:1rem;border-top:1px solid #e8e8e8;font-size:.65rem;color:#6b6b6b;}
+@media print{
+  @page{size:A4 portrait;margin:18mm 16mm 18mm 16mm;}
+  nav,.progress-bar,.btn-row,button{display:none!important;}
+  body{background:#fff!important;}
+  .main{max-width:100%!important;padding:0!important;}
+  .card,.section-result,.rec-card{break-inside:avoid;box-shadow:none!important;border:1px solid #e8e8e8!important;}
+  .result-hero{background:var(--petrol-dark)!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}
+  .print-footer{display:block!important;}
+}
+@media(max-width:600px){.diag-sections{grid-template-columns:1fr 1fr;}.grid-2{grid-template-columns:1fr;}.btn-row{flex-direction:column;}}
+@media(max-width:420px){.diag-sections{grid-template-columns:1fr;}.main{padding:1.25rem 1rem;}}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+<nav id="mainNav">
+  <a href="index.html" class="nav-logo">
+    <div class="nav-logo-mark">
+      <div class="nav-logo-name">CSH TALENT</div>
+      <div class="nav-logo-line"></div>
+      <div class="nav-logo-sub">Capital Sostenible y Humano</div>
+    </div>
+  </a>
+  <div class="nav-right" id="navRight">
+    <a href="#" class="nav-login-link" id="navLoginLink">Iniciar sesión</a>
+    <a href="historia.html" class="btn-nav coral">Acerca de CSH Talent</a>
+  </div>
+</nav>
+<div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+<div class="main">
+
+<div id="s0" class="screen active">
+  <div class="diag-hero">
+    <div class="dh-tag">Marco CIMA® · Diagnóstico Gratuito</div>
+    <h1>Diagnóstico <span>CIMA®</span></h1>
+    <p>Descubre el nivel de madurez del sistema de Gestión Humana de tu empresa. Recibirás un informe completo con fortalezas, puntos débiles y un plan de acción personalizado.</p>
+    <div class="diag-sections">
+      <div class="ds-item"><div class="ds-num">01</div><div class="ds-name">Estructura organizacional y perfiles</div></div>
+      <div class="ds-item"><div class="ds-num">02</div><div class="ds-name">Rotación y retención</div></div>
+      <div class="ds-item"><div class="ds-num">03</div><div class="ds-name">Desarrollo y desempeño</div></div>
+      <div class="ds-item"><div class="ds-num">04</div><div class="ds-name">Compensación y beneficios</div></div>
+      <div class="ds-item"><div class="ds-num">05</div><div class="ds-name">Cumplimiento legal laboral</div></div>
+      <div class="ds-item"><div class="ds-num">06</div><div class="ds-name">Cultura y liderazgo</div></div>
+      <div class="ds-item"><div class="ds-num">07</div><div class="ds-name">Reclutamiento y selección</div></div>
+      <div class="ds-item"><div class="ds-num">08</div><div class="ds-name">Responsabilidad social</div></div>
+      <div class="ds-item"><div class="ds-num">09</div><div class="ds-name">Nuevas formas de trabajo</div></div>
+    </div>
+    <button class="btn-primary" style="width:auto;padding:.9rem 3rem;" onclick="iniciarDiagnostico()">Comenzar diagnóstico →</button>
+  </div>
+</div>
+
+<div id="s1" class="screen">
+  <div class="card">
+    <div class="card-head">
+      <div class="ch-num">📋</div>
+      <div><div class="ch-title">Información de la Empresa</div><div class="ch-sub">Datos generales para personalizar tu informe</div></div>
+    </div>
+    <div class="card-body">
+      <div class="alert" id="err1">Por favor completa todos los campos obligatorios.</div>
+      <div class="grid-2">
+        <div class="field" style="grid-column:1/-1"><label>Nombre de la empresa *</label><input type="text" id="empresa" placeholder="Ej: Akarte SAS"></div>
+        <div class="field"><label>Nombre del contacto *</label><input type="text" id="contacto" placeholder="Tu nombre completo"></div>
+        <div class="field"><label>Cargo</label><input type="text" id="cargo" placeholder="Ej: Gerente General"></div>
+        <div class="field" style="grid-column:1/-1"><label>Correo electrónico *</label><input type="email" id="correo" placeholder="tu@empresa.com"></div>
+        <div class="field"><label>Total de empleados *</label><input type="number" id="empleados" placeholder="Ej: 25" min="1"></div>
+        <div class="field"><label>Tamaño de la empresa *</label>
+          <select id="tamano">
+            <option value="">— Selecciona —</option>
+            <option value="micro">Microempresa: hasta 10 empleados</option>
+            <option value="pequena">Pequeña empresa: 11 a 50 empleados</option>
+            <option value="mediana">Mediana empresa: 51 a 200 empleados</option>
+            <option value="grande">Gran empresa: más de 200 empleados</option>
+          </select>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn-secondary" onclick="goTo(0)">← Atrás</button>
+        <button class="btn-primary" onclick="validarS1()">Continuar →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="s2" class="screen"></div>
+<div id="s3" class="screen"></div>
+<div id="s4" class="screen"></div>
+<div id="s5" class="screen"></div>
+<div id="s6" class="screen"></div>
+<div id="s7" class="screen"></div>
+<div id="s8" class="screen"></div>
+<div id="s9" class="screen"></div>
+<div id="s10" class="screen"></div>
+<div id="s11" class="screen"><div id="resultado-container"></div></div>
+
+  <div class="print-footer">Diagnóstico CIMA® — Marco de Madurez en Gestión Humana · <strong>CSH Talent</strong> · Capital Sostenible y Humano · www.cshtalent.com · 2026©</div>
+
+</div>
+
+<footer style="background:var(--petrol-dark);color:rgba(255,255,255,.45);padding:2rem;text-align:center;font-size:.72rem;margin-top:2rem;">
+  © 2026 CSH Talent · Carolina Salazar Hernández · Diagnóstico CIMA® es una metodología propia de CSH Talent.
+</footer>
+
+<script>
+const SECCIONES=[
+  {id:2,num:'01',titulo:'Estructura Organizacional y Perfiles',peso:.10,preguntas:[
+    {texto:'¿Tienes organigrama actualizado que refleje la estructura real de tu empresa?',tipo:'radio',opciones:[{label:'Sí',score:1},{label:'No',score:.1}]},
+    {texto:'¿Cuántos cargos tienen perfil documentado?',tipo:'radio',opciones:[{label:'Menor al 50%',score:.1},{label:'Entre el 50% y el 70%',score:.5},{label:'Más del 70%',score:1}]},
+    {texto:'¿Se han definido competencias técnicas y blandas mediante un manual?',tipo:'radio',opciones:[{label:'Sí',score:1},{label:'Tenemos algo pero incompleto',score:.5},{label:'No',score:.1}]},
+    {texto:'¿Revisas y actualizas perfiles al menos una vez al año?',tipo:'radio',opciones:[{label:'Sí',score:1},{label:'No',score:.1}]},
+    {texto:'¿Existe un repositorio central donde estén todos los perfiles disponibles?',tipo:'radio',opciones:[{label:'Sí',score:1},{label:'No',score:.1}]},
+    {texto:'¿La empresa tiene definida una estrategia corporativa (MEGA, ejes estratégicos u otras)?',tipo:'radio',opciones:[{label:'Sí',score:1},{label:'Parcial',score:.5},{label:'No',score:.1}]}
+  ]},
+  {id:3,num:'02',titulo:'Rotación y Retención',peso:.13,preguntas:[
+    {texto:'¿Conoces tu tasa de rotación anual?',tipo:'radio',opciones:[{label:'Sí',score:1},{label:'No',score:.1}]},
+    {texto:'¿Cuál es tu rotación voluntaria anual?',tipo:'radio',opciones:[{label:'Menor al 9%',score:1},{label:'Entre el 9% y el 20%',score:.6},{label:'Más del 20%',score:.1}]},
+    {texto:'¿Realizas entrevistas de salida y analizas las causas de retiro?',tipo:'radio',opciones:[{label:'Siempre',score:1},{label:'A veces',score:.5},{label:'Nunca',score:.1}]},
+    {texto:'¿Tienes identificados los cargos críticos?',tipo:'radio',opciones:[{label:'Sí, basados en metodologías',score:1},{label:'Sí, según lo que yo considero',score:.6},{label:'No',score:.3}]},
+    {texto:'¿Tu empresa cuenta con planes de sucesión formalizados para cargos críticos?',tipo:'radio',opciones:[{label:'Sí, documentados',score:1},{label:'Parcial',score:.7},{label:'No',score:.5}]},
+    {texto:'¿Tienes implementadas acciones de retención (bonos, planes de carrera, bienestar)?',tipo:'radio',opciones:[{label:'Sí',score:1},{label:'Parcial',score:.6},{label:'No',score:.4}]},
+    {texto:'¿Cómo evaluarías el compromiso de tus colaboradores? (1=muy bajo · 5=excelente)',tipo:'escala',min:1,max:5,scores:{1:.2,2:.4,3:.6,4:.8,5:1}}
+  ]},
+  {id:4,num:'03',titulo:'Desarrollo y Gestión del Desempeño',peso:.13,preguntas:[
+    {texto:'¿Todos los cargos tienen objetivos de desempeño claros?',tipo:'radio',opciones:[{label:'Sí',score:1},{label:'No',score:.3}]},
+    {texto:'¿Realizas evaluaciones de desempeño?',tipo:'radio',opciones:[{label:'Sí, modelo de gestión estructurado',score:1},{label:'Solo evaluamos objetivos, no muy elaborado',score:.6},{label:'No conozco la metodología',score:.3},{label:'No se hace',score:.2}]},
+    {texto:'¿Con qué frecuencia haces evaluaciones de desempeño?',tipo:'radio',opciones:[{label:'Semestral',score:1},{label:'Anual',score:.9},{label:'No se hace',score:.2}]},
+    {texto:'¿Se entrega retroalimentación formal posterior a las evaluaciones?',tipo:'radio',opciones:[{label:'Siempre',score:1},{label:'A veces',score:.6},{label:'Nunca',score:.1}]},
+    {texto:'¿Existen planes de desarrollo vinculados a los resultados del desempeño?',tipo:'radio',opciones:[{label:'Sí',score:1},{label:'Parcialmente',score:.6},{label:'No',score:.1}]},
+    {texto:'¿Los líderes reciben capacitación para evaluar y dar feedback?',tipo:'radio',opciones:[{label:'Sí',score:.9},{label:'No',score:.4}]},
+    {texto:'¿Utilizan software o plataformas para gestión humana?',tipo:'radio',opciones:[{label:'Integrado (nómina + desempeño + capacitación)',score:1},{label:'Solo nómina',score:.7},{label:'No tenemos software',score:.4}]}
+  ]},
+  {id:5,num:'04',titulo:'Compensación y Beneficios',peso:.18,preguntas:[
+    {texto:'¿Existe una escala salarial documentada y aplicada por cargos?',tipo:'radio',opciones:[{label:'Sí',score:1},{label:'Nos apoyamos en headhunters o encuestas genéricas',score:.8},{label:'No',score:.1},{label:'Desconocemos las metodologías de escalas salariales',score:.1}]},
+    {texto:'¿Qué porcentaje de cargos tiene una banda salarial definida?',tipo:'radio',opciones:[{label:'76–100%',score:1},{label:'51–75%',score:.6},{label:'26–50%',score:.4},{label:'0–25%',score:.2}]},
+    {texto:'¿Se revisan los salarios al menos una vez al año (benchmark)?',tipo:'radio',opciones:[{label:'Sí',score:1},{label:'Solo algunas veces para cargos específicos',score:.5},{label:'No',score:.1}]},
+    {texto:'¿Existe alguna política definida de incrementos salariales anuales?',tipo:'radio',opciones:[{label:'Sí',score:1},{label:'No',score:.3}]},
+    {texto:'¿La estructura de beneficios está documentada y accesible para los empleados?',tipo:'radio',opciones:[{label:'Sí, documentados y comunicados',score:1},{label:'Sí, pero no se comunican',score:.6},{label:'No contamos con beneficios adicionales',score:.5}]},
+    {texto:'¿La compensación está alineada con desempeño o resultados (bonos/incentivos)?',tipo:'radio',opciones:[{label:'Sí',score:1},{label:'Algunos cargos',score:.7},{label:'No',score:.4}]},
+    {texto:'¿Existe bonificación anual grupal por resultados extraordinarios y colectivos?',tipo:'radio',opciones:[{label:'Sí',score:1},{label:'No',score:.5}]},
+    {texto:'¿Existe un presupuesto anual específico para gastos de personal y desarrollo?',tipo:'radio',opciones:[{label:'Sí',score:1},{label:'Parcial',score:.6},{label:'No',score:.3}]},
+    {texto:'¿Hacen seguimiento periódico a indicadores de gestión humana (rotación, ausentismo, clima)?',tipo:'radio',opciones:[{label:'Sí, dashboard estructurado',score:1},{label:'Algunos indicadores según la necesidad',score:.5},{label:'No',score:.1}]}
+  ]},
+  {id:6,num:'05',titulo:'Cumplimiento Legal Laboral',peso:.18,preguntas:[
+    {texto:'¿Todos los colaboradores tienen contrato escrito acorde a su naturaleza laboral?',tipo:'radio',opciones:[{label:'Sí',score:1},{label:'Parcial',score:.2},{label:'No',score:0}]},
+    {texto:'¿Las afiliaciones a EPS, Pensión y ARL están registradas y al día para todos?',tipo:'radio',opciones:[{label:'Sí',score:1},{label:'Parcial',score:.2},{label:'No',score:0}]},
+    {texto:'¿Se registran y pagan oportunamente las prestaciones sociales (cesantías y primas)?',tipo:'radio',opciones:[{label:'Sí',score:1},{label:'No',score:0}]},
+    {texto:'¿Existe el reglamento interno publicado?',tipo:'radio',opciones:[{label:'Sí',score:1},{label:'No',score:.2}]},
+    {texto:'¿La empresa cumple con obligaciones de prácticas de aprendizaje (cuota SENA)?',tipo:'radio',opciones:[{label:'Sí',score:1},{label:'No estamos obligados por el tamaño de la empresa',score:1},{label:'No',score:.2}]},
+    {texto:'¿Tienen procedimientos claros para la resolución de conflictos laborales?',tipo:'radio',opciones:[{label:'Sí, formalizados',score:1},{label:'No, los manejamos según surja',score:.5}]},
+    {texto:'¿Tu empresa cuenta con un proceso disciplinario formal, documentado y comunicado?',tipo:'radio',opciones:[{label:'Sí, completamente implementado',score:1},{label:'Parcial, algunas etapas aplicadas',score:.7},{label:'No existe un proceso definido',score:.5}]},
+    {texto:'¿Cuenta con los comités exigidos por la legislación colombiana (COPASST, Convivencia)?',tipo:'radio',opciones:[{label:'Cumplimos con lo exigido por la ley',score:1},{label:'Tenemos algunos, pero nos falta ser más juiciosos',score:.5},{label:'Por el tamaño de la empresa, no estamos obligados',score:1}]}
+  ]},
+  {id:7,num:'06',titulo:'Cultura y Liderazgo',peso:.15,preguntas:[
+    {texto:'¿La empresa tiene valores o principios declarados y difundidos en los colaboradores?',tipo:'radio',opciones:[{label:'Sí',score:1},{label:'En la página pero no los conocen los colaboradores',score:.7},{label:'No',score:.2}]},
+    {texto:'¿Se mide el clima o cultura con encuesta y acciones posteriores definidas?',tipo:'radio',opciones:[{label:'Sí, con planes de acción',score:1},{label:'Sí, sin planes de acción',score:.7},{label:'No',score:.2}]},
+    {texto:'¿Existen programas de desarrollo y capacitación según necesidades identificadas?',tipo:'radio',opciones:[{label:'Sí, planes de desarrollo documentados',score:1},{label:'Hacemos capacitaciones que ofrecen, sin plan formal',score:.7},{label:'No',score:.2}]},
+    {texto:'¿Los líderes reciben evaluación y feedback sobre su estilo de liderazgo?',tipo:'radio',opciones:[{label:'Sí',score:1},{label:'A veces',score:.5},{label:'No',score:.2}]},
+    {texto:'¿Cómo perciben los empleados la comunicación interna? (1=muy deficiente · 5=excelente)',tipo:'escala',min:1,max:5,scores:{1:.2,2:.4,3:.6,4:.8,5:1}},
+    {texto:'¿Existen mecanismos formales y efectivos de comunicación interna?',tipo:'radio',opciones:[{label:'Sí, formales y establecidos',score:1},{label:'Parcial',score:.5},{label:'No',score:.1}]},
+    {texto:'¿La empresa celebra fechas especiales o reconoce logros de los colaboradores?',tipo:'radio',opciones:[{label:'Sí, celebramos y reconocemos todo',score:1},{label:'Solo celebramos fechas especiales',score:.6},{label:'No',score:.2}]},
+    {texto:'¿Cómo describirías la cercanía y accesibilidad de los líderes? (1=muy distantes · 5=muy cercanos)',tipo:'escala',min:1,max:5,scores:{1:.2,2:.4,3:.6,4:.8,5:1}},
+    {texto:'¿Existen programas estructurados de bienestar físico, emocional o familiar?',tipo:'radio',opciones:[{label:'Sí, formales y continuos',score:1},{label:'Parciales o esporádicos',score:.6},{label:'No',score:.2}]}
+  ]},
+  {id:8,num:'07',titulo:'Reclutamiento y Selección',peso:.05,preguntas:[
+    {texto:'¿Tienes un proceso documentado y estandarizado de reclutamiento y selección?',tipo:'radio',opciones:[{label:'Sí',score:1},{label:'Me apoyo con externos',score:.8},{label:'No',score:.2}]},
+    {texto:'¿Utilizas descripciones de cargo actualizadas para publicar vacantes y evaluar candidatos?',tipo:'radio',opciones:[{label:'Siempre',score:1},{label:'A veces',score:.5},{label:'Nunca',score:.1}]},
+    {texto:'¿Mides indicadores como tiempo de cobertura de vacantes o calidad de contratación?',tipo:'radio',opciones:[{label:'Sí, ambos',score:1},{label:'Solo uno',score:.7},{label:'No',score:.2}]},
+    {texto:'¿Incluyes evaluaciones técnicas o psicotécnicas alineadas al cargo?',tipo:'radio',opciones:[{label:'Siempre',score:1},{label:'A veces',score:.5},{label:'Nunca',score:.3}]},
+    {texto:'¿Realizas seguimiento al desempeño de las nuevas contrataciones en su periodo de prueba?',tipo:'radio',opciones:[{label:'Siempre',score:1},{label:'A veces',score:.5},{label:'Nunca',score:.3}]}
+  ]},
+  {id:9,num:'08',titulo:'Responsabilidad Social, Diversidad e Innovación',peso:.04,preguntas:[
+    {texto:'¿Tu empresa cuenta con políticas de Responsabilidad Social Empresarial (RSE)?',tipo:'radio',opciones:[{label:'Sí, formalizadas',score:1},{label:'Parcial, algunas prácticas',score:.8},{label:'No / No las conozco',score:.4}]},
+    {texto:'¿Existen acciones para promover la diversidad e inclusión en selección, capacitación o ascensos?',tipo:'radio',opciones:[{label:'Siempre',score:1},{label:'A veces',score:.8},{label:'Nunca',score:.4}]},
+    {texto:'¿Monitorean o reportan el impacto social o ambiental de la organización?',tipo:'radio',opciones:[{label:'Sí, regularmente',score:1},{label:'Ocasionalmente',score:.8},{label:'No',score:.4}]},
+    {texto:'¿Tienen canales o programas para que los colaboradores propongan ideas innovadoras?',tipo:'radio',opciones:[{label:'Sí, estructurados',score:1},{label:'Informales',score:.8},{label:'No',score:.2}]}
+  ]},
+  {id:10,num:'09',titulo:'Nuevas Formas de Trabajo',peso:.04,preguntas:[
+    {texto:'¿Cuál es la modalidad de trabajo predominante y cómo la perciben los colaboradores?',tipo:'radio',opciones:[{label:'Trabajo 100% presencial — Muy satisfechos',score:1},{label:'Trabajo 100% presencial — Poco satisfechos',score:.2},{label:'Trabajo híbrido — Muy satisfechos',score:1},{label:'Trabajo híbrido — Poco satisfechos',score:.2},{label:'Trabajo remoto total — Muy satisfechos',score:1},{label:'Trabajo remoto total — Poco satisfechos',score:.2}]},
+    {texto:'¿Se realiza seguimiento estructurado al desempeño en modalidad remota o híbrida?',tipo:'radio',opciones:[{label:'Sí',score:1},{label:'No',score:.3}]},
+    {texto:'¿La empresa proporciona herramientas, recursos o capacitaciones para el teletrabajo?',tipo:'radio',opciones:[{label:'Sí, completos',score:1},{label:'Parciales',score:.7},{label:'No',score:.4}]}
+  ]}
+];
+
+let currentScreen=0;
+let answers={};
+let infoEmpresa={};
+
+function renderSecciones(){
+  SECCIONES.forEach((sec,si)=>{
+    const el=document.getElementById(`s${sec.id}`);
+    let html=`<div class="card"><div class="card-head"><div class="ch-num">${sec.num}</div><div><div class="ch-title">${sec.titulo}</div><div class="ch-sub">Sección ${sec.num} de 09 · Peso: ${Math.round(sec.peso*100)}%</div></div></div><div class="card-body"><div class="alert" id="err${sec.id}">Por favor responde todas las preguntas de esta sección.</div>`;
+    sec.preguntas.forEach((q,qi)=>{
+      html+=`<div class="question" id="q-${sec.id}-${qi}"><div class="q-text">${qi+1}. ${q.texto}</div>`;
+      if(q.tipo==='radio'){
+        html+=`<div class="q-options">`;
+        q.opciones.forEach((op,oi)=>{html+=`<div class="q-option" onclick="selectRadio(${sec.id},${qi},${oi},${op.score})"><div class="q-radio"></div><div class="q-label">${op.label}</div></div>`;});
+        html+=`</div>`;
+      }else if(q.tipo==='escala'){
+        html+=`<div class="q-scale">`;
+        for(let v=q.min;v<=q.max;v++){html+=`<button class="q-scale-btn" onclick="selectEscala(${sec.id},${qi},${v},${q.scores[v]})">${v}</button>`;}
+        html+=`</div>`;
+      }
+      html+=`</div>`;
+    });
+    const prevId=sec.id===2?1:sec.id-1;
+    html+=`<div class="btn-row"><button class="btn-secondary" onclick="goTo(${prevId})">← Atrás</button><button class="btn-primary" onclick="validarSeccion(${sec.id},${si})">Continuar →</button></div></div></div>`;
+    el.innerHTML=html;
+  });
+}
+
+function selectRadio(secId,qIdx,opIdx,score){
+  if(!answers[secId])answers[secId]={};
+  answers[secId][qIdx]=score;
+  const q=document.getElementById(`q-${secId}-${qIdx}`);
+  q.querySelectorAll('.q-option').forEach((el,i)=>el.classList.toggle('selected',i===opIdx));
+}
+
+function selectEscala(secId,qIdx,val,score){
+  if(!answers[secId])answers[secId]={};
+  answers[secId][qIdx]=score;
+  const q=document.getElementById(`q-${secId}-${qIdx}`);
+  q.querySelectorAll('.q-scale-btn').forEach((btn,i)=>btn.classList.toggle('selected',(i+1)===val));
+}
+
+function goTo(n){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(`s${n}`).classList.add('active');
+  currentScreen=n;
+  document.getElementById('progress').style.width=(n/11*100)+'%';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function validarS1(){
+  const campos=['empresa','contacto','correo','empleados','tamano'];
+  const errEl=document.getElementById('err1');
+  for(const c of campos){if(!document.getElementById(c).value.trim()){errEl.classList.add('show');return;}}
+  errEl.classList.remove('show');
+  infoEmpresa={
+    empresa:document.getElementById('empresa').value.trim(),
+    contacto:document.getElementById('contacto').value.trim(),
+    cargo:document.getElementById('cargo').value.trim(),
+    correo:document.getElementById('correo').value.trim(),
+    empleados:document.getElementById('empleados').value,
+    tamano:document.getElementById('tamano').value
+  };
+  goTo(2);
+}
+
+function validarSeccion(secId,secIdx){
+  const sec=SECCIONES[secIdx];
+  const errEl=document.getElementById(`err${secId}`);
+  if(!answers[secId]){errEl.classList.add('show');return;}
+  for(let qi=0;qi<sec.preguntas.length;qi++){if(answers[secId][qi]===undefined){
+    errEl.innerHTML='⚠️ Falta contestar una o más preguntas en esta sección. Todas son obligatorias para continuar.';
+    errEl.classList.add('show');
+    document.getElementById('q-'+secId+'-'+qi).scrollIntoView({behavior:'smooth',block:'center'});
+    return;
+  }}
+  errEl.classList.remove('show');
+  const nextId=secId<10?secId+1:11;
+  if(nextId===11){goTo(11);generarResultado();}
+  else goTo(nextId);
+}
+
+function getNivel(s){
+  if(s<.5)return{label:'Por mejorar',cls:'nivel-bajo'};
+  if(s<.8)return{label:'En desarrollo',cls:'nivel-medio'};
+  return{label:'Sólido',cls:'nivel-alto'};
+}
+
+function getDiag(id,s){
+  const t={
+    2:s>=.7?'La empresa cuenta con estructura organizacional sólida, perfiles documentados y estrategia definida.':s>=.4?'Existen avances en la estructura, pero se requiere formalizar perfiles, competencias y estrategia corporativa.':'La empresa presenta brechas importantes en documentación de perfiles. Es una prioridad para crecer ordenadamente.',
+    3:s>=.7?'Los procesos de retención y gestión de rotación son sólidos, con indicadores claros y planes de acción.':s>=.4?'Hay consciencia sobre la rotación, pero faltan procesos formales de retención y planes de sucesión.':'La rotación es un riesgo crítico. No existen mecanismos formales para retener talento ni identificar cargos clave.',
+    4:s>=.7?'La gestión del desempeño está bien estructurada con evaluaciones formales y planes de desarrollo vinculados.':s>=.4?'Hay elementos de gestión del desempeño, pero el proceso no está completamente formalizado ni es consistente.':'La empresa carece de un sistema formal de evaluación del desempeño, lo que limita el crecimiento del equipo.',
+    5:s>=.7?'La estructura de compensación es competitiva y equitativa, con bandas salariales y beneficios comunicados.':s>=.4?'Existe alguna estructura salarial, pero faltan políticas formales y vinculación entre compensación y desempeño.':'La compensación no tiene estructura formal, generando riesgo de inequidad y pérdida de talento clave.',
+    6:s>=.7?'La empresa demuestra sólido cumplimiento legal laboral con contratos formales y reglamentos establecidos.':s>=.4?'Hay cumplimiento parcial de obligaciones laborales. Se requiere regularizar contratos y procesos disciplinarios.':'Existen riesgos legales significativos. Se deben tomar acciones inmediatas para regularizar el cumplimiento laboral.',
+    7:s>=.7?'La cultura organizacional es sólida con líderes accesibles, buena comunicación y programas de bienestar activos.':s>=.4?'Hay elementos de cultura positiva, pero se requiere fortalecer comunicación interna, liderazgo y reconocimiento.':'La cultura y el liderazgo necesitan intervención urgente. Los colaboradores perciben distancia y falta de comunicación.',
+    8:s>=.7?'El proceso de reclutamiento y selección es estructurado, con evaluaciones técnicas y seguimiento en prueba.':s>=.4?'Existen elementos en el proceso de selección, pero falta estandarización y medición de indicadores.':'El proceso de selección es informal, aumentando el riesgo de contratar personal no alineado con las necesidades.',
+    9:s>=.7?'La empresa demuestra compromiso con responsabilidad social, diversidad e innovación de manera estructurada.':s>=.4?'Hay algunas prácticas de RSE y diversidad, pero no están formalizadas ni medidas de manera consistente.':'La empresa no tiene políticas formales de RSE, diversidad e innovación, lo que puede afectar su reputación.',
+    10:s>=.7?'La empresa gestiona bien las nuevas formas de trabajo, con seguimiento estructurado y recursos adecuados.':s>=.4?'Las modalidades de trabajo existen pero se requiere mejorar el seguimiento y los recursos para equipos remotos.':'Las nuevas formas de trabajo generan insatisfacción. Se requieren políticas claras y recursos para los equipos.'
+  };
+  return t[id]||'';
+}
+
+function getRec(id){
+  const r={
+    2:'Documentar y centralizar perfiles de cargos. Definir competencias mediante un manual estructurado. Implementar revisiones periódicas y alinear con la estrategia corporativa.',
+    3:'Implementar un programa integral de retención. Formalizar entrevistas de salida. Identificar cargos críticos y diseñar planes de sucesión. Vincular compensación al desempeño.',
+    4:'Implementar evaluaciones formales de desempeño con retroalimentación estructurada. Crear planes de desarrollo vinculados a resultados. Capacitar líderes en feedback efectivo.',
+    5:'Establecer bandas salariales y políticas claras de incrementos. Diseñar incentivos ligados al desempeño. Comunicar efectivamente los beneficios. Crear presupuesto anual de talento.',
+    6:'Regularizar contratos y afiliaciones a seguridad social de manera urgente. Elaborar y comunicar reglamento interno. Definir procesos disciplinarios y de resolución de conflictos.',
+    7:'Formalizar la cultura con valores vividos por todos. Medir clima laboral con planes de acción. Implementar programas de reconocimiento y bienestar. Desarrollar habilidades de liderazgo.',
+    8:'Diseñar proceso formal de reclutamiento con descripciones actualizadas. Implementar evaluaciones técnicas y psicotécnicas. Formalizar el seguimiento en período de prueba.',
+    9:'Documentar políticas de RSE. Integrar criterios de diversidad en todos los procesos. Crear canales formales para la innovación interna y medir su impacto.',
+    10:'Definir políticas claras para cada modalidad. Proporcionar herramientas completas para teletrabajo. Implementar seguimiento estructurado al desempeño remoto.'
+  };
+  return r[id]||'';
+}
+
+function generarResultado(){
+  const scores=SECCIONES.map(sec=>{
+    const resps=answers[sec.id]||{};
+    const vals=Object.values(resps);
+    const avg=vals.length?vals.reduce((a,b)=>a+b,0)/vals.length:0;
+    return{...sec,avg,ponderado:avg*sec.peso};
+  });
+  const total=scores.reduce((a,s)=>a+s.ponderado,0);
+  const pct=Math.round(total*100);
+  const nivel=getNivel(total);
+
+  let html=`
+    <div class="result-hero">
+      <div class="result-company">${infoEmpresa.empresa}</div>
+      <div class="result-sub">Diagnóstico CIMA® · ${new Date().toLocaleDateString('es-CO',{day:'2-digit',month:'long',year:'numeric'})}</div>
+      <div class="result-score-big">
+        <div class="score-num">${pct}%</div>
+        <div><div class="score-label">Cumplimiento general en estándares de Gestión Humana</div><div class="score-nivel">${nivel.label}</div></div>
+      </div>
+    </div>
+    <div class="chart-wrap">
+      <div class="chart-title">Radar de Madurez — Ejes Estratégicos de Gestión Humana</div>
+      <div class="chart-container"><canvas id="radarChart"></canvas></div>
+    </div>
+    <div class="card" style="margin-bottom:1.5rem;">
+      <div class="card-head">
+        <div class="ch-num" style="background:var(--petrol-dark);color:#fff;font-size:.6rem;font-weight:800;letter-spacing:.05em;">CIMA</div>
+        <div>
+          <div class="ch-title">Informe Ejecutivo — Marco CIMA®</div>
+          <div class="ch-sub">Diagnóstico de madurez en Gestión Humana · CSH Talent</div>
+        </div>
+      </div>
+      <div class="card-body" id="informe-cima" style="font-size:.85rem;line-height:1.9;color:var(--text);"></div>
+    </div>
+    <div style="font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--petrol);margin-bottom:.75rem;">Resultados por área</div>`;
+
+  scores.forEach(sec=>{
+    const p=Math.round(sec.avg*100);
+    const n=getNivel(sec.avg);
+    const barC=sec.avg<.5?'#b5404a':sec.avg<.8?'#e8a020':'#2e7d32';
+    const scoreC=sec.avg<.5?'#b5404a':sec.avg<.8?'#a07800':'#2e7d32';
+    html+=`<div class="section-result">
+      <div class="sr-header"><div class="sr-name">${sec.num}. ${sec.titulo}</div><div class="sr-score" style="color:${scoreC}">${p}%</div></div>
+      <div class="sr-bar-track"><div class="sr-bar-fill" style="width:${p}%;background:${barC}"></div></div>
+      <div class="sr-diag"><span class="sr-nivel ${n.cls}">${n.label}</span>${getDiag(sec.id,sec.avg)}</div>
+    </div>`;
+  });
+
+  const criticas=scores.filter(s=>s.avg<.5).sort((a,b)=>a.avg-b.avg).slice(0,3);
+  if(criticas.length){
+    html+=`<div style="font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--petrol);margin-bottom:.75rem;margin-top:1rem;">Recomendaciones prioritarias</div>`;
+    criticas.forEach(sec=>{html+=`<div class="rec-card"><div class="rec-section">${sec.titulo}</div><div class="rec-text">${getRec(sec.id)}</div></div>`;});
+  }
+
+  html+=`<div class="legal-note"><strong>Nota:</strong> Este diagnóstico es una simulación orientativa basada en las respuestas suministradas. Los resultados reflejan el estado percibido del sistema de Gestión Humana y no constituyen una auditoría formal. Para una evaluación más profunda, agenda una asesoría personalizada con CSH Talent.</div>
+  <div class="btn-row" style="margin-top:1.5rem;">
+    <button class="btn-primary" id="btnImprimir" onclick="window.print()">Imprimir / Guardar PDF</button>
+    <button class="btn-secondary" onclick="location.reload()">Nuevo diagnóstico</button>
+  </div>`;
+
+  document.getElementById('resultado-container').innerHTML=html;
+
+  // Generar informe IA (el guardado en Supabase ya lo hace el propio servidor)
+  generarInformeCIMA(scores, total, pct, nivel);
+
+  setTimeout(()=>{
+    const ctx=document.getElementById('radarChart').getContext('2d');
+    new Chart(ctx,{
+      type:'radar',
+      data:{
+        labels:scores.map(s=>{
+          var palabras = s.titulo.replace(/&/g,'y').split(' ');
+          var lineas = [], linea = '';
+          palabras.forEach(function(p) {
+            if ((linea+' '+p).trim().length > 16) { if(linea) lineas.push(linea.trim()); linea = p; }
+            else linea = (linea+' '+p).trim();
+          });
+          if(linea) lineas.push(linea.trim());
+          return lineas;
+        }),
+        datasets:[{
+          label:infoEmpresa.empresa,
+          data:scores.map(s=>Math.round(s.avg*100)),
+          backgroundColor:'rgba(232,123,111,0.12)',
+          borderColor:'#E87B6F',borderWidth:2,
+          pointBackgroundColor:scores.map(s=>s.avg<.5?'#b5404a':s.avg<.8?'#e8a020':'#2e7d32'),
+          pointBorderColor:'#fff',pointBorderWidth:2,pointRadius:6,pointHoverRadius:8
+        }]
+      },
+      options:{
+        responsive:true,maintainAspectRatio:false,
+        scales:{r:{min:0,max:100,ticks:{stepSize:25,font:{family:'Raleway',size:10},color:'#9ca3af'},grid:{color:'#e5e7eb'},pointLabels:{font:{family:'Raleway',size:10,weight:'600'},color:function(ctx){var s=scores[ctx.index];return s.avg<.5?'#b5404a':s.avg<.8?'#a07800':'#2e7d32';}}}},
+        plugins:{legend:{display:false}}
+      }
+    });
+  },300);
+}
+
+renderSecciones();
+
+// ══ INFORME IA (conectado al backend seguro con límite de 2 por usuario) ══
+async function guardarEnEspacioPersonal(pct, nivel){
+  try{
+    const sb = window.getCSHSupabaseClient();
+    const { data: { user } } = await sb.auth.getUser();
+    if(!user) return;
+    await sb.from('user_workspace').insert([{
+      user_id: user.id,
+      tool_slug: 'diagnostico-cima',
+      record_type: 'diagnostico',
+      title: `Diagnóstico CIMA® — ${infoEmpresa.empresa} (${pct}% · ${nivel})`,
+      payload: { empresa: infoEmpresa.empresa, score_total: pct, nivel: nivel }
+    }]);
+  }catch(e){
+    console.error('No se pudo guardar en el espacio personal:', e);
+  }
+}
+
+async function generarInformeCIMA(scores, total, pct, nivel) {
+  const el = document.getElementById('informe-cima');
+  if (!el) return;
+
+  el.innerHTML = `<div class="informe-loader">
+    <div class="dots"><span></span><span></span><span></span></div>
+    <p>Analizando los resultados de tu empresa<br>y redactando el informe ejecutivo CIMA®...</p>
+  </div>`;
+
+  const scoresParaAPI = scores.map(s => ({
+    titulo: s.titulo,
+    avg: s.avg,
+    diagnostico: getDiag(s.id, s.avg)
+  }));
+
+  try {
+    const sb = window.getCSHSupabaseClient();
+    const { data: { session } } = await sb.auth.getSession();
+    const token = session?.access_token;
+
+    const res = await fetch('/api/generate-report', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        empresa: {
+          nombre: infoEmpresa.empresa,
+          tamano: infoEmpresa.tamano,
+          sector: infoEmpresa.sector,
+          empleados: infoEmpresa.empleados
+        },
+        scores: scoresParaAPI,
+        totalPct: pct,
+        nivel: nivel.label
+      })
+    });
+
+    const data = await res.json();
+
+    if (data.limite_alcanzado) {
+      el.innerHTML = `<div class="limite-note">${data.error} Escríbenos a <a href="mailto:carolina@cshtalent.com">carolina@cshtalent.com</a> si necesitas un informe adicional.</div>`;
+      const btnImprimir = document.getElementById('btnImprimir');
+      if (btnImprimir) btnImprimir.style.display = 'none';
+      return;
+    }
+
+    if (data.informe) {
+      let texto = data.informe
+        .replace(/#{1,6}\s*/g, '')
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.*?)\*/g, '$1')
+        .replace(/^---+$/gm, '')
+        .replace(/^___+$/gm, '')
+        .replace(/\[b\](.*?)\[\/b\]/g, '<strong>$1</strong>')
+        .trim();
+
+      const parrafos = texto.split(/\n\n+/).map(p => {
+        const lineas = p.trim().split('\n').map(l => {
+          const trim = l.trim();
+          if (/^\d+\.\s+[A-ZÁÉÍÓÚÑ]/.test(trim) && trim.length < 80) {
+            return `<div style="font-size:.92rem;font-weight:800;color:var(--petrol);margin:1.5rem 0 .4rem;letter-spacing:.02em;">${trim}</div>`;
+          }
+          if (/^\d+\.\d+\s+/.test(trim) && trim.length < 100) {
+            return `<div style="font-size:.88rem;font-weight:700;color:var(--dark);margin:.75rem 0 .25rem;">${trim}</div>`;
+          }
+          if (trim.startsWith('•') || trim.startsWith('-')) {
+            return `<div style="padding-left:.5rem;margin-bottom:.3rem;">${trim}</div>`;
+          }
+          return l;
+        }).join('<br>');
+        return `<p style="margin-bottom:1rem;font-size:.88rem;line-height:1.9;color:var(--text);">${lineas}</p>`;
+      }).join('');
+
+      let restantesHtml = '';
+      if (typeof data.diagnosticos_restantes === 'number') {
+        restantesHtml = `<div class="restantes-tag">Te queda${data.diagnosticos_restantes===1?'':'n'} ${data.diagnosticos_restantes} diagnóstico${data.diagnosticos_restantes===1?'':'s'} gratuito${data.diagnosticos_restantes===1?'':'s'} con esta cuenta</div>`;
+      }
+
+      el.innerHTML = parrafos + restantesHtml;
+
+      // Guardar resumen en el espacio personal del usuario
+      guardarEnEspacioPersonal(pct, nivel.label);
+    } else {
+      el.innerHTML = `<p style="color:var(--brand-red);font-size:.82rem;">${data.error || 'No fue posible generar el informe.'} Los resultados por sección están disponibles abajo.</p>`;
+    }
+  } catch (err) {
+    el.innerHTML = `<p style="color:var(--brand-red);font-size:.82rem;">Error al conectar con el agente. Los resultados por sección están disponibles abajo.</p>`;
+  }
+}
+
+// ══ TOOLTIPS POR TEXTO DE PREGUNTA ══
+const AYUDAS = {
+  'organigrama': 'El organigrama es la representación gráfica de la estructura jerárquica de la empresa: quién reporta a quién y cómo se organizan los cargos.',
+  'perfil documentado': 'Un perfil de cargo documentado es la descripción formal de las funciones, competencias y requisitos de cada posición en la empresa.',
+  'manual': 'El manual de funciones describe qué hace cada cargo, qué se requiere para ocuparlo y cómo se relaciona con los demás roles.',
+  'repositorio central': 'Un repositorio central es el lugar único — físico o digital — donde se guardan todos los documentos de GH de manera organizada.',
+  'estrategia corporativa': 'La estrategia corporativa es el conjunto de objetivos y lineamientos que definen hacia dónde va la empresa y cómo lograrlo.',
+  'tasa de rotación': 'La tasa de rotación mide qué porcentaje de personas se fueron de la empresa en un período comparado con el total de colaboradores.',
+  'rotación voluntaria': 'La rotación voluntaria ocurre cuando el colaborador decide irse por su propia cuenta, no por decisión de la empresa.',
+  'entrevista de salida': 'La entrevista de salida es una conversación estructurada con el colaborador que se va para entender por qué tomó esa decisión.',
+  'cargos críticos': 'Los cargos críticos son las posiciones cuya ausencia afecta significativamente la operación o los resultados del negocio.',
+  'planes de sucesión': 'Un plan de sucesión es una estrategia para identificar y preparar personas dentro de la empresa que puedan asumir cargos críticos en el futuro.',
+  'acciones de retención': 'Las acciones de retención son iniciativas para que los colaboradores clave quieran quedarse: planes de carrera, bienestar, reconocimiento.',
+  'compromiso': 'El compromiso organizacional es el grado en que los colaboradores se identifican con la empresa y están motivados a dar lo mejor de sí.',
+  'objetivos de desempeño': 'Los objetivos de desempeño son las metas concretas y medibles que debe alcanzar cada colaborador en un período determinado.',
+  'evaluaciones de desempeño': 'La evaluación de desempeño es el proceso que mide qué tan bien cumple cada persona con sus responsabilidades y objetivos.',
+  'frecuencia': 'La frecuencia de evaluación define cada cuánto se mide el desempeño: anual, semestral o trimestral.',
+  'retroalimentación formal': 'La retroalimentación formal es la conversación estructurada donde se le comunica al colaborador sus fortalezas y áreas de mejora.',
+  'planes de desarrollo': 'Un plan de desarrollo es el acuerdo entre el colaborador y la empresa sobre las acciones para crecer en competencias o carrera.',
+  'software o plataformas': 'Un software de GH es una herramienta digital que automatiza procesos como nómina, desempeño o selección.',
+  'escala salarial': 'Una escala salarial define los rangos de compensación según el nivel de cada cargo dentro de la empresa.',
+  'banda salarial': 'Una banda salarial es el rango mínimo y máximo de compensación definido para un cargo o nivel específico.',
+  'benchmark': 'El benchmark salarial compara lo que paga la empresa versus lo que paga el mercado para el mismo cargo en el mismo sector.',
+  'incrementos salariales': 'La política de incrementos define cuándo, cuánto y por qué criterios sube el salario de un colaborador.',
+  'estructura de beneficios': 'La estructura de beneficios es el conjunto formal de ventajas adicionales al salario: auxilio de alimentación, flexibilidad, seguros.',
+  'compensación está alineada': 'La compensación variable vinculada a resultados significa que parte del salario depende de cumplir metas.',
+  'bonificación anual': 'La bonificación grupal es un pago adicional cuando la empresa o el área alcanza resultados extraordinarios.',
+  'presupuesto anual': 'El presupuesto de personal es la planeación financiera del costo total del talento: salarios, beneficios y desarrollo.',
+  'indicadores de gestión humana': 'Los indicadores de GH miden aspectos clave como rotación, ausentismo, clima y desempeño.',
+  'contrato escrito': 'El contrato de trabajo escrito es el documento legal que formaliza la relación laboral y protege a ambas partes.',
+  'afiliaciones a EPS': 'Las afiliaciones a EPS, Pensión y ARL son la obligación del empleador de inscribir a cada trabajador en seguridad social.',
+  'prestaciones sociales': 'Las prestaciones sociales son pagos adicionales al salario exigidos por ley: cesantías, primas, vacaciones e intereses.',
+  'reglamento interno': 'El reglamento interno establece las normas de convivencia, disciplina y procedimientos dentro de la empresa.',
+  'proceso disciplinario': 'El proceso disciplinario es el procedimiento formal que garantiza el debido proceso cuando un colaborador incumple normas.',
+  'comités exigidos': 'Los comités obligatorios en Colombia incluyen el COPASST y el Comité de Convivencia Laboral, según el tamaño de la empresa.',
+  'valores o principios': 'Los valores organizacionales son los principios que guían el comportamiento de las personas en su día a día.',
+  'clima o cultura': 'El clima laboral es la percepción colectiva de los colaboradores sobre cómo es trabajar en la empresa.',
+  'programas de desarrollo y capacitación': 'Los programas de desarrollo son iniciativas formales para que los colaboradores mejoren sus conocimientos y habilidades.',
+  'estilo de liderazgo': 'El estilo de liderazgo es la manera en que un líder orienta, motiva y gestiona a las personas de su equipo.',
+  'comunicación interna': 'La comunicación interna es el flujo de información entre la empresa y sus colaboradores: decisiones, noticias y reconocimientos.',
+  'mecanismos formales': 'Los mecanismos formales de comunicación son los canales establecidos para informar y escuchar al equipo.',
+  'celebra fechas especiales': 'Celebrar logros refuerza la cultura de pertenencia y hace que los colaboradores se sientan valorados.',
+  'cercanía y accesibilidad': 'La accesibilidad de los líderes refleja qué tan fácil es para los colaboradores acercarse y expresar sus inquietudes.',
+  'bienestar': 'Los programas de bienestar son iniciativas para cuidar la salud física, emocional y familiar de los colaboradores.',
+  'reclutamiento y selección': 'El proceso de selección es la metodología con etapas claras para evaluar candidatos con criterios objetivos.',
+  'vacantes': 'Las descripciones de cargo actualizadas garantizan que se evalúen los candidatos correctos para cada posición.',
+  'tiempo de cobertura': 'Los indicadores de selección miden cuánto tarda en cubrirse una vacante y qué tan bien se desempeña quien se contrató.',
+  'evaluaciones técnicas': 'Las pruebas técnicas o psicométricas evalúan conocimientos y habilidades para reducir el riesgo de malas contrataciones.',
+  'período de prueba': 'El período de prueba es el tiempo inicial del contrato donde se verifica si la persona cumple las expectativas del cargo.',
+  'responsabilidad social': 'La RSE es el compromiso de la empresa con generar impacto positivo en su entorno social, ambiental y económico.',
+  'diversidad e inclusión': 'La diversidad e inclusión garantiza que personas con diferentes perspectivas tengan igualdad de oportunidades.',
+  'impacto social': 'Monitorear el impacto social y ambiental permite demostrar responsabilidad y mejorar la reputación de la empresa.',
+  'ideas innovadoras': 'Los canales de innovación interna permiten aprovechar el conocimiento del equipo para mejorar procesos y resultados.',
+  'modalidad de trabajo': 'La modalidad define cómo trabajan los colaboradores: presencial, remoto o híbrido (combinación de ambos).',
+  'desempeño en modalidad remota': 'El seguimiento al trabajo remoto verifica avances y resultados sin necesidad de presencia física.',
+  'herramientas': 'Las herramientas para trabajo remoto son los equipos y plataformas que permiten trabajar efectivamente fuera de la oficina.'
+};
+
+function getAyuda(texto) {
+  if (!texto) return null;
+  const t = texto.toLowerCase();
+  for (const clave in AYUDAS) {
+    if (t.includes(clave)) return AYUDAS[clave];
+  }
+  return null;
+}
+
+function inyectarTooltips() {
+  document.querySelectorAll('.question').forEach(function(qDiv) {
+    const qText = qDiv.querySelector('.q-text');
+    if (!qText || qText.querySelector('.q-help')) return;
+    const ayuda = getAyuda(qText.textContent.trim());
+    if (!ayuda) return;
+    const span = document.createElement('span');
+    span.className = 'q-help';
+    span.dataset.ayuda = ayuda;
+    span.textContent = '?';
+    span.addEventListener('mouseenter', function(e) {
+      var tt = document.getElementById('global-tooltip');
+      if (!tt) { tt = document.createElement('div'); tt.id = 'global-tooltip'; tt.className = 'q-tooltip'; document.body.appendChild(tt); }
+      tt.textContent = this.dataset.ayuda;
+      tt.style.visibility = 'visible'; tt.style.opacity = '1';
+      var r = this.getBoundingClientRect();
+      tt.style.left = Math.min(r.left + r.width/2 - 130, window.innerWidth - 270) + 'px';
+      tt.style.top = (r.top - tt.offsetHeight - 10) + 'px';
+    });
+    span.addEventListener('mouseleave', function() {
+      var tt = document.getElementById('global-tooltip'); if (tt) { tt.style.visibility='hidden'; tt.style.opacity='0'; }
+    });
+    qText.appendChild(span);
+  });
+}
+
+const _goTo = goTo;
+goTo = function(n) { _goTo(n); setTimeout(inyectarTooltips, 80); };
+setTimeout(inyectarTooltips, 400);
+
+// ══ AUTENTICACIÓN (compartida con todo el ecosistema) ══
+function iniciarDiagnostico() {
+  window.CSHAuth.requireAuth(function (user) {
+    goTo(1);
+  });
+}
+</script>
+
+<script src="csh-auth.js"></script>
+<script src="assistant.js"></script>
+<script>
+const sb = window.getCSHSupabaseClient();
+window.addEventListener('scroll', () => document.getElementById('mainNav').classList.toggle('scrolled', window.scrollY > 20));
+document.getElementById('navLoginLink')?.addEventListener('click', (e) => { e.preventDefault(); window.CSHAuth.open('login'); });
+
+(async () => {
+  const { data: { user } } = await sb.auth.getUser();
+  if (user) {
+    const name = (user.user_metadata?.full_name || user.email.split('@')[0]).split(' ')[0];
+    document.getElementById('navRight').innerHTML = `
+      <a href="dashboard.html" style="font-size:.78rem;font-weight:600;color:var(--muted);text-decoration:none;">Hola, ${name}</a>
+      <button onclick="(async()=>{await sb.auth.signOut();window.location.reload();})()" class="btn-nav coral" style="cursor:pointer;">Salir</button>`;
+  }
+})();
+</script>
+
+</body>
+</html>
