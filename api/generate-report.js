@@ -5,7 +5,7 @@ export default async function handler(req, res) {
 
   const SUPABASE_URL = 'https://eiauimhrybdamjpntdwh.supabase.co';
   const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  const LIMITE_POR_USUARIO = 2;
+  const TOOL_SLUG = 'cima';
 
   // ── 1. Verificar quién está llamando, usando su token de sesión ──
   const authHeader = req.headers.authorization || '';
@@ -30,11 +30,13 @@ export default async function handler(req, res) {
     return res.status(401).json({ error: 'No pudimos verificar tu sesión.' });
   }
 
-  // ── 2. Contar cuántos diagnósticos ya tiene este usuario ──
+  // ── 2. Contar cuántos diagnósticos COMPLETADOS ya tiene este usuario ──
+  // (los borradores no cuentan contra el límite: solo los diagnósticos
+  // realmente terminados consumen un cupo)
   let yaGenerados = 0;
   try {
     const countRes = await fetch(
-      `${SUPABASE_URL}/rest/v1/diagnosticos?user_id=eq.${user.id}&select=id`,
+      `${SUPABASE_URL}/rest/v1/diagnosticos?user_id=eq.${user.id}&estado=eq.completado&select=id`,
       {
         headers: {
           'apikey': SERVICE_KEY,
@@ -49,14 +51,38 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: 'No pudimos verificar tu historial de diagnósticos.' });
   }
 
-  if (yaGenerados >= LIMITE_POR_USUARIO) {
+  // ── 3. Preguntarle a la función genérica si este usuario puede usar el CIMA ──
+  // Esta misma función (check_tool_access) la reutilizará cualquier herramienta
+  // futura: ella resuelve sola membresía activa vs. límite gratuito configurado
+  // en la tabla `tools`, sin que cada endpoint reinvente esa lógica.
+  let acceso;
+  try {
+    const accesoRes = await fetch(`${SUPABASE_URL}/rest/v1/rpc/check_tool_access`, {
+      method: 'POST',
+      headers: {
+        'apikey': SERVICE_KEY,
+        'Authorization': `Bearer ${SERVICE_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        p_user_id: user.id,
+        p_tool_slug: TOOL_SLUG,
+        p_current_uses: yaGenerados
+      })
+    });
+    acceso = await accesoRes.json();
+  } catch (e) {
+    return res.status(500).json({ error: 'No pudimos verificar tu acceso a esta herramienta.' });
+  }
+
+  if (!acceso.allowed) {
     return res.status(403).json({
-      error: `Ya generaste tus ${LIMITE_POR_USUARIO} diagnósticos gratuitos con esta cuenta. Escríbenos si necesitas uno adicional.`,
+      error: 'Ya generaste tus diagnósticos gratuitos con esta cuenta. Escríbenos si necesitas uno adicional.',
       limite_alcanzado: true
     });
   }
 
-  // ── 3. Generar el informe (misma lógica de siempre, sin tocar) ──
+  // ── 4. Generar el informe (misma lógica de siempre, sin tocar) ──
   const { empresa, scores, totalPct, nivel } = req.body;
 
   if (!empresa || !scores) {
@@ -146,42 +172,97 @@ Formato: no uses tablas en formato markdown (nada de símbolos | para crear fila
     return res.status(500).json({ error: 'Error interno del servidor' });
   }
 
-  // ── 4. Guardar el diagnóstico (solo el servidor puede insertar aquí) ──
+  // ── 4. Guardar el diagnóstico (solo el servidor puede insertar/completar aquí) ──
+  // Si el usuario venía con un borrador (guardado automático mientras contestaba),
+  // ESE MISMO registro pasa a estado 'completado' — no se crea uno nuevo aparte.
+  // Así el registro conserva su fecha de creación real (cuando empezó) y su fecha
+  // de modificación (cuando terminó), en vez de duplicar filas.
   const get = (id) => {
     const s = scores.find((s, i) => i === id - 2); // s2..s10 → índice 0..8
     return s ? Math.round(s.avg * 100) : null;
   };
 
+  const datosFinales = {
+    user_id: user.id,
+    user_email: user.email,
+    empresa: empresa.nombre,
+    sector: empresa.sector || null,
+    tamano: empresa.tamano || null,
+    empleados: empresa.empleados ? String(empresa.empleados) : null,
+    score_total: totalPct,
+    nivel: nivel,
+    s2_estructura: get(2),
+    s3_rotacion: get(3),
+    s4_desarrollo: get(4),
+    s5_compensacion: get(5),
+    s6_cumplimiento: get(6),
+    s7_cultura: get(7),
+    s8_reclutamiento: get(8),
+    s9_rse: get(9),
+    s10_nuevas_formas: get(10),
+    informe_texto: informe,
+    estado: 'completado',
+    respuestas_parciales: null,
+    updated_at: new Date().toISOString()
+  };
+
+  let diagnosticoId = null;
   try {
-    await fetch(`${SUPABASE_URL}/rest/v1/diagnosticos`, {
-      method: 'POST',
-      headers: {
-        'apikey': SERVICE_KEY,
-        'Authorization': `Bearer ${SERVICE_KEY}`,
-        'Content-Type': 'application/json',
-        'Prefer': 'return=minimal'
-      },
-      body: JSON.stringify({
-        user_id: user.id,
-        user_email: user.email,
-        empresa: empresa.nombre,
-        sector: empresa.sector || null,
-        tamano: empresa.tamano || null,
-        empleados: empresa.empleados ? String(empresa.empleados) : null,
-        score_total: totalPct,
-        nivel: nivel,
-        s2_estructura: get(2),
-        s3_rotacion: get(3),
-        s4_desarrollo: get(4),
-        s5_compensacion: get(5),
-        s6_cumplimiento: get(6),
-        s7_cultura: get(7),
-        s8_reclutamiento: get(8),
-        s9_rse: get(9),
-        s10_nuevas_formas: get(10),
-        informe_texto: informe
-      })
-    });
+    // ¿Ya tenía un borrador? Lo completamos en vez de crear una fila nueva.
+    const borradorRes = await fetch(
+      `${SUPABASE_URL}/rest/v1/diagnosticos?user_id=eq.${user.id}&estado=eq.borrador&select=id`,
+      { headers: { 'apikey': SERVICE_KEY, 'Authorization': `Bearer ${SERVICE_KEY}` } }
+    );
+    const borradores = await borradorRes.json();
+
+    if (Array.isArray(borradores) && borradores.length > 0) {
+      const idBorrador = borradores[0].id;
+      const updateRes = await fetch(`${SUPABASE_URL}/rest/v1/diagnosticos?id=eq.${idBorrador}`, {
+        method: 'PATCH',
+        headers: {
+          'apikey': SERVICE_KEY,
+          'Authorization': `Bearer ${SERVICE_KEY}`,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=representation'
+        },
+        body: JSON.stringify(datosFinales)
+      });
+      const updated = await updateRes.json();
+      diagnosticoId = updated?.[0]?.id ?? idBorrador;
+    } else {
+      const insertRes = await fetch(`${SUPABASE_URL}/rest/v1/diagnosticos`, {
+        method: 'POST',
+        headers: {
+          'apikey': SERVICE_KEY,
+          'Authorization': `Bearer ${SERVICE_KEY}`,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=representation'
+        },
+        body: JSON.stringify(datosFinales)
+      });
+      const inserted = await insertRes.json();
+      diagnosticoId = inserted?.[0]?.id ?? null;
+    }
+
+    // Puntero liviano en el índice de "Mi Espacio" — el detalle real vive en `diagnosticos`.
+    if (diagnosticoId) {
+      await fetch(`${SUPABASE_URL}/rest/v1/user_workspace`, {
+        method: 'POST',
+        headers: {
+          'apikey': SERVICE_KEY,
+          'Authorization': `Bearer ${SERVICE_KEY}`,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify({
+          user_id: user.id,
+          tool_slug: 'cima',
+          record_type: 'diagnostico',
+          record_id: String(diagnosticoId),
+          title: `${empresa.nombre} — ${totalPct}% · ${nivel}`
+        })
+      });
+    }
   } catch (e) {
     console.error('Error guardando diagnóstico:', e);
     // No bloqueamos la respuesta al usuario por esto: ya generó su informe,
@@ -190,6 +271,6 @@ Formato: no uses tablas en formato markdown (nada de símbolos | para crear fila
 
   return res.status(200).json({
     informe,
-    diagnosticos_restantes: LIMITE_POR_USUARIO - (yaGenerados + 1)
+    diagnosticos_restantes: acceso.remaining
   });
 }
