@@ -226,12 +226,29 @@
     el.className = 'csh-auth-status' + (kind ? ' ' + kind : '');
   }
 
+  function limpiarCampos() {
+    const ids = [
+      'cshAuthSignupEmail', 'cshAuthSignupPassword', 'cshAuthSignupPassword2',
+      'cshAuthLoginEmail', 'cshAuthLoginPassword',
+      'cshAuthForgotEmail',
+      'cshAuthResetPassword', 'cshAuthResetPassword2'
+    ];
+    ids.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = '';
+    });
+  }
+
   function openModal(view) {
     ensureBuilt();
     setView(view || 'signup');
     document.getElementById('cshAuthSignupForm').style.display = 'flex';
     document.getElementById('cshAuthSignupSuccess').style.display = 'none';
     document.getElementById('cshAuthOverlay').classList.add('open');
+    limpiarCampos();
+    // Chrome a veces autocompleta después de que el modal ya se muestra —
+    // lo volvemos a limpiar un instante después, por si acaso.
+    setTimeout(limpiarCampos, 60);
   }
 
   function closeModal() {
