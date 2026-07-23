@@ -43,18 +43,27 @@ nav.scrolled{box-shadow:0 2px 20px rgba(0,0,0,.08);}
 .diag-hero h1{font-size:clamp(1.6rem,3.5vw,2.4rem);font-weight:800;color:var(--dark);line-height:1.2;margin-bottom:.6rem;}
 .diag-hero h1 span{color:var(--coral);font-style:italic;}
 .diag-hero p{font-size:.9rem;color:var(--muted);max-width:520px;margin:0 auto;line-height:1.6;}
-.diag-info-line{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:.5rem;font-size:.76rem;color:var(--muted);margin-top:.75rem;max-width:600px;margin-left:auto;margin-right:auto;}
-.diag-info-line .dot{color:var(--border);}
+.diag-info-line{display:flex;flex-direction:column;align-items:flex-start;gap:.55rem;font-size:.78rem;color:var(--muted);margin-top:1rem;line-height:1.5;}
+.diag-info-line .dot{display:none;}
 .diag-hero-split{display:flex;align-items:center;gap:2.5rem;padding:2.5rem 1rem 1.5rem;}
 .diag-hero-text{flex:1.3;text-align:left;}
 .diag-hero-text .dh-tag{display:inline-block;background:var(--coral-pale);color:var(--coral-deep);font-size:.65rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:.3rem .9rem;border-radius:99px;margin-bottom:1rem;}
 .diag-hero-text h1{font-size:clamp(1.6rem,3.5vw,2.3rem);font-weight:800;color:var(--dark);line-height:1.2;margin-bottom:.6rem;}
 .diag-hero-text h1 span{color:var(--coral);font-style:italic;}
 .diag-hero-text p{font-size:.9rem;color:var(--muted);line-height:1.6;}
+.diag-dims{display:grid;grid-template-columns:1fr 1fr;gap:.4rem .75rem;margin:1rem 0 0;padding:0;list-style:none;}
+.diag-dims li{font-size:.78rem;color:var(--text);display:flex;align-items:center;gap:.45rem;}
+.diag-dims li::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--coral);flex-shrink:0;}
+.diag-marquee-caption{text-align:center;font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--petrol);margin:0 0 .75rem;}
+.diag-marquee{overflow:hidden;position:relative;padding:.25rem 0 1.5rem;-webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);}
+.diag-marquee-track{display:flex;gap:.6rem;width:max-content;animation:diagMarqueeScroll 22s linear infinite;}
+.diag-marquee-pill{flex-shrink:0;background:var(--petrol-pale);color:var(--petrol);font-size:.8rem;font-weight:700;padding:.5rem 1.1rem;border-radius:99px;white-space:nowrap;}
+.diag-marquee-pill.alt{background:var(--coral-pale);color:var(--coral-deep);}
+@keyframes diagMarqueeScroll{from{transform:translateX(0);}to{transform:translateX(-50%);}}
 .diag-hero-radar{flex:1;display:flex;flex-direction:column;align-items:center;text-align:center;flex-shrink:0;}
 .diag-hero-legend{display:flex;gap:.9rem;flex-wrap:wrap;justify-content:center;margin-top:.75rem;font-size:.72rem;color:var(--muted);}
 .diag-hero-legend i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:.35rem;vertical-align:middle;}
-@media(max-width:760px){.diag-hero-split{flex-direction:column;gap:1.5rem;padding:1.75rem 1rem 1rem;}.diag-hero-text{text-align:center;}.diag-info-line{justify-content:center!important;margin-left:auto!important;}}
+@media(max-width:760px){.diag-hero-split{flex-direction:column;gap:1.5rem;padding:1.75rem 1rem 1rem;}.diag-hero-text{text-align:center;}.diag-info-line{align-items:center!important;}.diag-dims{text-align:left;}}
 .diag-sections{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;margin:1.5rem 0 2rem;text-align:left;}
 .ds-item{background:#fff;border:1px solid var(--border);border-radius:10px;padding:.9rem 1rem;}
 .ds-num{font-size:.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--petrol);margin-bottom:.25rem;}
@@ -211,6 +220,30 @@ nav.scrolled{box-shadow:0 2px 20px rgba(0,0,0,.08);}
         <span><i style="background:#b5404a;"></i> Por mejorar</span>
       </div>
       <div style="font-size:.68rem;color:var(--muted2);margin-top:.5rem;">Ejemplo ilustrativo — tu radar mostrará tus propios resultados por dimensión.</div>
+    </div>
+  </div>
+
+  <div class="diag-marquee-caption">Evaluamos 9 áreas clave de la Gestión Humana</div>
+  <div class="diag-marquee">
+    <div class="diag-marquee-track">
+      <span class="diag-marquee-pill">Estructura</span>
+      <span class="diag-marquee-pill alt">Rotación</span>
+      <span class="diag-marquee-pill">Desarrollo</span>
+      <span class="diag-marquee-pill alt">Compensación</span>
+      <span class="diag-marquee-pill">Legal</span>
+      <span class="diag-marquee-pill alt">Cultura</span>
+      <span class="diag-marquee-pill">Selección</span>
+      <span class="diag-marquee-pill alt">RSE</span>
+      <span class="diag-marquee-pill">Nuevas formas</span>
+      <span class="diag-marquee-pill">Estructura</span>
+      <span class="diag-marquee-pill alt">Rotación</span>
+      <span class="diag-marquee-pill">Desarrollo</span>
+      <span class="diag-marquee-pill alt">Compensación</span>
+      <span class="diag-marquee-pill">Legal</span>
+      <span class="diag-marquee-pill alt">Cultura</span>
+      <span class="diag-marquee-pill">Selección</span>
+      <span class="diag-marquee-pill alt">RSE</span>
+      <span class="diag-marquee-pill">Nuevas formas</span>
     </div>
   </div>
 </div>
