@@ -188,6 +188,7 @@ nav.scrolled{box-shadow:0 2px 20px rgba(0,0,0,.08);}
 
 <div id="s0" class="screen active">
   <div id="bannerBorrador" style="display:none;"></div>
+  <div id="bloqueoAcceso" style="display:none;padding:0 1rem;"></div>
   <div class="diag-hero-split">
     <div class="diag-hero-text">
       <div class="dh-tag">Marco CIMA® · Diagnóstico Gratuito</div>
@@ -800,22 +801,7 @@ async function generarInformeCIMA(scores, total, pct, nivel) {
     const data = await res.json();
 
     if (data.limite_alcanzado) {
-      el.innerHTML = `
-        <div class="limite-note">${data.error}</div>
-        <div class="pago-opciones">
-          <div class="pago-card">
-            <div class="pago-card-titulo">Diagnóstico CIMA®</div>
-            <div class="pago-card-precio">$20.000 COP</div>
-            <div class="pago-card-desc">Un diagnóstico adicional, acceso por 30 días para volver a consultarlo.</div>
-            <button class="pago-btn" id="btnComprarCima" onclick="comprarAcceso('tool','cima')">Comprar este diagnóstico</button>
-          </div>
-          <div class="pago-card destacado">
-            <div class="pago-card-titulo">Membresía CSH Talent</div>
-            <div class="pago-card-precio">$100.000 COP</div>
-            <div class="pago-card-desc">Uso ilimitado de todas las herramientas Premium de CSH Talent durante 30 días.</div>
-            <button class="pago-btn" id="btnComprarMembresia" onclick="comprarAcceso('membership')">Hazte Miembro</button>
-          </div>
-        </div>`;
+      el.innerHTML = `<div class="limite-note">${data.error}</div>` + pagoOpcionesHTML();
       const btnImprimir = document.getElementById('btnImprimir');
       if (btnImprimir) btnImprimir.style.display = 'none';
       return;
@@ -967,8 +953,55 @@ goTo = function(n) { _goTo(n); setTimeout(inyectarTooltips, 80); if(n === 1) mos
 setTimeout(inyectarTooltips, 400);
 
 // ══ AUTENTICACIÓN (compartida con todo el ecosistema) ══
+function pagoOpcionesHTML(){
+  return `
+    <div class="pago-opciones">
+      <div class="pago-card">
+        <div class="pago-card-titulo">Diagnóstico CIMA®</div>
+        <div class="pago-card-precio">$20.000 COP</div>
+        <div class="pago-card-desc">Un diagnóstico adicional, acceso por 30 días para volver a consultarlo.</div>
+        <button class="pago-btn" id="btnComprarCima" onclick="comprarAcceso('tool','cima')">Comprar este diagnóstico</button>
+      </div>
+      <div class="pago-card destacado">
+        <div class="pago-card-titulo">Membresía CSH Talent</div>
+        <div class="pago-card-precio">$100.000 COP</div>
+        <div class="pago-card-desc">Uso ilimitado de todas las herramientas Premium de CSH Talent durante 30 días.</div>
+        <button class="pago-btn" id="btnComprarMembresia" onclick="comprarAcceso('membership')">Hazte Miembro</button>
+      </div>
+    </div>`;
+}
+
+async function verificarAccesoCima(userId){
+  try{
+    const sb = window.getCSHSupabaseClient();
+    const { count } = await sb.from('diagnosticos')
+      .select('id', { count: 'exact', head: true })
+      .eq('user_id', userId).eq('estado', 'completado');
+    const { data } = await sb.rpc('check_tool_access', {
+      p_user_id: userId, p_tool_slug: 'cima', p_current_uses: count || 0
+    });
+    return data || { allowed: false, reason: 'error' };
+  }catch(e){
+    console.error('No se pudo verificar el acceso:', e);
+    return { allowed: true }; // ante un error de verificación, dejamos pasar (el servidor vuelve a validar de todas formas)
+  }
+}
+
 function iniciarDiagnostico() {
-  window.CSHAuth.requireAuth(function (user) {
+  window.CSHAuth.requireAuth(async function (user) {
+    const btn = document.getElementById('btnComenzar');
+    if(btn){ btn.disabled = true; btn.textContent = 'Verificando acceso...'; }
+    const acceso = await verificarAccesoCima(user.id);
+    if(btn){ btn.disabled = false; btn.textContent = 'Comenzar diagnóstico →'; }
+
+    if(!acceso.allowed){
+      const bloqueo = document.getElementById('bloqueoAcceso');
+      bloqueo.innerHTML = `<div class="limite-note">Ya usaste tu diagnóstico gratuito con esta cuenta.</div>` + pagoOpcionesHTML();
+      bloqueo.style.display = 'block';
+      bloqueo.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      if(btn) btn.style.display = 'none';
+      return;
+    }
     goTo(1);
   });
 }
@@ -1020,11 +1053,23 @@ async function comprarAcceso(tipo, toolSlug){
       if(btn){ btn.disabled = false; btn.textContent = tipo === 'tool' ? 'Comprar este diagnóstico' : 'Hazte Miembro'; }
       const estado = result?.transaction?.status;
       if(estado === 'APPROVED'){
-        const el = document.getElementById('informe-cima');
-        if(el) el.innerHTML = `<div class="informe-loader"><div class="dots"><span></span><span></span><span></span></div><p>Pago aprobado. Confirmando tu acceso y generando tu informe...</p></div>`;
-        setTimeout(function(){
-          if(ultimoResultado){
+        const enResultados = ultimoResultado !== null;
+        const contenedor = document.getElementById(enResultados ? 'informe-cima' : 'bloqueoAcceso');
+        if(contenedor) contenedor.innerHTML = `<div class="informe-loader"><div class="dots"><span></span><span></span><span></span></div><p>Pago aprobado. Confirmando tu acceso...</p></div>`;
+        setTimeout(async function(){
+          if(enResultados){
             generarInformeCIMA(ultimoResultado.scores, ultimoResultado.total, ultimoResultado.pct, ultimoResultado.nivel);
+          }else{
+            const { data: { user } } = await sb.auth.getUser();
+            const acceso = await verificarAccesoCima(user.id);
+            if(acceso.allowed){
+              document.getElementById('bloqueoAcceso').style.display = 'none';
+              const btnComenzar = document.getElementById('btnComenzar');
+              if(btnComenzar) btnComenzar.style.display = 'inline-block';
+              goTo(1);
+            }else{
+              document.getElementById('bloqueoAcceso').innerHTML = `<div class="limite-note">Tu pago se está confirmando. Si esto no cambia en un momento, refresca la página.</div>` + pagoOpcionesHTML();
+            }
           }
         }, 3000);
       }else if(estado === 'DECLINED'){
@@ -1051,7 +1096,8 @@ document.getElementById('navLoginLink')?.addEventListener('click', (e) => { e.pr
   if (user) {
     const name = (user.user_metadata?.full_name || user.email.split('@')[0]).split(' ')[0];
     document.getElementById('navRight').innerHTML = `
-      <a href="mi-espacio.html" style="font-size:.78rem;font-weight:600;color:var(--muted);text-decoration:none;">Hola, ${name}</a>
+      <span style="font-size:.78rem;color:var(--muted);">Hola, ${name}</span>
+      <a href="mi-espacio.html" class="btn-nav" style="background:var(--petrol, #2F4E5F);">Mi Espacio</a>
       <button onclick="(async()=>{await sb.auth.signOut();window.location.reload();})()" class="btn-nav coral" style="cursor:pointer;">Salir</button>`;
   }
   // Se llama aquí, no antes: en este punto assistant.js ya terminó de cargar de verdad.

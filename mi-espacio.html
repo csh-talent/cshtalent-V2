@@ -236,7 +236,8 @@ function cerrarModal(){
   if (user) {
     const name = (user.user_metadata?.full_name || user.email.split('@')[0]).split(' ')[0];
     document.getElementById('navRight').innerHTML = `
-      <a href="mi-espacio.html" style="font-size:.78rem;font-weight:600;color:var(--muted);text-decoration:none;">Hola, ${name}</a>
+      <span style="font-size:.78rem;color:var(--muted);">Hola, ${name}</span>
+      <a href="mi-espacio.html" class="btn-nav" style="background:var(--petrol, #2F4E5F);">Mi Espacio</a>
       <button onclick="(async()=>{await sb.auth.signOut();window.location.reload();})()" class="btn-nav coral" style="cursor:pointer;">Salir</button>`;
   }
   cargarMiEspacio();

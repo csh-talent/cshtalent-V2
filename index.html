@@ -307,7 +307,7 @@ footer { background: var(--dark); color: rgba(255,255,255,0.45); padding: 3rem 2
       <div class="footer-social">
         <a href="https://www.linkedin.com/in/carolina-salazar-gh" target="_blank" title="LinkedIn">in</a>
         <a href="https://www.instagram.com/cshtalent" target="_blank" title="Instagram">ig</a>
-        <a href="mailto:carolina@cshtalent.com" title="Correo">@</a>
+        <a href="contacto.html" title="Correo">@</a>
       </div>
     </div>
     <div>
@@ -324,7 +324,7 @@ footer { background: var(--dark); color: rgba(255,255,255,0.45); padding: 3rem 2
       <ul class="footer-links">
         <li><a href="politica-privacidad.html">Política de privacidad</a></li>
         <li><a href="terminos-condiciones.html">Términos de uso</a></li>
-        <li><a href="mailto:carolina@cshtalent.com">Contacto</a></li>
+        <li><a href="contacto.html">Contacto</a></li>
         <li><a href="verificar.html">Verificar certificado</a></li>
       </ul>
     </div>
@@ -351,7 +351,8 @@ document.getElementById('navLoginLink')?.addEventListener('click', (e) => { e.pr
   if (user) {
     const name = (user.user_metadata?.full_name || user.email.split('@')[0]).split(' ')[0];
     document.getElementById('navRight').innerHTML = `
-      <a href="mi-espacio.html" style="font-size:0.78rem;font-weight:600;color:var(--muted);text-decoration:none;">Hola, ${name}</a>
+      <span style="font-size:.78rem;color:var(--muted);">Hola, ${name}</span>
+      <a href="mi-espacio.html" class="btn-nav" style="background:var(--petrol, #2F4E5F);">Mi Espacio</a>
       <button onclick="(async()=>{await sb.auth.signOut();window.location.reload();})()" class="btn-nav coral" style="cursor:pointer;">Salir</button>`;
   }
 })();

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contáctanos — CSH Talent</title>
+<link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --petrol: #2F4E5F; --petrol-soft: #4A90A4; --petrol-pale: #e6ecef; --petrol-dark: #1e3340;
+  --coral: #E87B6F; --coral-deep: #d26359; --coral-pale: #fdece9;
+  --brand-red: #b5404a; --dark: #111827; --text: #1f2937; --muted: #6b7280;
+  --border: #e5e7eb; --surface: #f9fafb; --white: #ffffff;
+}
+body { font-family: 'Raleway', sans-serif; background: var(--surface); color: var(--text); min-height: 100vh; }
+
+nav { position: sticky; top: 0; left: 0; right: 0; z-index: 1000; background: rgba(255,255,255,0.97); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); height: 60px; padding: 0 2rem; display: flex; align-items: center; justify-content: space-between; }
+.nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+.nav-logo-mark { display: flex; flex-direction: column; }
+.nav-logo-name { font-size: .95rem; font-weight: 800; letter-spacing: .18em; color: var(--dark); line-height: 1; }
+.nav-logo-line { height: 1.5px; background: var(--brand-red); margin: 2px 0; }
+.nav-logo-sub { font-size: .42rem; font-weight: 500; letter-spacing: .2em; color: var(--muted); text-transform: uppercase; }
+.nav-right { display: flex; align-items: center; gap: 1.1rem; }
+.nav-login-link { font-size: .78rem; font-weight: 600; color: var(--muted); text-decoration: none; }
+.nav-login-link:hover { color: var(--petrol); }
+.btn-nav { font-size: .78rem; font-weight: 700; color: white; padding: .5rem 1.2rem; border-radius: 8px; text-decoration: none; border: none; cursor: pointer; font-family: 'Raleway', sans-serif; letter-spacing: .04em; }
+.btn-nav.coral { background: var(--coral); }
+.btn-nav.coral:hover { background: var(--coral-deep); }
+
+.main { max-width: 620px; margin: 0 auto; padding: 3rem 1.5rem 5rem; }
+.page-header { text-align: center; margin-bottom: 2rem; }
+.eyebrow { font-size: .65rem; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; color: var(--petrol-soft); margin-bottom: .75rem; }
+.page-header h1 { font-size: clamp(1.6rem, 4vw, 2.2rem); font-weight: 800; color: var(--dark); line-height: 1.2; margin-bottom: .5rem; }
+.page-header p { font-size: .88rem; color: var(--muted); line-height: 1.6; }
+
+.card { background: white; border: 1px solid var(--border); border-radius: 18px; padding: 2rem; }
+.field { margin-bottom: 1.25rem; }
+.field label { display: block; font-size: .7rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin-bottom: .4rem; }
+.field input, .field select, .field textarea { width: 100%; background: var(--surface); border: 1.5px solid var(--border); border-radius: 8px; padding: .7rem .9rem; font-family: 'Raleway', sans-serif; font-size: .88rem; color: var(--text); outline: none; }
+.field input:focus, .field select:focus, .field textarea:focus { border-color: var(--petrol); }
+.field textarea { min-height: 130px; resize: vertical; }
+.btn-enviar { width: 100%; background: var(--petrol-dark); color: white; border: none; border-radius: 10px; padding: .9rem; font-family: 'Raleway', sans-serif; font-size: .85rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; cursor: pointer; margin-top: .5rem; }
+.btn-enviar:hover { background: var(--petrol); }
+.btn-enviar:disabled { opacity: .6; cursor: default; }
+.status-msg { font-size: .85rem; text-align: center; margin-top: 1rem; padding: .9rem; border-radius: 10px; display: none; }
+.status-msg.ok { display: block; background: var(--petrol-pale); color: var(--petrol); }
+.status-msg.error { display: block; background: var(--coral-pale); color: var(--coral-deep); }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+<nav id="mainNav">
+  <a href="index.html" class="nav-logo">
+    <div class="nav-logo-mark">
+      <div class="nav-logo-name">CSH TALENT</div>
+      <div class="nav-logo-line"></div>
+      <div class="nav-logo-sub">Capital Sostenible y Humano</div>
+    </div>
+  </a>
+  <div class="nav-right" id="navRight">
+    <a href="#" class="nav-login-link" id="navLoginLink">Iniciar sesión</a>
+    <a href="historia.html" class="btn-nav coral">Acerca de CSH Talent</a>
+  </div>
+</nav>
+
+<div class="main">
+  <div class="page-header">
+    <div class="eyebrow">PQRS</div>
+    <h1>¿No encuentras lo que buscas?</h1>
+    <p>Cuéntanos tu petición, queja, reclamo o sugerencia. Leemos todos los mensajes.</p>
+  </div>
+
+  <div class="card">
+    <div class="field">
+      <label>Nombre completo *</label>
+      <input type="text" id="cNombre" placeholder="Tu nombre">
+    </div>
+    <div class="field">
+      <label>Correo electrónico *</label>
+      <input type="email" id="cCorreo" placeholder="tu@correo.com">
+    </div>
+    <div class="field">
+      <label>Tipo de solicitud *</label>
+      <select id="cTipo">
+        <option value="Petición">Petición</option>
+        <option value="Queja">Queja</option>
+        <option value="Reclamo">Reclamo</option>
+        <option value="Sugerencia">Sugerencia</option>
+        <option value="Otro">Otro</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Mensaje *</label>
+      <textarea id="cMensaje" placeholder="Cuéntanos con detalle..."></textarea>
+    </div>
+    <button class="btn-enviar" id="btnEnviar" onclick="enviarContacto()">Enviar mensaje</button>
+    <div class="status-msg" id="statusMsg"></div>
+  </div>
+</div>
+
+<script src="csh-auth.js"></script>
+<script src="assistant.js"></script>
+<script>
+const sb = window.getCSHSupabaseClient();
+document.getElementById('navLoginLink')?.addEventListener('click', (e) => { e.preventDefault(); window.CSHAuth.open('login'); });
+
+async function enviarContacto(){
+  const nombre = document.getElementById('cNombre').value.trim();
+  const correo = document.getElementById('cCorreo').value.trim();
+  const tipo = document.getElementById('cTipo').value;
+  const mensaje = document.getElementById('cMensaje').value.trim();
+  const status = document.getElementById('statusMsg');
+  const btn = document.getElementById('btnEnviar');
+
+  if(!nombre || !correo || !mensaje){
+    status.textContent = 'Por favor completa nombre, correo y mensaje.';
+    status.className = 'status-msg error';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Enviando...';
+  status.className = 'status-msg';
+
+  try{
+    const res = await fetch('/api/enviar-contacto', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ nombre, correo, tipo, mensaje })
+    });
+    const data = await res.json();
+    if(data.ok){
+      status.textContent = 'Listo, recibimos tu mensaje. Te responderemos pronto a ' + correo + '.';
+      status.className = 'status-msg ok';
+      document.getElementById('cNombre').value = '';
+      document.getElementById('cCorreo').value = '';
+      document.getElementById('cMensaje').value = '';
+    }else{
+      status.textContent = data.error || 'No pudimos enviar tu mensaje. Intenta de nuevo.';
+      status.className = 'status-msg error';
+    }
+  }catch(e){
+    status.textContent = 'No pudimos enviar tu mensaje. Intenta de nuevo en unos segundos.';
+    status.className = 'status-msg error';
+  }
+  btn.disabled = false;
+  btn.textContent = 'Enviar mensaje';
+}
+
+(async () => {
+  const { data: { user } } = await sb.auth.getUser();
+  if (user) {
+    const name = (user.user_metadata?.full_name || user.email.split('@')[0]).split(' ')[0];
+    document.getElementById('navRight').innerHTML = `
+      <span style="font-size:.78rem;color:var(--muted);">Hola, ${name}</span>
+      <a href="mi-espacio.html" class="btn-nav" style="background:var(--petrol, #2F4E5F);">Mi Espacio</a>
+      <button onclick="(async()=>{await sb.auth.signOut();window.location.reload();})()" class="btn-nav coral" style="cursor:pointer;">Salir</button>`;
+    document.getElementById('cCorreo').value = user.email;
+  }
+})();
+</script>
+</body>
+</html>

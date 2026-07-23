@@ -144,7 +144,7 @@ footer.csh-footer { background: var(--petrol-dark); color: rgba(255,255,255,0.45
     <li>Proporcionar información veraz, completa y actualizada.</li>
     <li>Mantener la confidencialidad de su contraseña.</li>
     <li>Todas las actividades realizadas desde su cuenta.</li>
-    <li>Notificar de inmediato cualquier uso no autorizado a carolina@cshtalent.com.</li>
+    <li>Notificar de inmediato cualquier uso no autorizado a gh.bycaro@gmail.com.</li>
   </ul>
 
   <h2>5. Herramientas gratuitas, Premium y Membresía CSH Talent</h2>
@@ -200,7 +200,7 @@ footer.csh-footer { background: var(--petrol-dark); color: rgba(255,255,255,0.45
 
   <div class="contact-box">
     <p><strong>¿Preguntas sobre estos términos?</strong></p>
-    <p>Escríbenos a <a href="mailto:carolina@cshtalent.com">carolina@cshtalent.com</a></p>
+    <p><a href="contacto.html">Escríbenos aquí</a></p>
     <p style="margin-top:0.5rem;font-size:0.78rem;">Respondemos en máximo 15 días hábiles.</p>
   </div>
 
@@ -216,7 +216,7 @@ footer.csh-footer { background: var(--petrol-dark); color: rgba(255,255,255,0.45
       <div class="csh-footer-social">
         <a href="https://www.linkedin.com/in/carosalazarhdez" target="_blank" title="LinkedIn">in</a>
         <a href="https://www.instagram.com/cshtalent" target="_blank" title="Instagram">ig</a>
-        <a href="mailto:carolina@cshtalent.com" title="Correo">@</a>
+        <a href="contacto.html" title="Correo">@</a>
       </div>
     </div>
     <div>
@@ -233,7 +233,7 @@ footer.csh-footer { background: var(--petrol-dark); color: rgba(255,255,255,0.45
       <ul class="csh-footer-links">
         <li><a href="politica-privacidad.html">Política de privacidad</a></li>
         <li><a href="terminos-condiciones.html">Términos de uso</a></li>
-        <li><a href="mailto:carolina@cshtalent.com">Contacto</a></li>
+        <li><a href="contacto.html">Contacto</a></li>
       </ul>
     </div>
   </div>
@@ -255,7 +255,8 @@ document.getElementById('navLoginLink')?.addEventListener('click', (e) => { e.pr
   if (user) {
     const name = (user.user_metadata?.full_name || user.email.split('@')[0]).split(' ')[0];
     document.getElementById('navRight').innerHTML = `
-      <a href="dashboard.html" style="font-size:0.78rem;font-weight:600;color:var(--muted);text-decoration:none;">Hola, ${name}</a>
+      <span style="font-size:.78rem;color:var(--muted);">Hola, ${name}</span>
+      <a href="mi-espacio.html" class="btn-nav" style="background:var(--petrol, #2F4E5F);">Mi Espacio</a>
       <button onclick="(async()=>{await sb.auth.signOut();window.location.reload();})()" class="btn-nav coral" style="cursor:pointer;">Salir</button>`;
   }
 })();

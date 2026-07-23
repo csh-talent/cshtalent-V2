@@ -99,13 +99,9 @@ footer.csh-footer { background: var(--petrol-dark); color: rgba(255,255,255,0.45
 
 <div class="content">
 
-  <div class="highlight-box">
-    <p>Esta política aplica exclusivamente a contratos de trabajo privados regidos por el Código Sustantivo del Trabajo (CST) de Colombia. Las herramientas de CSH Talent son orientativas y no constituyen asesoría legal.</p>
-  </div>
-
   <h2>1. Responsable del tratamiento</h2>
   <p>El responsable del tratamiento de sus datos personales es <strong>Carolina Salazar Hernández</strong>, fundadora de CSH Talent (Capital Sostenible y Humano), con domicilio en la ciudad de Cali, Colombia.</p>
-  <p>Para cualquier consulta relacionada con sus datos personales puede contactarnos a través de: <strong>carolina@cshtalent.com</strong></p>
+  <p>Para cualquier consulta relacionada con sus datos personales puede contactarnos a través de: <strong>gh.bycaro@gmail.com</strong></p>
 
   <h2>2. Marco legal</h2>
   <p>CSH Talent da cumplimiento a la <strong>Ley Estatutaria 1581 de 2012</strong> de Protección de Datos Personales y su Decreto Reglamentario 1377 de 2013, así como a las demás normas que la modifiquen, adicionen o complementen en Colombia.</p>
@@ -135,7 +131,7 @@ footer.csh-footer { background: var(--petrol-dark); color: rgba(255,255,255,0.45
 
   <h2>5. Autorización y consentimiento</h2>
   <p>Al registrarse en CSH Talent, usted otorga su consentimiento libre, previo, expreso e informado para el tratamiento de sus datos personales de acuerdo con esta política.</p>
-  <p>La autorización para recibir comunicaciones comerciales es <strong>opcional y separada</strong> del registro. Puede revocarla en cualquier momento escribiéndonos a carolina@cshtalent.com.</p>
+  <p>La autorización para recibir comunicaciones comerciales es <strong>opcional y separada</strong> del registro. Puede revocarla en cualquier momento escribiéndonos a gh.bycaro@gmail.com.</p>
 
   <h2>6. Derechos del titular</h2>
   <p>Como titular de sus datos personales, usted tiene derecho a:</p>
@@ -147,7 +143,7 @@ footer.csh-footer { background: var(--petrol-dark); color: rgba(255,255,255,0.45
     <li>Acceder de forma gratuita a sus datos personales.</li>
     <li>Presentar quejas ante la Superintendencia de Industria y Comercio (SIC).</li>
   </ul>
-  <p>Para ejercer estos derechos, escríbanos a: <strong>carolina@cshtalent.com</strong>. Atenderemos su solicitud en un plazo máximo de <strong>15 días hábiles</strong>.</p>
+  <p>Para ejercer estos derechos, escríbanos a: <strong>gh.bycaro@gmail.com</strong>. Atenderemos su solicitud en un plazo máximo de <strong>15 días hábiles</strong>.</p>
 
   <h2>7. Seguridad de los datos</h2>
   <p>CSH Talent implementa medidas técnicas y organizativas para proteger sus datos personales, incluyendo el uso de <strong>Supabase</strong> como proveedor de base de datos y autenticación, con cifrado en tránsito y en reposo, contraseñas almacenadas de forma encriptada, y reglas de seguridad a nivel de fila que garantizan que cada usuario solo pueda acceder a su propia información.</p>
@@ -173,7 +169,7 @@ footer.csh-footer { background: var(--petrol-dark); color: rgba(255,255,255,0.45
 
   <div class="contact-box">
     <p><strong>¿Preguntas sobre tus datos?</strong></p>
-    <p>Escríbenos a <a href="mailto:carolina@cshtalent.com">carolina@cshtalent.com</a></p>
+    <p><a href="contacto.html">Escríbenos aquí</a></p>
     <p style="margin-top:0.5rem;font-size:0.78rem;">Respondemos en máximo 15 días hábiles.</p>
   </div>
 
@@ -189,7 +185,7 @@ footer.csh-footer { background: var(--petrol-dark); color: rgba(255,255,255,0.45
       <div class="csh-footer-social">
         <a href="https://www.linkedin.com/in/carosalazarhdez" target="_blank" title="LinkedIn">in</a>
         <a href="https://www.instagram.com/cshtalent" target="_blank" title="Instagram">ig</a>
-        <a href="mailto:carolina@cshtalent.com" title="Correo">@</a>
+        <a href="contacto.html" title="Correo">@</a>
       </div>
     </div>
     <div>
@@ -206,7 +202,7 @@ footer.csh-footer { background: var(--petrol-dark); color: rgba(255,255,255,0.45
       <ul class="csh-footer-links">
         <li><a href="politica-privacidad.html">Política de privacidad</a></li>
         <li><a href="terminos-condiciones.html">Términos de uso</a></li>
-        <li><a href="mailto:carolina@cshtalent.com">Contacto</a></li>
+        <li><a href="contacto.html">Contacto</a></li>
       </ul>
     </div>
   </div>
@@ -228,7 +224,8 @@ document.getElementById('navLoginLink')?.addEventListener('click', (e) => { e.pr
   if (user) {
     const name = (user.user_metadata?.full_name || user.email.split('@')[0]).split(' ')[0];
     document.getElementById('navRight').innerHTML = `
-      <a href="dashboard.html" style="font-size:0.78rem;font-weight:600;color:var(--muted);text-decoration:none;">Hola, ${name}</a>
+      <span style="font-size:.78rem;color:var(--muted);">Hola, ${name}</span>
+      <a href="mi-espacio.html" class="btn-nav" style="background:var(--petrol, #2F4E5F);">Mi Espacio</a>
       <button onclick="(async()=>{await sb.auth.signOut();window.location.reload();})()" class="btn-nav coral" style="cursor:pointer;">Salir</button>`;
   }
 })();
