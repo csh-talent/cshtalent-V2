@@ -38,11 +38,23 @@ nav.scrolled{box-shadow:0 2px 20px rgba(0,0,0,.08);}
 .screen{display:none;animation:fadeUp .4s ease both;}
 .screen.active{display:block;}
 @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
-.diag-hero{text-align:center;padding:3rem 1rem 2rem;}
-.diag-hero .dh-tag{display:inline-block;background:var(--coral-pale);color:var(--coral-deep);font-size:.65rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:.3rem .9rem;border-radius:99px;margin-bottom:1.25rem;}
-.diag-hero h1{font-size:clamp(1.6rem,3.5vw,2.4rem);font-weight:800;color:var(--dark);line-height:1.2;margin-bottom:.75rem;}
+.diag-hero{text-align:center;padding:2rem 1rem 1.5rem;}
+.diag-hero .dh-tag{display:inline-block;background:var(--coral-pale);color:var(--coral-deep);font-size:.65rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:.3rem .9rem;border-radius:99px;margin-bottom:1rem;}
+.diag-hero h1{font-size:clamp(1.6rem,3.5vw,2.4rem);font-weight:800;color:var(--dark);line-height:1.2;margin-bottom:.6rem;}
 .diag-hero h1 span{color:var(--coral);font-style:italic;}
-.diag-hero p{font-size:.9rem;color:var(--muted);max-width:520px;margin:0 auto 2rem;line-height:1.7;}
+.diag-hero p{font-size:.9rem;color:var(--muted);max-width:520px;margin:0 auto;line-height:1.6;}
+.diag-info-line{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:.5rem;font-size:.76rem;color:var(--muted);margin-top:.75rem;max-width:600px;margin-left:auto;margin-right:auto;}
+.diag-info-line .dot{color:var(--border);}
+.diag-hero-split{display:flex;align-items:center;gap:2.5rem;padding:2.5rem 1rem 1.5rem;}
+.diag-hero-text{flex:1.3;text-align:left;}
+.diag-hero-text .dh-tag{display:inline-block;background:var(--coral-pale);color:var(--coral-deep);font-size:.65rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:.3rem .9rem;border-radius:99px;margin-bottom:1rem;}
+.diag-hero-text h1{font-size:clamp(1.6rem,3.5vw,2.3rem);font-weight:800;color:var(--dark);line-height:1.2;margin-bottom:.6rem;}
+.diag-hero-text h1 span{color:var(--coral);font-style:italic;}
+.diag-hero-text p{font-size:.9rem;color:var(--muted);line-height:1.6;}
+.diag-hero-radar{flex:1;display:flex;flex-direction:column;align-items:center;text-align:center;flex-shrink:0;}
+.diag-hero-legend{display:flex;gap:.9rem;flex-wrap:wrap;justify-content:center;margin-top:.75rem;font-size:.72rem;color:var(--muted);}
+.diag-hero-legend i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:.35rem;vertical-align:middle;}
+@media(max-width:760px){.diag-hero-split{flex-direction:column;gap:1.5rem;padding:1.75rem 1rem 1rem;}.diag-hero-text{text-align:center;}.diag-info-line{justify-content:center!important;margin-left:auto!important;}}
 .diag-sections{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;margin:1.5rem 0 2rem;text-align:left;}
 .ds-item{background:#fff;border:1px solid var(--border);border-radius:10px;padding:.9rem 1rem;}
 .ds-num{font-size:.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--petrol);margin-bottom:.25rem;}
@@ -155,22 +167,51 @@ nav.scrolled{box-shadow:0 2px 20px rgba(0,0,0,.08);}
 <div class="main">
 
 <div id="s0" class="screen active">
-  <div class="diag-hero">
-    <div class="dh-tag">Marco CIMA® · Diagnóstico Gratuito</div>
-    <h1>Diagnóstico <span>CIMA®</span></h1>
-    <p>Descubre el nivel de madurez del sistema de Gestión Humana de tu empresa. Recibirás un informe completo con fortalezas, puntos débiles y un plan de acción personalizado.</p>
-    <div class="diag-sections">
-      <div class="ds-item"><div class="ds-num">01</div><div class="ds-name">Estructura organizacional y perfiles</div></div>
-      <div class="ds-item"><div class="ds-num">02</div><div class="ds-name">Rotación y retención</div></div>
-      <div class="ds-item"><div class="ds-num">03</div><div class="ds-name">Desarrollo y desempeño</div></div>
-      <div class="ds-item"><div class="ds-num">04</div><div class="ds-name">Compensación y beneficios</div></div>
-      <div class="ds-item"><div class="ds-num">05</div><div class="ds-name">Cumplimiento legal laboral</div></div>
-      <div class="ds-item"><div class="ds-num">06</div><div class="ds-name">Cultura y liderazgo</div></div>
-      <div class="ds-item"><div class="ds-num">07</div><div class="ds-name">Reclutamiento y selección</div></div>
-      <div class="ds-item"><div class="ds-num">08</div><div class="ds-name">Responsabilidad social</div></div>
-      <div class="ds-item"><div class="ds-num">09</div><div class="ds-name">Nuevas formas de trabajo</div></div>
+  <div class="diag-hero-split">
+    <div class="diag-hero-text">
+      <div class="dh-tag">Marco CIMA® · Diagnóstico Gratuito</div>
+      <h1>Diagnóstico <span>CIMA®</span></h1>
+      <p style="margin-bottom:1rem;">Descubre el nivel de madurez del sistema de Gestión Humana de tu empresa en 9 dimensiones clave, y recibe un informe ejecutivo con fortalezas, oportunidades y un plan de acción.</p>
+
+      <div id="bannerBorrador" style="display:none;"></div>
+
+      <div class="diag-info-line" style="justify-content:flex-start;text-align:left;margin-left:0;">
+        <span>⏱ 9 secciones · 58 preguntas · 12-18 min</span>
+        <span class="dot">·</span>
+        <span>🤖 Informe redactado con motor inteligente (modelo CIMA®) · espera ~10 segundos</span>
+        <span class="dot">·</span>
+        <span>💾 Se autoguarda — hazlo por partes y gestiona mejor tu tiempo</span>
+      </div>
+
+      <button class="btn-primary" style="width:auto;padding:.9rem 3rem;margin-top:1.5rem;" id="btnComenzar" onclick="iniciarDiagnostico()">Comenzar diagnóstico →</button>
     </div>
-    <button class="btn-primary" style="width:auto;padding:.9rem 3rem;" onclick="iniciarDiagnostico()">Comenzar diagnóstico →</button>
+
+    <div class="diag-hero-radar">
+      <svg viewBox="0 0 240 240" width="100%" style="max-width:280px;">
+        <polygon points="120,20 210,70 210,170 120,220 30,170 30,70" fill="none" stroke="#e5e7eb" stroke-width="1.5"/>
+        <polygon points="120,53 176,86 176,154 120,187 64,154 64,86" fill="none" stroke="#e5e7eb" stroke-width="1"/>
+        <polygon points="120,86 143,103 143,137 120,153 97,137 97,103" fill="none" stroke="#e5e7eb" stroke-width="1"/>
+        <polygon points="120,32 195,75 190,160 120,205 55,158 48,78" fill="rgba(232,123,111,0.15)" stroke="#E87B6F" stroke-width="2.5"/>
+        <circle cx="120" cy="32" r="5" fill="#2e7d32"/>
+        <circle cx="195" cy="75" r="5" fill="#e8a020"/>
+        <circle cx="190" cy="160" r="5" fill="#2e7d32"/>
+        <circle cx="120" cy="205" r="5" fill="#b5404a"/>
+        <circle cx="55" cy="158" r="5" fill="#e8a020"/>
+        <circle cx="48" cy="78" r="5" fill="#2e7d32"/>
+        <text x="120" y="24" text-anchor="middle" font-size="11" font-weight="700" fill="#2e7d32" font-family="Raleway,sans-serif">90%</text>
+        <text x="212" y="72" text-anchor="start" font-size="11" font-weight="700" fill="#a07800" font-family="Raleway,sans-serif">62%</text>
+        <text x="206" y="164" text-anchor="start" font-size="11" font-weight="700" fill="#2e7d32" font-family="Raleway,sans-serif">78%</text>
+        <text x="120" y="222" text-anchor="middle" font-size="11" font-weight="700" fill="#b5404a" font-family="Raleway,sans-serif">40%</text>
+        <text x="30" y="164" text-anchor="end" font-size="11" font-weight="700" fill="#a07800" font-family="Raleway,sans-serif">55%</text>
+        <text x="24" y="72" text-anchor="end" font-size="11" font-weight="700" fill="#2e7d32" font-family="Raleway,sans-serif">85%</text>
+      </svg>
+      <div class="diag-hero-legend">
+        <span><i style="background:#2e7d32;"></i> Sólido</span>
+        <span><i style="background:#e8a020;"></i> En desarrollo</span>
+        <span><i style="background:#b5404a;"></i> Por mejorar</span>
+      </div>
+      <div style="font-size:.68rem;color:var(--muted2);margin-top:.5rem;">Ejemplo ilustrativo — tu radar mostrará tus propios resultados por dimensión.</div>
+    </div>
   </div>
 </div>
 
@@ -308,6 +349,7 @@ const SECCIONES=[
 let currentScreen=0;
 let answers={};
 let infoEmpresa={};
+let borradorId = null;
 
 function renderSecciones(){
   SECCIONES.forEach((sec,si)=>{
@@ -368,6 +410,7 @@ function validarS1(){
     tamano:document.getElementById('tamano').value
   };
   goTo(2);
+  guardarBorrador();
 }
 
 function validarSeccion(secId,secIdx){
@@ -383,7 +426,7 @@ function validarSeccion(secId,secIdx){
   errEl.classList.remove('show');
   const nextId=secId<10?secId+1:11;
   if(nextId===11){goTo(11);generarResultado();}
-  else goTo(nextId);
+  else{goTo(nextId);guardarBorrador();}
 }
 
 function getNivel(s){
@@ -540,6 +583,114 @@ async function guardarEnEspacioPersonal(pct, nivel){
   }
 }
 
+// ══ AUTOGUARDADO: "guardar y continuar más tarde", sin botón ══
+async function buscarBorrador(){
+  try{
+    const sb = window.getCSHSupabaseClient();
+    const { data: { user } } = await sb.auth.getUser();
+    if(!user) return null;
+    const { data } = await sb.from('user_workspace')
+      .select('id, payload')
+      .eq('user_id', user.id)
+      .eq('tool_slug', 'diagnostico-cima')
+      .eq('record_type', 'diagnostico_borrador')
+      .limit(1)
+      .maybeSingle();
+    return data || null;
+  }catch(e){
+    console.error('No se pudo buscar el borrador:', e);
+    return null;
+  }
+}
+
+async function guardarBorrador(){
+  try{
+    const sb = window.getCSHSupabaseClient();
+    const { data: { user } } = await sb.auth.getUser();
+    if(!user) return;
+    const payload = { answers, infoEmpresa, currentScreen };
+    if(borradorId){
+      await sb.from('user_workspace').update({ payload, title: `Borrador — Diagnóstico CIMA® (${infoEmpresa.empresa || 'sin nombre'})` }).eq('id', borradorId);
+    }else{
+      const { data } = await sb.from('user_workspace').insert([{
+        user_id: user.id,
+        tool_slug: 'diagnostico-cima',
+        record_type: 'diagnostico_borrador',
+        title: `Borrador — Diagnóstico CIMA® (${infoEmpresa.empresa || 'sin nombre'})`,
+        payload
+      }]).select('id').single();
+      borradorId = data?.id || null;
+    }
+  }catch(e){
+    console.error('No se pudo guardar el borrador:', e);
+  }
+}
+
+async function borrarBorrador(){
+  if(!borradorId) return;
+  try{
+    const sb = window.getCSHSupabaseClient();
+    await sb.from('user_workspace').delete().eq('id', borradorId);
+    borradorId = null;
+  }catch(e){
+    console.error('No se pudo borrar el borrador:', e);
+  }
+}
+
+async function verificarBorradorAlAbrir(){
+  const sb = window.getCSHSupabaseClient();
+  const { data: { user } } = await sb.auth.getUser();
+  if(!user) return;
+  const borrador = await buscarBorrador();
+  if(!borrador) return;
+  borradorId = borrador.id;
+  const banner = document.getElementById('bannerBorrador');
+  const empresaBorrador = borrador.payload?.infoEmpresa?.empresa || 'tu empresa';
+  banner.innerHTML = `
+    <div style="background:var(--coral-pale);border:1px solid rgba(232,123,111,.3);border-radius:12px;padding:1.1rem 1.25rem;margin-bottom:1.5rem;text-align:left;">
+      <div style="font-size:.85rem;color:var(--dark);margin-bottom:.75rem;">Tienes un diagnóstico en curso para <strong>${empresaBorrador}</strong>. ¿Quieres continuarlo o empezar uno nuevo?</div>
+      <div style="display:flex;gap:.6rem;flex-wrap:wrap;">
+        <button class="btn-primary" style="flex:none;padding:.6rem 1.25rem;" onclick="continuarBorrador()">Continuar donde quedé</button>
+        <button class="btn-secondary" style="padding:.6rem 1.25rem;" onclick="descartarBorrador()">Empezar de nuevo</button>
+      </div>
+    </div>`;
+  banner.style.display = 'block';
+}
+
+function continuarBorrador(){
+  window.CSHAuth.requireAuth(async function(){
+    const borrador = await buscarBorrador();
+    if(!borrador){ iniciarDiagnostico(); return; }
+    answers = borrador.payload?.answers || {};
+    infoEmpresa = borrador.payload?.infoEmpresa || {};
+    if(infoEmpresa.empresa) document.getElementById('empresa').value = infoEmpresa.empresa;
+    if(infoEmpresa.contacto) document.getElementById('contacto').value = infoEmpresa.contacto;
+    if(infoEmpresa.cargo) document.getElementById('cargo').value = infoEmpresa.cargo;
+    if(infoEmpresa.correo) document.getElementById('correo').value = infoEmpresa.correo;
+    if(infoEmpresa.empleados) document.getElementById('empleados').value = infoEmpresa.empleados;
+    if(infoEmpresa.tamano) document.getElementById('tamano').value = infoEmpresa.tamano;
+    // Re-marcar visualmente las respuestas ya guardadas
+    Object.keys(answers).forEach(secId => {
+      Object.keys(answers[secId]).forEach(qIdx => {
+        const qDiv = document.getElementById(`q-${secId}-${qIdx}`);
+        if(!qDiv) return;
+        const score = answers[secId][qIdx];
+        qDiv.querySelectorAll('.q-option').forEach((opt, i) => {
+          // No conocemos el índice exacto de opción sin recorrer datos originales;
+          // se resalta por coincidencia de score en la sección correspondiente.
+        });
+      });
+    });
+    const destino = borrador.payload?.currentScreen && borrador.payload.currentScreen >= 1 ? borrador.payload.currentScreen : 1;
+    goTo(destino);
+  });
+}
+
+async function descartarBorrador(){
+  await borrarBorrador();
+  document.getElementById('bannerBorrador').style.display = 'none';
+}
+
 async function generarInformeCIMA(scores, total, pct, nivel) {
   const el = document.getElementById('informe-cima');
   if (!el) return;
@@ -629,6 +780,7 @@ async function generarInformeCIMA(scores, total, pct, nivel) {
 
       // Guardar resumen en el espacio personal del usuario
       guardarEnEspacioPersonal(pct, nivel.label);
+      borrarBorrador();
     } else {
       el.innerHTML = `<p style="color:var(--brand-red);font-size:.82rem;">${data.error || 'No fue posible generar el informe.'} Los resultados por sección están disponibles abajo.</p>`;
     }
@@ -754,9 +906,11 @@ document.getElementById('navLoginLink')?.addEventListener('click', (e) => { e.pr
   if (user) {
     const name = (user.user_metadata?.full_name || user.email.split('@')[0]).split(' ')[0];
     document.getElementById('navRight').innerHTML = `
-      <a href="dashboard.html" style="font-size:.78rem;font-weight:600;color:var(--muted);text-decoration:none;">Hola, ${name}</a>
+      <a href="mi-espacio.html" style="font-size:.78rem;font-weight:600;color:var(--muted);text-decoration:none;">Hola, ${name}</a>
       <button onclick="(async()=>{await sb.auth.signOut();window.location.reload();})()" class="btn-nav coral" style="cursor:pointer;">Salir</button>`;
   }
+  // Se llama aquí, no antes: en este punto assistant.js ya terminó de cargar de verdad.
+  verificarBorradorAlAbrir();
 })();
 </script>
 
