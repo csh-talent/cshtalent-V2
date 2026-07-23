@@ -382,7 +382,6 @@ const SECCIONES=[
 let currentScreen=0;
 let answers={};
 let infoEmpresa={};
-let borradorId = null;
 
 function renderSecciones(){
   SECCIONES.forEach((sec,si)=>{
@@ -598,35 +597,18 @@ function generarResultado(){
 
 renderSecciones();
 
-// ══ INFORME IA (conectado al backend seguro con límite de 2 por usuario) ══
-async function guardarEnEspacioPersonal(pct, nivel){
-  try{
-    const sb = window.getCSHSupabaseClient();
-    const { data: { user } } = await sb.auth.getUser();
-    if(!user) return;
-    await sb.from('user_workspace').insert([{
-      user_id: user.id,
-      tool_slug: 'diagnostico-cima',
-      record_type: 'diagnostico',
-      title: `Diagnóstico CIMA® — ${infoEmpresa.empresa} (${pct}% · ${nivel})`,
-      payload: { empresa: infoEmpresa.empresa, score_total: pct, nivel: nivel }
-    }]);
-  }catch(e){
-    console.error('No se pudo guardar en el espacio personal:', e);
-  }
-}
-
 // ══ AUTOGUARDADO: "guardar y continuar más tarde", sin botón ══
+// El borrador vive en la propia tabla `diagnosticos` (estado='borrador'),
+// no en un índice genérico — cada herramienta es dueña de su información.
 async function buscarBorrador(){
   try{
     const sb = window.getCSHSupabaseClient();
     const { data: { user } } = await sb.auth.getUser();
     if(!user) return null;
-    const { data } = await sb.from('user_workspace')
-      .select('id, payload')
+    const { data } = await sb.from('diagnosticos')
+      .select('id, empresa, respuestas_parciales')
       .eq('user_id', user.id)
-      .eq('tool_slug', 'diagnostico-cima')
-      .eq('record_type', 'diagnostico_borrador')
+      .eq('estado', 'borrador')
       .limit(1)
       .maybeSingle();
     return data || null;
@@ -641,30 +623,26 @@ async function guardarBorrador(){
     const sb = window.getCSHSupabaseClient();
     const { data: { user } } = await sb.auth.getUser();
     if(!user) return;
-    const payload = { answers, infoEmpresa, currentScreen };
-    if(borradorId){
-      await sb.from('user_workspace').update({ payload, title: `Borrador — Diagnóstico CIMA® (${infoEmpresa.empresa || 'sin nombre'})` }).eq('id', borradorId);
-    }else{
-      const { data } = await sb.from('user_workspace').insert([{
-        user_id: user.id,
-        tool_slug: 'diagnostico-cima',
-        record_type: 'diagnostico_borrador',
-        title: `Borrador — Diagnóstico CIMA® (${infoEmpresa.empresa || 'sin nombre'})`,
-        payload
-      }]).select('id').single();
-      borradorId = data?.id || null;
-    }
+    await sb.from('diagnosticos').upsert({
+      user_id: user.id,
+      estado: 'borrador',
+      empresa: infoEmpresa.empresa || null,
+      tamano: infoEmpresa.tamano || null,
+      empleados: infoEmpresa.empleados ? String(infoEmpresa.empleados) : null,
+      respuestas_parciales: { answers, infoEmpresa, currentScreen },
+      updated_at: new Date().toISOString()
+    }, { onConflict: 'user_id' });
   }catch(e){
     console.error('No se pudo guardar el borrador:', e);
   }
 }
 
 async function borrarBorrador(){
-  if(!borradorId) return;
   try{
     const sb = window.getCSHSupabaseClient();
-    await sb.from('user_workspace').delete().eq('id', borradorId);
-    borradorId = null;
+    const { data: { user } } = await sb.auth.getUser();
+    if(!user) return;
+    await sb.from('diagnosticos').delete().eq('user_id', user.id).eq('estado', 'borrador');
   }catch(e){
     console.error('No se pudo borrar el borrador:', e);
   }
@@ -676,9 +654,8 @@ async function verificarBorradorAlAbrir(){
   if(!user) return;
   const borrador = await buscarBorrador();
   if(!borrador) return;
-  borradorId = borrador.id;
   const banner = document.getElementById('bannerBorrador');
-  const empresaBorrador = borrador.payload?.infoEmpresa?.empresa || 'tu empresa';
+  const empresaBorrador = borrador.empresa || borrador.respuestas_parciales?.infoEmpresa?.empresa || 'tu empresa';
   banner.innerHTML = `
     <div style="background:var(--coral-pale);border:1px solid rgba(232,123,111,.3);border-radius:12px;padding:1.1rem 1.25rem;margin-bottom:1.5rem;text-align:left;">
       <div style="font-size:.85rem;color:var(--dark);margin-bottom:.75rem;">Tienes un diagnóstico en curso para <strong>${empresaBorrador}</strong>. ¿Quieres continuarlo o empezar uno nuevo?</div>
@@ -694,27 +671,15 @@ function continuarBorrador(){
   window.CSHAuth.requireAuth(async function(){
     const borrador = await buscarBorrador();
     if(!borrador){ iniciarDiagnostico(); return; }
-    answers = borrador.payload?.answers || {};
-    infoEmpresa = borrador.payload?.infoEmpresa || {};
+    answers = borrador.respuestas_parciales?.answers || {};
+    infoEmpresa = borrador.respuestas_parciales?.infoEmpresa || {};
     if(infoEmpresa.empresa) document.getElementById('empresa').value = infoEmpresa.empresa;
     if(infoEmpresa.contacto) document.getElementById('contacto').value = infoEmpresa.contacto;
     if(infoEmpresa.cargo) document.getElementById('cargo').value = infoEmpresa.cargo;
     if(infoEmpresa.correo) document.getElementById('correo').value = infoEmpresa.correo;
     if(infoEmpresa.empleados) document.getElementById('empleados').value = infoEmpresa.empleados;
     if(infoEmpresa.tamano) document.getElementById('tamano').value = infoEmpresa.tamano;
-    // Re-marcar visualmente las respuestas ya guardadas
-    Object.keys(answers).forEach(secId => {
-      Object.keys(answers[secId]).forEach(qIdx => {
-        const qDiv = document.getElementById(`q-${secId}-${qIdx}`);
-        if(!qDiv) return;
-        const score = answers[secId][qIdx];
-        qDiv.querySelectorAll('.q-option').forEach((opt, i) => {
-          // No conocemos el índice exacto de opción sin recorrer datos originales;
-          // se resalta por coincidencia de score en la sección correspondiente.
-        });
-      });
-    });
-    const destino = borrador.payload?.currentScreen && borrador.payload.currentScreen >= 1 ? borrador.payload.currentScreen : 1;
+    const destino = borrador.respuestas_parciales?.currentScreen && borrador.respuestas_parciales.currentScreen >= 1 ? borrador.respuestas_parciales.currentScreen : 1;
     goTo(destino);
   });
 }
@@ -810,10 +775,8 @@ async function generarInformeCIMA(scores, total, pct, nivel) {
       }
 
       el.innerHTML = parrafos + restantesHtml;
-
-      // Guardar resumen en el espacio personal del usuario
-      guardarEnEspacioPersonal(pct, nivel.label);
-      borrarBorrador();
+      // El servidor ya completó el registro (borrador → completado) y creó
+      // el puntero en el índice de "Mi Espacio" — no hay nada más que hacer aquí.
     } else {
       el.innerHTML = `<p style="color:var(--brand-red);font-size:.82rem;">${data.error || 'No fue posible generar el informe.'} Los resultados por sección están disponibles abajo.</p>`;
     }
