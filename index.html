@@ -212,7 +212,7 @@ footer { background: var(--dark); color: rgba(255,255,255,0.45); padding: 3rem 2
   <div class="hero-glow-2"></div>
   <div class="hero-inner">
     <h1>Gestión Humana<br><em>para todos.</em></h1>
-    <p class="hero-sub">Conocimiento, herramientas e inteligencia artificial para transformar la forma en que trabajamos.</p>
+    <p class="hero-sub">Hacemos la Gestión Humana más simple, accesible y estratégica. Para todos.</p>
   </div>
 </section>
 
@@ -351,7 +351,7 @@ document.getElementById('navLoginLink')?.addEventListener('click', (e) => { e.pr
   if (user) {
     const name = (user.user_metadata?.full_name || user.email.split('@')[0]).split(' ')[0];
     document.getElementById('navRight').innerHTML = `
-      <a href="dashboard.html" style="font-size:0.78rem;font-weight:600;color:var(--muted);text-decoration:none;">Hola, ${name}</a>
+      <a href="mi-espacio.html" style="font-size:0.78rem;font-weight:600;color:var(--muted);text-decoration:none;">Hola, ${name}</a>
       <button onclick="(async()=>{await sb.auth.signOut();window.location.reload();})()" class="btn-nav coral" style="cursor:pointer;">Salir</button>`;
   }
 })();
@@ -359,7 +359,7 @@ document.getElementById('navLoginLink')?.addEventListener('click', (e) => { e.pr
 async function cargarNoticias() {
   const grid = document.getElementById('noticiasGrid');
   try {
-    const { data, error } = await sb.from('actualidad_laboral').select('titular,medio,fecha,url').eq('activo',true).order('fecha',{ascending:false}).limit(6);
+    const { data, error } = await sb.from('actualidad_laboral').select('titular,medio,fecha,url').eq('activo',true).order('fecha',{ascending:false}).limit(9);
     if (error || !data || data.length === 0) {
       grid.innerHTML = '<div class="noticias-empty">Las noticias estarán disponibles próximamente.</div>';
       return;
