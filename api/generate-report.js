@@ -113,7 +113,9 @@ Redacta un informe ejecutivo y gerencial con la siguiente estructura:
    - Áreas críticas de mejora
    - Impacto esperado
 
-Redacta en tono profesional pero cercano, en español colombiano. No uses lenguaje genérico — conecta cada hallazgo con el impacto real en el negocio y en las personas. El informe debe fluir como si lo hubiera escrito un consultor experto, no como una lista de descripciones pegadas.`;
+Redacta en tono profesional pero cercano, en español colombiano. No uses lenguaje genérico — conecta cada hallazgo con el impacto real en el negocio y en las personas. El informe debe fluir como si lo hubiera escrito un consultor experto, no como una lista de descripciones pegadas.
+
+Formato: no uses tablas en formato markdown (nada de símbolos | para crear filas o columnas). Si necesitas comparar dimensiones o presentar datos en paralelo, hazlo en prosa fluida o con líneas de texto simples, una por dimensión.`;
 
   let informe;
   try {
