@@ -136,7 +136,11 @@ async function enviarContacto(){
     });
     const data = await res.json();
     if(data.ok){
-      status.textContent = 'Listo, recibimos tu mensaje. Te responderemos pronto a ' + correo + '.';
+      if (data.correo_enviado) {
+        status.textContent = 'Listo, recibimos tu mensaje. Te responderemos pronto a ' + correo + '.';
+      } else {
+        status.textContent = 'Tu mensaje quedó registrado, aunque la notificación por correo no pudo enviarse en este momento — igual lo revisaremos.';
+      }
       status.className = 'status-msg ok';
       document.getElementById('cNombre').value = '';
       document.getElementById('cCorreo').value = '';

@@ -387,6 +387,7 @@ async function enviarComunidad() {
   const btn = document.getElementById('btnEnviar');
   if (!mensaje) { msg.textContent='Escribe tu idea antes de enviar.'; msg.className='msg-form err'; return; }
   btn.disabled=true; btn.textContent='Enviando...';
+  let data = null;
   try {
     const { data: { session } } = await sb.auth.getSession();
     const res = await fetch('/api/enviar-contacto', {
@@ -402,7 +403,7 @@ async function enviarComunidad() {
         mensaje
       })
     });
-    const data = await res.json();
+    data = await res.json();
     btn.disabled=false; btn.textContent='Enviar mi idea';
     if (!data.ok) { msg.textContent = data.error || 'Error al enviar. Inténtalo de nuevo.'; msg.className='msg-form err'; return; }
   } catch (e) {
@@ -413,7 +414,8 @@ async function enviarComunidad() {
   document.getElementById('cNombre').value='';
   document.getElementById('cEmail').value='';
   document.getElementById('cMensaje').value='';
-  msg.textContent='¡Gracias! Tu idea ya nos llegó.'; msg.className='msg-form ok';
+  msg.textContent = data.correo_enviado ? '¡Gracias! Tu idea ya nos llegó.' : 'Tu idea quedó registrada — la notificación por correo no salió esta vez, pero igual la vamos a revisar.';
+  msg.className='msg-form ok';
 }
 </script>
 </body>
