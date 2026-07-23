@@ -387,13 +387,33 @@ async function enviarComunidad() {
   const btn = document.getElementById('btnEnviar');
   if (!mensaje) { msg.textContent='Escribe tu idea antes de enviar.'; msg.className='msg-form err'; return; }
   btn.disabled=true; btn.textContent='Enviando...';
-  const { error } = await sb.from('comunidad_buzon').insert([{nombre:nombre||'Anónimo',email:email||null,mensaje}]);
-  btn.disabled=false; btn.textContent='Enviar mi idea';
-  if (error) { msg.textContent='Error al enviar. Inténtalo de nuevo.'; msg.className='msg-form err'; return; }
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    const res = await fetch('/api/enviar-contacto', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(session?.access_token ? { 'Authorization': `Bearer ${session.access_token}` } : {})
+      },
+      body: JSON.stringify({
+        nombre: nombre || 'Anónimo (buzón de comunidad)',
+        correo: email || 'sin-correo@cshtalent.com',
+        tipo: 'Sugerencia (buzón de comunidad)',
+        mensaje
+      })
+    });
+    const data = await res.json();
+    btn.disabled=false; btn.textContent='Enviar mi idea';
+    if (!data.ok) { msg.textContent = data.error || 'Error al enviar. Inténtalo de nuevo.'; msg.className='msg-form err'; return; }
+  } catch (e) {
+    btn.disabled=false; btn.textContent='Enviar mi idea';
+    msg.textContent='Error al enviar. Inténtalo de nuevo.'; msg.className='msg-form err';
+    return;
+  }
   document.getElementById('cNombre').value='';
   document.getElementById('cEmail').value='';
   document.getElementById('cMensaje').value='';
-  msg.textContent='¡Gracias! Tu idea ya está en nuestro buzón.'; msg.className='msg-form ok';
+  msg.textContent='¡Gracias! Tu idea ya nos llegó.'; msg.className='msg-form ok';
 }
 </script>
 </body>

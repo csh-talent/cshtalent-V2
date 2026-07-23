@@ -125,9 +125,13 @@ async function enviarContacto(){
   status.className = 'status-msg';
 
   try{
+    const { data: { session } } = await sb.auth.getSession();
     const res = await fetch('/api/enviar-contacto', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        ...(session?.access_token ? { 'Authorization': `Bearer ${session.access_token}` } : {})
+      },
       body: JSON.stringify({ nombre, correo, tipo, mensaje })
     });
     const data = await res.json();
