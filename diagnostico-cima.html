@@ -176,13 +176,12 @@ nav.scrolled{box-shadow:0 2px 20px rgba(0,0,0,.08);}
 <div class="main">
 
 <div id="s0" class="screen active">
+  <div id="bannerBorrador" style="display:none;"></div>
   <div class="diag-hero-split">
     <div class="diag-hero-text">
       <div class="dh-tag">Marco CIMA® · Diagnóstico Gratuito</div>
       <h1>Diagnóstico <span>CIMA®</span></h1>
       <p style="margin-bottom:1rem;">Descubre el nivel de madurez del sistema de Gestión Humana de tu empresa en 9 dimensiones clave, y recibe un informe ejecutivo con fortalezas, oportunidades y un plan de acción.</p>
-
-      <div id="bannerBorrador" style="display:none;"></div>
 
       <div class="diag-info-line" style="justify-content:flex-start;text-align:left;margin-left:0;">
         <span>⏱ 9 secciones · 58 preguntas · 12-18 min</span>
@@ -597,6 +596,18 @@ function generarResultado(){
 
 renderSecciones();
 
+// ══ Autocompletar "Tamaño de la empresa" según "Total de empleados" ══
+// Evita que la persona tenga que dar la misma información dos veces.
+document.getElementById('empleados')?.addEventListener('input', function(){
+  const n = parseInt(this.value, 10);
+  const sel = document.getElementById('tamano');
+  if(!sel || !n || n <= 0) return;
+  if(n <= 10) sel.value = 'micro';
+  else if(n <= 50) sel.value = 'pequena';
+  else if(n <= 200) sel.value = 'mediana';
+  else sel.value = 'grande';
+});
+
 // ══ AUTOGUARDADO: "guardar y continuar más tarde", sin botón ══
 // El borrador vive en la propia tabla `diagnosticos` (estado='borrador'),
 // no en un índice genérico — cada herramienta es dueña de su información.
@@ -623,7 +634,7 @@ async function guardarBorrador(){
     const sb = window.getCSHSupabaseClient();
     const { data: { user } } = await sb.auth.getUser();
     if(!user) return;
-    await sb.from('diagnosticos').upsert({
+    const datos = {
       user_id: user.id,
       estado: 'borrador',
       empresa: infoEmpresa.empresa || null,
@@ -631,7 +642,18 @@ async function guardarBorrador(){
       empleados: infoEmpresa.empleados ? String(infoEmpresa.empleados) : null,
       respuestas_parciales: { answers, infoEmpresa, currentScreen },
       updated_at: new Date().toISOString()
-    }, { onConflict: 'user_id' });
+    };
+    // No usamos upsert: el índice único de "un borrador por usuario" es parcial
+    // (solo aplica cuando estado='borrador'), y ese tipo de índice no es
+    // compatible con el mecanismo automático de resolución de conflictos.
+    // En vez de eso, buscamos si ya existe y decidimos insertar o actualizar.
+    const { data: existente } = await sb.from('diagnosticos')
+      .select('id').eq('user_id', user.id).eq('estado', 'borrador').limit(1).maybeSingle();
+    if(existente){
+      await sb.from('diagnosticos').update(datos).eq('id', existente.id);
+    }else{
+      await sb.from('diagnosticos').insert([datos]);
+    }
   }catch(e){
     console.error('No se pudo guardar el borrador:', e);
   }
@@ -657,11 +679,14 @@ async function verificarBorradorAlAbrir(){
   const banner = document.getElementById('bannerBorrador');
   const empresaBorrador = borrador.empresa || borrador.respuestas_parciales?.infoEmpresa?.empresa || 'tu empresa';
   banner.innerHTML = `
-    <div style="background:var(--coral-pale);border:1px solid rgba(232,123,111,.3);border-radius:12px;padding:1.1rem 1.25rem;margin-bottom:1.5rem;text-align:left;">
-      <div style="font-size:.85rem;color:var(--dark);margin-bottom:.75rem;">Tienes un diagnóstico en curso para <strong>${empresaBorrador}</strong>. ¿Quieres continuarlo o empezar uno nuevo?</div>
+    <div style="background:var(--petrol-dark);border-radius:14px;padding:1.4rem 1.6rem;margin:1rem 1rem 0;display:flex;align-items:center;justify-content:space-between;gap:1.25rem;flex-wrap:wrap;">
+      <div style="display:flex;align-items:center;gap:.9rem;flex-wrap:wrap;">
+        <span style="font-size:1.4rem;">⏳</span>
+        <div style="font-size:.92rem;color:white;text-align:left;">Tienes un diagnóstico en curso para <strong>${empresaBorrador}</strong>. ¿Quieres continuarlo o empezar uno nuevo?</div>
+      </div>
       <div style="display:flex;gap:.6rem;flex-wrap:wrap;">
-        <button class="btn-primary" style="flex:none;padding:.6rem 1.25rem;" onclick="continuarBorrador()">Continuar donde quedé</button>
-        <button class="btn-secondary" style="padding:.6rem 1.25rem;" onclick="descartarBorrador()">Empezar de nuevo</button>
+        <button class="btn-primary" style="flex:none;padding:.6rem 1.25rem;background:var(--coral);box-shadow:none;" onclick="continuarBorrador()">Continuar donde quedé</button>
+        <button class="btn-secondary" style="padding:.6rem 1.25rem;border-color:rgba(255,255,255,.3);color:white;" onclick="descartarBorrador()">Empezar de nuevo</button>
       </div>
     </div>`;
   banner.style.display = 'block';
