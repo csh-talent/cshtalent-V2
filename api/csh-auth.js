@@ -160,10 +160,13 @@
 
             <!-- INICIAR SESIÓN -->
             <div class="csh-auth-view" id="cshAuthViewLogin">
+              <!-- Campos señuelo invisibles: Chrome intenta autocompletar aquí en vez de en los campos reales -->
+              <input type="text" name="username" autocomplete="username" style="position:absolute;opacity:0;height:0;width:0;pointer-events:none;" tabindex="-1" aria-hidden="true">
+              <input type="password" name="password" autocomplete="current-password" style="position:absolute;opacity:0;height:0;width:0;pointer-events:none;" tabindex="-1" aria-hidden="true">
               <div class="csh-auth-label">Correo electrónico</div>
-              <input type="email" class="csh-auth-input" id="cshAuthLoginEmail" name="email" placeholder="tu@correo.com" autocomplete="email">
+              <input type="email" class="csh-auth-input" id="cshAuthLoginEmail" name="cshEmailLogin" placeholder="tu@correo.com" autocomplete="off">
               <div class="csh-auth-label">Contraseña</div>
-              <input type="password" class="csh-auth-input" id="cshAuthLoginPassword" name="current-password" placeholder="Tu contraseña" autocomplete="current-password">
+              <input type="password" class="csh-auth-input" id="cshAuthLoginPassword" name="cshPasswordLogin" placeholder="Tu contraseña" autocomplete="new-password">
               <div class="csh-auth-forgot" id="cshAuthGoForgot">¿Olvidaste tu contraseña?</div>
               <button class="csh-auth-btn" id="cshAuthLoginSubmit">Iniciar sesión</button>
               <div class="csh-auth-status" id="cshAuthStatusLogin"></div>
