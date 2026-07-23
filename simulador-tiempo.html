@@ -42,8 +42,12 @@ nav.scrolled{box-shadow:0 2px 20px rgba(0,0,0,.08);}
 .sim-hero-text h1{font-size:clamp(1.7rem,3.5vw,2.5rem);font-weight:900;color:var(--dark);line-height:1.15;letter-spacing:-.02em;margin-bottom:.7rem;}
 .sim-hero-text h1 em{font-style:italic;color:var(--coral);}
 .sim-hero-text p{font-size:.92rem;color:var(--muted);line-height:1.7;max-width:440px;}
+.ref-box{display:flex;gap:1.5rem;margin-top:1.1rem;flex-wrap:wrap;}
+.ref-item{background:white;border:1px solid var(--border);border-radius:10px;padding:.55rem .9rem;}
+.ref-label{font-size:.62rem;font-weight:700;letter-spacing:.03em;color:var(--muted);text-transform:uppercase;}
+.ref-value{font-size:.95rem;font-weight:800;color:var(--petrol);margin-top:1px;}
 .sim-hero-illus{flex:1;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-@media(max-width:760px){.sim-hero-split{flex-direction:column;gap:1.5rem;padding:1.5rem 1rem .5rem;text-align:center;}.sim-hero-text{text-align:center;}.sim-hero-text p{margin:0 auto;}}
+@media(max-width:760px){.sim-hero-split{flex-direction:column;gap:1.5rem;padding:1.5rem 1rem .5rem;text-align:center;}.sim-hero-text{text-align:center;}.sim-hero-text p{margin:0 auto;}.ref-box{justify-content:center;}}
 
 .sim-marquee-caption{text-align:center;font-size:.66rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--petrol);margin:.5rem 0 .75rem;}
 .sim-marquee{overflow:hidden;position:relative;padding:.25rem 0 1.5rem;-webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);}
@@ -66,6 +70,15 @@ nav.scrolled{box-shadow:0 2px 20px rgba(0,0,0,.08);}
 .salary-hint{font-size:.72rem;color:var(--muted);margin-top:.4rem;}
 .vh-box{margin-top:12px;font-size:.8rem;color:var(--text);background:white;border-radius:10px;padding:.7rem .9rem;border:1px solid rgba(47,78,95,.15);line-height:1.6;}
 .vh-box strong{color:var(--petrol);}
+
+/* ═══ EXPLICACIÓN EXTRAS VS RECARGOS ═══ */
+.explica-box{display:grid;grid-template-columns:1fr 1fr;gap:.9rem;margin-bottom:1.5rem;}
+.explica-item{background:white;border:1px solid var(--border);border-radius:12px;padding:.9rem 1rem;}
+.explica-tag{display:inline-block;font-size:.64rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase;padding:.25rem .65rem;border-radius:99px;margin-bottom:.5rem;}
+.explica-tag.extras{background:var(--petrol-pale);color:var(--petrol);}
+.explica-tag.recargos{background:var(--coral-pale);color:var(--coral-deep);}
+.explica-text{font-size:.78rem;color:var(--text);line-height:1.55;}
+@media(max-width:600px){.explica-box{grid-template-columns:1fr;}}
 
 /* ═══ SECCIONES / TABLAS ═══ */
 .section-label{font-size:.72rem;font-weight:800;color:var(--petrol);text-transform:uppercase;letter-spacing:.09em;margin:0 0 .6rem;display:flex;align-items:center;gap:.5rem;}
@@ -100,11 +113,9 @@ nav.scrolled{box-shadow:0 2px 20px rgba(0,0,0,.08);}
 .tip-ejemplo{margin-top:.4rem;background:white;border-radius:6px;padding:.45rem .6rem;font-size:.65rem;color:var(--muted);}
 .tip-ejemplo span{color:var(--petrol);font-weight:700;}
 
-.cst-tag{font-size:.58rem;color:var(--muted2);border:1px solid var(--border);border-radius:4px;padding:1px 5px;cursor:default;white-space:nowrap;position:relative;display:inline-block;}
-.cst-tag:hover{color:var(--petrol);border-color:var(--petrol-soft);background:var(--petrol-pale);}
-.cst-tag .cst-tooltip{display:none;position:absolute;right:0;top:18px;width:230px;background:var(--dark);color:#eee;font-size:.65rem;border-radius:8px;padding:.55rem .65rem;line-height:1.55;z-index:10;font-weight:400;box-shadow:0 4px 16px rgba(0,0,0,.2);}
-.cst-tag .cst-tooltip::before{content:'';position:absolute;right:8px;top:-5px;border-width:0 5px 5px;border-style:solid;border-color:transparent transparent var(--dark);}
-.cst-tag:hover .cst-tooltip{display:block;}
+.tip-legal{margin-top:.5rem;padding-top:.5rem;border-top:1px dashed rgba(47,78,95,.25);font-size:.66rem;color:var(--petrol);line-height:1.55;display:flex;gap:.4rem;}
+.tip-legal .tip-legal-icon{flex-shrink:0;font-weight:800;}
+.tip-legal span.cite{color:var(--text);font-weight:400;}
 
 /* ═══ RESUMEN ═══ */
 .resumen-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.75rem;margin-bottom:1.5rem;}
@@ -182,7 +193,17 @@ footer{background:var(--dark);color:rgba(255,255,255,0.45);padding:3rem 2rem;}
     <div class="sim-hero-text">
       <div class="door-tag">Trabajadores</div>
       <h1>Simulador de <em>Tiempo Suplementario</em></h1>
-      <p>Calcula cuánto deberías recibir por tus horas extra y recargos, según lo que exige la legislación laboral colombiana vigente.</p>
+      <p>Calcula cuánto deberías recibir por tus horas extras y recargos, según lo que exige la legislación laboral colombiana vigente.</p>
+      <div class="ref-box">
+        <div class="ref-item">
+          <div class="ref-label">Salario mínimo legal vigente 2026</div>
+          <div class="ref-value">$1.750.905</div>
+        </div>
+        <div class="ref-item">
+          <div class="ref-label">Auxilio de transporte legal 2026</div>
+          <div class="ref-value">$249.095</div>
+        </div>
+      </div>
     </div>
     <div class="sim-hero-illus">
       <svg viewBox="0 0 220 220" width="100%" style="max-width:210px;">
@@ -232,11 +253,22 @@ footer{background:var(--dark);color:rgba(255,255,255,0.45);padding:3rem 2rem;}
       <div class="salary-row">
         <span class="salary-label">Tu salario mensual</span>
         <div>
-          <input class="salary-input" type="number" id="salario" placeholder="Ej: 1755905" min="0" step="1000" oninput="calcular()">
+          <input class="salary-input" type="number" id="salario" value="1750905" min="0" step="1000" oninput="calcular()">
           <div class="salary-hint">Ingresa el salario que aparece en tu comprobante de pago</div>
         </div>
       </div>
       <div class="vh-box" id="vh-box">Ingresa tu salario para ver el valor de tu hora.</div>
+    </div>
+
+    <div class="explica-box">
+      <div class="explica-item">
+        <div class="explica-tag extras">Horas extras</div>
+        <div class="explica-text">Pagan el valor de tu hora <strong>completa</strong> más el % del tipo de extra. Por eso el factor siempre es mayor a 100% (ej. 125% = 100% de tu hora + 25% de extra).</div>
+      </div>
+      <div class="explica-item">
+        <div class="explica-tag recargos">Recargos</div>
+        <div class="explica-text">Pagan <strong>solo</strong> el % del recargo, porque la hora ordinaria ya está incluida en tu salario mensual — no se vuelve a pagar.</div>
+      </div>
     </div>
 
     <p class="section-label">Horas extras</p>
@@ -412,18 +444,19 @@ function toggleTip(id){
 
 function renderFila(item, tbodyId){
   const tip = tooltips[item.id];
-  const tipBtn = tip ? `<button class="tip-btn" onclick="toggleTip('${item.id}')" title="¿Cuándo aplica?">i</button>` : '';
-  const cstTag = item.cst ? `<span class="cst-tag">CST<span class="cst-tooltip">${item.cst}</span></span>` : '';
+  const tipBtn = tip ? `<button class="tip-btn" onclick="toggleTip('${item.id}')" title="¿Cuándo aplica y qué dice la ley?">i</button>` : '';
+  const legalLine = item.cst ? `<div class="tip-legal"><span class="tip-legal-icon">§</span><span class="cite">${item.cst}</span></div>` : '';
   const tipPanel = tip ? `
     <div class="tip-panel" id="tip-${item.id}">
       <strong>¿Cuándo aplica?</strong> ${tip.cuando}
       <div class="tip-ejemplo">📌 <strong>Ejemplo:</strong> <span>${tip.ejemplo}</span></div>
+      ${legalLine}
     </div>` : '';
 
   const tr = document.createElement('tr');
   tr.innerHTML = `
     <td>
-      <div class="c-nombre" style="justify-content:space-between">${item.label} ${tipBtn} ${cstTag}</div>
+      <div class="c-nombre" style="justify-content:space-between">${item.label} ${tipBtn}</div>
       <div class="c-formula">${item.formula}</div>
       ${tipPanel}
     </td>
