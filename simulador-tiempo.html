@@ -94,7 +94,6 @@ nav.scrolled{box-shadow:0 2px 20px rgba(0,0,0,.08);}
 .tabla-wrap tr:nth-child(even) td{background:var(--surface);}
 .c-nombre{font-size:.78rem;font-weight:700;color:var(--dark);display:flex;align-items:flex-start;gap:.4rem;flex-wrap:nowrap;}
 .c-nombre-text{flex:1;min-width:0;}
-.c-formula{font-size:.68rem;color:var(--muted);margin-top:2px;}
 .hm-wrap{display:flex;align-items:center;gap:3px;}
 .horas-input,.min-input{text-align:center;border:1px solid var(--border);border-radius:6px;padding:4px 4px;font-size:.78rem;background:white;font-family:'Raleway',sans-serif;}
 .horas-input{width:44px;}
@@ -177,10 +176,8 @@ footer{background:var(--dark);color:rgba(255,255,255,0.45);padding:3rem 2rem;}
   .tabla-wrap td{padding:0;border-bottom:none;}
   .tabla-wrap td.r{text-align:left;}
   .tabla-wrap td:nth-child(1){margin-bottom:.6rem;}
-  .tabla-wrap td:nth-child(2){display:flex;align-items:center;gap:.4rem;margin-bottom:.6rem;font-size:.8rem;font-weight:800;color:var(--petrol);}
-  .tabla-wrap td:nth-child(2)::before{content:'Factor';font-size:.64rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);background:var(--surface);border-radius:6px;padding:.15rem .5rem;}
-  .tabla-wrap td:nth-child(4){margin-top:.6rem;padding-top:.6rem;border-top:1px dashed var(--border);}
-  .tabla-wrap td:nth-child(4)::before{content:'Valor total: ';font-size:.68rem;font-weight:700;color:var(--muted);text-transform:none;}
+  .tabla-wrap td:nth-child(3){margin-top:.6rem;padding-top:.6rem;border-top:1px dashed var(--border);}
+  .tabla-wrap td:nth-child(3)::before{content:'Valor total: ';font-size:.68rem;font-weight:700;color:var(--muted);text-transform:none;}
   .tabla-wrap .v-cell{display:inline;font-size:.95rem;}
 }
 </style>
@@ -268,7 +265,7 @@ footer{background:var(--dark);color:rgba(255,255,255,0.45);padding:3rem 2rem;}
       <div class="salary-row">
         <span class="salary-label">Tu salario mensual</span>
         <div>
-          <input class="salary-input" type="number" id="salario" value="1750905" min="0" step="1000" oninput="calcular()">
+          <input class="salary-input" type="number" id="salario" value="1750905" min="0" step="1000" oninput="programarCalculo()">
           <div class="salary-hint">Ingresa el salario que aparece en tu comprobante de pago</div>
         </div>
       </div>
@@ -278,11 +275,11 @@ footer{background:var(--dark);color:rgba(255,255,255,0.45);padding:3rem 2rem;}
     <div class="explica-box">
       <div class="explica-item">
         <div class="explica-tag extras">Horas extras</div>
-        <div class="explica-text">Pagan el valor de tu hora <strong>completa</strong> más el % del tipo de extra. Por eso el factor siempre es mayor a 100% (ej. 125% = 100% de tu hora + 25% de extra).</div>
+        <div class="explica-text">Pagan el valor de tu hora <strong>completa</strong> más un adicional según el tipo de extra. Por eso siempre valen más que una hora normal.</div>
       </div>
       <div class="explica-item">
         <div class="explica-tag recargos">Recargos</div>
-        <div class="explica-text">Pagan <strong>solo</strong> el % del recargo, porque la hora ordinaria ya está incluida en tu salario mensual — no se vuelve a pagar.</div>
+        <div class="explica-text">Pagan <strong>solo</strong> el adicional del recargo, porque la hora ordinaria ya está incluida en tu salario mensual — no se vuelve a pagar.</div>
       </div>
     </div>
 
@@ -290,10 +287,9 @@ footer{background:var(--dark);color:rgba(255,255,255,0.45);padding:3rem 2rem;}
     <div class="tabla-wrap">
       <table>
         <thead><tr>
-          <th style="width:36%">Concepto</th>
-          <th style="width:9%" class="r">Factor</th>
-          <th style="width:28%">Horas / Min</th>
-          <th style="width:27%" class="r">Valor</th>
+          <th style="width:46%">Concepto</th>
+          <th style="width:30%">Horas / Min</th>
+          <th style="width:24%" class="r">Valor</th>
         </tr></thead>
         <tbody id="tbody-extras"></tbody>
       </table>
@@ -303,10 +299,9 @@ footer{background:var(--dark);color:rgba(255,255,255,0.45);padding:3rem 2rem;}
     <div class="tabla-wrap">
       <table>
         <thead><tr>
-          <th style="width:36%">Concepto</th>
-          <th style="width:9%" class="r">Factor</th>
-          <th style="width:28%">Horas / Min</th>
-          <th style="width:27%" class="r">Valor</th>
+          <th style="width:46%">Concepto</th>
+          <th style="width:30%">Horas / Min</th>
+          <th style="width:24%" class="r">Valor</th>
         </tr></thead>
         <tbody id="tbody-recargos"></tbody>
       </table>
@@ -328,7 +323,7 @@ footer{background:var(--dark);color:rgba(255,255,255,0.45);padding:3rem 2rem;}
     </div>
 
     <div class="nota-legal">
-      <strong>Marco legal vigente:</strong> recargo dominical/festivo del 90% desde el 1 de julio de 2026 (Ley 2466 de 2025 — subirá a 100% desde julio de 2027); jornada nocturna desde las 7:00 p.m.; divisor de 210 horas mensuales, según la jornada máxima legal de 42 horas semanales (Ley 2101 de 2021, vigente desde el 15 de julio de 2026).
+      <strong>Marco legal vigente:</strong> el recargo dominical/festivo subió al 90% desde el 1 de julio de 2026 (Ley 2466 de 2025 — subirá a 100% desde julio de 2027); la jornada nocturna aplica desde las 7:00 p.m.; y el valor de tu hora se calcula con base en la jornada máxima legal mensual vigente (Ley 2101 de 2021, 42 horas semanales desde el 15 de julio de 2026).
     </div>
 
     <div class="disclaimer">
@@ -413,39 +408,38 @@ footer{background:var(--dark);color:rgba(255,255,255,0.45);padding:3rem 2rem;}
 <script src="assistant.js"></script>
 <script>
 const sb = window.getCSHSupabaseClient();
-const JORNADA = 210;
 
-// ══ Definición de conceptos (fórmulas y porcentajes legales vigentes desde jul. 2026) ══
+// ══ Etiquetas y contenido educativo (público) — la tabla de factores y el
+// divisor de jornada YA NO viven aquí: los calcula el servidor en
+// /api/calcular-tiempo-suplementario y solo devuelve el resultado en pesos. ══
 const tooltips = {
   e1: { cuando: 'Trabajas más horas de las de tu turno normal, durante el día (entre 6 a.m. y 7 p.m.).', ejemplo: 'Tu turno termina a las 5 p.m. y te quedas hasta las 7 p.m. Esas 2 horas son extra diurnas.' },
   e2: { cuando: 'Trabajas más horas de las de tu turno normal y esas horas caen en la noche (después de las 7 p.m.).', ejemplo: 'Tu turno termina a las 9 p.m. y te quedas hasta las 11 p.m. Esas 2 horas son extra nocturnas.' },
   e3: { cuando: 'Ya cumpliste tu jornada normal y te quedas horas adicionales de día, y encima es domingo.', ejemplo: 'Trabajas tu turno completo un domingo y además te quedas 2 horas extra de día.' },
   e4: { cuando: 'Ya cumpliste tu jornada normal y te quedas horas adicionales de día, y encima es festivo.', ejemplo: 'Trabajas tu turno completo un 1 de enero y además te quedas 2 horas extra de día.' },
   e6: { cuando: 'Ya cumpliste tu jornada normal y te quedas horas adicionales de noche en un domingo o festivo. Es la combinación más alta.', ejemplo: 'Tu turno termina a las 10 p.m. un domingo y te quedas 2 horas más hasta la medianoche.' },
-  r1: { cuando: 'Tu día de descanso semanal pactado es el domingo, pero trabajas ese día. Como no descansas cuando te corresponde, se paga la hora completa más el recargo.', ejemplo: 'Tu contrato dice que descansas los domingos, pero trabajas un domingo. Cada hora vale el 190% de tu hora base.' },
+  r1: { cuando: 'Tu día de descanso semanal pactado es el domingo, pero trabajas ese día. Como no descansas cuando te corresponde, se paga la hora completa más el recargo.', ejemplo: 'Tu contrato dice que descansas los domingos, pero trabajas un domingo. Se te paga la hora con el recargo dominical habitual.' },
   r2: { cuando: 'Trabajas un domingo o festivo de forma ocasional (hasta 2 en el mes), pero tu día de descanso asignado es otro día. El descanso se disfruta después.', ejemplo: 'Tu día libre es el lunes, pero trabajas un domingo. Recibes el recargo y luego tomas el descanso compensatorio.' },
   r3: { cuando: 'Trabajas de noche (desde las 7 p.m.) dentro de tu jornada ordinaria pactada. No son horas extra, tu turno normal simplemente es nocturno.', ejemplo: 'Tu turno es de 7 p.m. a 3 a.m. Todas esas horas llevan el recargo nocturno del 35%.' },
-  r4: { cuando: 'Tu jornada ordinaria (no extra) cae de noche en un domingo o festivo. Se suman el recargo nocturno y el dominical/festivo.', ejemplo: 'Tu turno normal es de 8 p.m. a 4 a.m. y ese día es festivo. Cada hora lleva 35% nocturno + 90% festivo.' },
+  r4: { cuando: 'Tu jornada ordinaria (no extra) cae de noche en un domingo o festivo. Se suman el recargo nocturno y el dominical/festivo.', ejemplo: 'Tu turno normal es de 8 p.m. a 4 a.m. y ese día es festivo. Se te reconocen ambos recargos sobre esas horas.' },
 };
 
 const extras = [
-  {id:'e1', label:'Hora Extra Diurna Ordinaria',           formula:'25% extra diurna + 100% hora base',                            pct:1.25, cst:'Art. 168 CST — El trabajo extra diurno se remunera con un recargo del 25% sobre el valor del trabajo ordinario diurno.'},
-  {id:'e2', label:'Hora Extra Nocturna',                   formula:'75% extra nocturna + 100% hora base',                          pct:1.75, cst:'Art. 168 CST — El trabajo extra nocturno se remunera con un recargo del 75% sobre el valor del trabajo ordinario diurno.'},
-  {id:'e3', label:'Hora Extra Diurna Dominical',           formula:'25% extra + 90% dominical + 100% hora base',                   pct:2.15, cst:'Arts. 168 + 179 CST — Se acumula el recargo de hora extra diurna (25%) con el recargo dominical (90% desde jul. 2026, Ley 2466/2025).'},
-  {id:'e4', label:'Hora Extra Diurna Festiva',             formula:'25% extra + 90% festivo + 100% hora base',                     pct:2.15, cst:'Arts. 168 + 179 CST — Se acumula el recargo de hora extra diurna (25%) con el recargo festivo (90% desde jul. 2026, Ley 2466/2025).'},
-  {id:'e6', label:'Hora Extra Nocturna Dominical/Festiva', formula:'75% extra nocturna + 90% dominical/festivo + 100% hora base',  pct:2.65, cst:'Arts. 168 + 179 CST — Se acumula el recargo de hora extra nocturna (75%) con el recargo dominical/festivo (90% desde jul. 2026, Ley 2466/2025).'},
+  {id:'e1', label:'Hora Extra Diurna Ordinaria',           cst:'Art. 168 CST — El trabajo extra diurno se remunera con un recargo sobre el valor del trabajo ordinario diurno.'},
+  {id:'e2', label:'Hora Extra Nocturna',                   cst:'Art. 168 CST — El trabajo extra nocturno se remunera con un recargo sobre el valor del trabajo ordinario diurno, mayor al de la extra diurna.'},
+  {id:'e3', label:'Hora Extra Diurna Dominical',           cst:'Arts. 168 + 179 CST — Se acumula el recargo de hora extra diurna con el recargo dominical (vigente desde jul. 2026, Ley 2466/2025).'},
+  {id:'e4', label:'Hora Extra Diurna Festiva',             cst:'Arts. 168 + 179 CST — Se acumula el recargo de hora extra diurna con el recargo festivo (vigente desde jul. 2026, Ley 2466/2025).'},
+  {id:'e6', label:'Hora Extra Nocturna Dominical/Festiva', cst:'Arts. 168 + 179 CST — Se acumula el recargo de hora extra nocturna con el recargo dominical/festivo (vigente desde jul. 2026, Ley 2466/2025). Es la combinación de mayor valor.'},
 ];
 const recargos = [
-  {id:'r1', label:'Hora Recargo Diurno Dominical Habitual',  formula:'100% hora base + 90% recargo dominical = 190%', pct:1.90, cst:'Art. 179 CST mod. Ley 2466/2025 — Recargo dominical habitual: 90% desde jul. 2026, 100% desde jul. 2027.'},
-  {id:'r2', label:'Hora Recargo Diurno Dominical/Festivo Ocasional', formula:'Solo el recargo (90%) — el descanso se toma en disfrute', pct:0.90, cst:'Art. 179 CST — El trabajo dominical u festivo ocasional (hasta 2 al mes) se remunera con el recargo del 90% (desde jul. 2026). El trabajador tiene derecho a un descanso compensatorio.'},
-  {id:'r3', label:'Hora Recargo Nocturno',                   formula:'Trabajas de noche (desde las 7 p.m.) en día ordinario', pct:0.35, cst:'Art. 168 CST — El trabajo nocturno (desde las 7 p.m. según Ley 2466 de 2025) se remunera con un recargo del 35% sobre el valor del trabajo ordinario diurno.'},
-  {id:'r4', label:'Hora Recargo Nocturno Dominical/Festivo', formula:'35% nocturno + 90% dominical/festivo', pct:1.25, cst:'Arts. 168 + 179 CST — Se acumulan el recargo nocturno (35%) y el recargo dominical/festivo (90% desde jul. 2026, Ley 2466/2025).'},
+  {id:'r1', label:'Hora Recargo Diurno Dominical Habitual',           cst:'Art. 179 CST mod. Ley 2466/2025 — Recargo dominical habitual, con incremento progresivo hasta 2027.'},
+  {id:'r2', label:'Hora Recargo Diurno Dominical/Festivo Ocasional',  cst:'Art. 179 CST — El trabajo dominical o festivo ocasional (hasta 2 al mes) se remunera con el recargo vigente. El trabajador tiene derecho a un descanso compensatorio.'},
+  {id:'r3', label:'Hora Recargo Nocturno',                            cst:'Art. 168 CST — El trabajo nocturno (desde las 7 p.m. según Ley 2466 de 2025) se remunera con un recargo sobre el valor del trabajo ordinario diurno.'},
+  {id:'r4', label:'Hora Recargo Nocturno Dominical/Festivo',          cst:'Arts. 168 + 179 CST — Se acumulan el recargo nocturno y el recargo dominical/festivo (vigente desde jul. 2026, Ley 2466/2025).'},
 ];
 
 function fmt(n){ return '$' + Math.round(n).toLocaleString('es-CO'); }
-function fmtPct(p){ return Math.round(p * 100) + '%'; }
 function n2(n){ return n.toFixed(2).replace('.', ','); }
-function n4(n){ return parseFloat(n.toFixed(4)).toString().replace('.', ','); }
 
 function getHM(id){
   const h = parseFloat(document.getElementById('h-' + id)?.value) || 0;
@@ -472,15 +466,13 @@ function renderFila(item, tbodyId){
   tr.innerHTML = `
     <td>
       <div class="c-nombre"><span class="c-nombre-text">${item.label}</span>${tipBtn}</div>
-      <div class="c-formula">${item.formula}</div>
       ${tipPanel}
     </td>
-    <td class="r">${fmtPct(item.pct)}</td>
     <td>
       <div class="hm-wrap">
-        <input class="horas-input" type="number" id="h-${item.id}" value="0" min="0" max="300" step="1" oninput="calcular()">
+        <input class="horas-input" type="number" id="h-${item.id}" value="0" min="0" max="300" step="1" oninput="programarCalculo()">
         <span class="hm-sep">h</span>
-        <input class="min-input" type="number" id="m-${item.id}" value="0" min="0" max="59" step="1" oninput="calcular()">
+        <input class="min-input" type="number" id="m-${item.id}" value="0" min="0" max="59" step="1" oninput="programarCalculo()">
         <span class="hm-sep">m</span>
       </div>
       <div class="calculo-line" id="cl-${item.id}"></div>
@@ -489,43 +481,88 @@ function renderFila(item, tbodyId){
   document.getElementById(tbodyId).appendChild(tr);
 }
 
-function calcular(){
-  const salario = parseFloat(document.getElementById('salario').value) || 0;
-  const vh = salario / JORNADA;
+// ══ Cálculo: ahora vive 100% en el servidor. El navegador solo junta los
+// inputs, los envía, y pinta el resultado que recibe — nunca aplica factores. ══
+let debounceCalculo = null;
+let ultimoResultado = null;
 
-  document.getElementById('vh-box').innerHTML = salario > 0
-    ? `<strong>Valor hora</strong> = $${Math.round(salario).toLocaleString('es-CO')} ÷ ${JORNADA} horas = <strong style="color:var(--petrol)">${fmt(vh)}</strong>`
-    : 'Ingresa tu salario para ver el valor de tu hora.';
+function programarCalculo(){
+  document.getElementById('guardarMsg').style.display = 'none';
+  clearTimeout(debounceCalculo);
+  debounceCalculo = setTimeout(calcularServidor, 350);
+}
 
-  let te = 0, tr_ = 0;
+function recogerHoras(){
+  const horas = {};
   [...extras, ...recargos].forEach(item => {
-    const { h, m, dec } = getHM(item.id);
-    const val = dec * vh * item.pct;
-    if (extras.includes(item)) te += val; else tr_ += val;
-    document.getElementById('v-' + item.id).textContent = dec > 0 ? fmt(val) : '$0';
+    const { h, m } = getHM(item.id);
+    horas[item.id] = { horas: h, minutos: m };
+  });
+  return horas;
+}
 
+async function calcularServidor(){
+  const salario = parseFloat(document.getElementById('salario').value) || 0;
+  if (salario <= 0){
+    document.getElementById('vh-box').textContent = 'Ingresa tu salario para ver el valor de tu hora.';
+    return null;
+  }
+
+  document.getElementById('vh-box').innerHTML = 'Calculando…';
+
+  try{
+    const { data: { session } } = await sb.auth.getSession();
+    const token = session?.access_token;
+
+    const res = await fetch('/api/calcular-tiempo-suplementario', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+      body: JSON.stringify({ salario, horas: recogerHoras() })
+    });
+
+    if (!res.ok){
+      const data = await res.json().catch(() => ({}));
+      document.getElementById('vh-box').textContent = data.error || 'No se pudo calcular en este momento. Intenta de nuevo.';
+      return null;
+    }
+
+    const data = await res.json();
+    pintarResultado(data);
+    ultimoResultado = data;
+    return data;
+  }catch(e){
+    console.error('Error al calcular:', e);
+    document.getElementById('vh-box').textContent = 'No se pudo conectar con el servidor. Intenta de nuevo.';
+    return null;
+  }
+}
+
+function pintarResultado(data){
+  document.getElementById('vh-box').innerHTML =
+    `<strong>Valor hora usado en este cálculo:</strong> ${fmt(data.valorHora)}`;
+
+  [...extras, ...recargos].forEach(item => {
+    const r = data.resultados[item.id];
+    const vCell = document.getElementById('v-' + item.id);
     const cl = document.getElementById('cl-' + item.id);
-    if (dec > 0 && m > 0){
-      const md = m / 60;
-      cl.style.display = 'block';
-      cl.innerHTML =
-        `<span class="dec">${n2(dec)} horas</span> <span style="color:var(--muted2)">(${m} ÷ 60 = ${n4(md)}, entonces ${h} + ${n4(md)} = ${n2(dec)})</span><br>` +
-        `<span>${n2(dec)} × ${fmtPct(item.pct)} × ${fmt(vh)} = </span><span class="result">${fmt(val)}</span>`;
-    } else if (dec > 0){
-      cl.style.display = 'block';
-      cl.innerHTML =
-        `<span class="dec">${n2(dec)} horas</span><br>` +
-        `<span>${n2(dec)} × ${fmtPct(item.pct)} × ${fmt(vh)} = </span><span class="result">${fmt(val)}</span>`;
-    } else {
-      cl.style.display = 'none';
+    if (!r){ if(vCell) vCell.textContent = '$0'; return; }
+
+    if (vCell) vCell.textContent = r.valor > 0 ? fmt(r.valor) : '$0';
+
+    if (cl){
+      if (r.horas > 0 || r.minutos > 0){
+        const dec = r.horas + (r.minutos / 60);
+        cl.style.display = 'block';
+        cl.textContent = r.minutos > 0 ? `${r.horas}h ${r.minutos}m = ${n2(dec)} horas` : `${n2(dec)} horas`;
+      } else {
+        cl.style.display = 'none';
+      }
     }
   });
 
-  document.getElementById('tot-extras').textContent = fmt(te);
-  document.getElementById('tot-recargos').textContent = fmt(tr_);
-  document.getElementById('tot-total').textContent = fmt(te + tr_);
-
-  document.getElementById('guardarMsg').style.display = 'none';
+  document.getElementById('tot-extras').textContent = fmt(data.totalExtras);
+  document.getElementById('tot-recargos').textContent = fmt(data.totalRecargos);
+  document.getElementById('tot-total').textContent = fmt(data.totalGeneral);
 }
 
 extras.forEach(i => renderFila(i, 'tbody-extras'));
@@ -540,26 +577,32 @@ async function guardarSimulacion(){
   const salario = parseFloat(document.getElementById('salario').value) || 0;
   if(salario <= 0){ alert('Ingresa tu salario antes de guardar.'); return; }
 
+  btn.disabled = true; btn.textContent = 'Guardando...';
+
+  // Recalculamos justo antes de guardar para no depender de un resultado desactualizado.
+  const resultado = await calcularServidor();
+  if(!resultado){
+    btn.disabled = false; btn.textContent = 'Guardar en Mi Espacio';
+    alert('No se pudo calcular tu simulación. Intenta de nuevo.');
+    return;
+  }
+
   const detalle = {};
-  [...extras, ...recargos].forEach(item => {
-    const { h, m } = getHM(item.id);
-    if (h > 0 || m > 0) detalle[item.id] = { horas: h, minutos: m };
+  Object.keys(resultado.resultados).forEach(id => {
+    const r = resultado.resultados[id];
+    if (r.horas > 0 || r.minutos > 0) detalle[id] = { horas: r.horas, minutos: r.minutos, valor: r.valor };
   });
 
-  const totalExtras = parseFloat(document.getElementById('tot-extras').textContent.replace(/[^0-9]/g,'')) || 0;
-  const totalRecargos = parseFloat(document.getElementById('tot-recargos').textContent.replace(/[^0-9]/g,'')) || 0;
-  const totalGeneral = totalExtras + totalRecargos;
-
-  btn.disabled = true; btn.textContent = 'Guardando...';
   try{
     const { data: sim, error } = await sb.from('simulaciones_tiempo').insert({
       user_id: user.id,
       user_email: user.email,
       salario_mensual: salario,
+      valor_hora: resultado.valorHora,
       detalle_horas: detalle,
-      total_extras: totalExtras,
-      total_recargos: totalRecargos,
-      total_general: totalGeneral
+      total_extras: resultado.totalExtras,
+      total_recargos: resultado.totalRecargos,
+      total_general: resultado.totalGeneral
     }).select('id').single();
 
     if(error) throw error;
@@ -589,7 +632,7 @@ async function inicializar(){
   if(user){
     document.getElementById('simGate').style.display = 'none';
     document.getElementById('simTool').style.display = 'block';
-    calcular();
+    calcularServidor();
   } else {
     document.getElementById('simGate').style.display = 'block';
     document.getElementById('simTool').style.display = 'none';

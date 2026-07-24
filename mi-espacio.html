@@ -131,18 +131,18 @@ const NOMBRES_MODULO = {
   'tiempo-suplementario': { nombre: 'Simulador de Tiempo Suplementario', icono: '⏱' }
 };
 
-// Mismo catálogo de conceptos que simulador-tiempo.html, para reconstruir el desglose guardado
-const JORNADA_TIEMPO = 210;
+// Solo etiquetas y agrupación (extra/recargo) para mostrar el desglose ya calculado
+// por el servidor y guardado en cada simulación — el factor NUNCA vive aquí.
 const CONCEPTOS_TIEMPO = {
-  e1: { label: 'Hora Extra Diurna Ordinaria', pct: 1.25, tipo: 'extra' },
-  e2: { label: 'Hora Extra Nocturna', pct: 1.75, tipo: 'extra' },
-  e3: { label: 'Hora Extra Diurna Dominical', pct: 2.15, tipo: 'extra' },
-  e4: { label: 'Hora Extra Diurna Festiva', pct: 2.15, tipo: 'extra' },
-  e6: { label: 'Hora Extra Nocturna Dominical/Festiva', pct: 2.65, tipo: 'extra' },
-  r1: { label: 'Hora Recargo Diurno Dominical Habitual', pct: 1.90, tipo: 'recargo' },
-  r2: { label: 'Hora Recargo Diurno Dominical/Festivo Ocasional', pct: 0.90, tipo: 'recargo' },
-  r3: { label: 'Hora Recargo Nocturno', pct: 0.35, tipo: 'recargo' },
-  r4: { label: 'Hora Recargo Nocturno Dominical/Festivo', pct: 1.25, tipo: 'recargo' },
+  e1: { label: 'Hora Extra Diurna Ordinaria', tipo: 'extra' },
+  e2: { label: 'Hora Extra Nocturna', tipo: 'extra' },
+  e3: { label: 'Hora Extra Diurna Dominical', tipo: 'extra' },
+  e4: { label: 'Hora Extra Diurna Festiva', tipo: 'extra' },
+  e6: { label: 'Hora Extra Nocturna Dominical/Festiva', tipo: 'extra' },
+  r1: { label: 'Hora Recargo Diurno Dominical Habitual', tipo: 'recargo' },
+  r2: { label: 'Hora Recargo Diurno Dominical/Festivo Ocasional', tipo: 'recargo' },
+  r3: { label: 'Hora Recargo Nocturno', tipo: 'recargo' },
+  r4: { label: 'Hora Recargo Nocturno Dominical/Festivo', tipo: 'recargo' },
 };
 
 function formatearFecha(iso){
@@ -250,8 +250,6 @@ async function verDetalle(slug, recordId, descargarDirecto){
     document.getElementById('modalTitulo').textContent = 'Simulación de Tiempo Suplementario';
     document.getElementById('modalSub').textContent = `${formatearFecha(d.created_at)} · Salario base: $${Number(d.salario_mensual).toLocaleString('es-CO')}`;
     const fmt = (n) => '$' + Math.round(n).toLocaleString('es-CO');
-    const fmtPct = (p) => Math.round(p * 100) + '%';
-    const valorHora = Number(d.salario_mensual) / JORNADA_TIEMPO;
     const detalle = d.detalle_horas || {};
 
     function filasPara(tipo){
@@ -259,16 +257,13 @@ async function verDetalle(slug, recordId, descargarDirecto){
         .filter(id => CONCEPTOS_TIEMPO[id] && CONCEPTOS_TIEMPO[id].tipo === tipo)
         .map(id => {
           const c = CONCEPTOS_TIEMPO[id];
-          const { horas = 0, minutos = 0 } = detalle[id];
-          const dec = horas + (minutos / 60);
-          if (dec <= 0) return '';
-          const valor = dec * valorHora * c.pct;
+          const { horas = 0, minutos = 0, valor = 0 } = detalle[id];
+          if (horas <= 0 && minutos <= 0) return '';
           const horasTxt = minutos > 0 ? `${horas}h ${minutos}m` : `${horas}h`;
           return `
             <tr>
               <td style="padding:.5rem .25rem;font-size:.82rem;">${c.label}</td>
               <td style="padding:.5rem .25rem;font-size:.8rem;text-align:center;white-space:nowrap;">${horasTxt}</td>
-              <td style="padding:.5rem .25rem;font-size:.8rem;text-align:center;">${fmtPct(c.pct)}</td>
               <td style="padding:.5rem .25rem;font-size:.82rem;text-align:right;font-weight:700;">${fmt(valor)}</td>
             </tr>`;
         }).join('');
@@ -279,12 +274,13 @@ async function verDetalle(slug, recordId, descargarDirecto){
     const theadRow = `<tr>
       <th style="text-align:left;padding:.4rem .25rem;font-size:.68rem;color:var(--muted);text-transform:uppercase;">Concepto</th>
       <th style="text-align:center;padding:.4rem .25rem;font-size:.68rem;color:var(--muted);text-transform:uppercase;">Horas</th>
-      <th style="text-align:center;padding:.4rem .25rem;font-size:.68rem;color:var(--muted);text-transform:uppercase;">Factor</th>
       <th style="text-align:right;padding:.4rem .25rem;font-size:.68rem;color:var(--muted);text-transform:uppercase;">Valor</th>
     </tr>`;
 
+    const valorHoraTxt = d.valor_hora ? `<div style="font-size:.7rem;color:var(--muted);margin-bottom:.5rem;">Valor hora usado en este cálculo: $${Math.round(d.valor_hora).toLocaleString('es-CO')}</div>` : '';
+
     body.innerHTML = `
-      <div style="font-size:.7rem;color:var(--muted);margin-bottom:.5rem;">Valor hora usado: $${Math.round(valorHora).toLocaleString('es-CO')} (salario ÷ ${JORNADA_TIEMPO})</div>
+      ${valorHoraTxt}
 
       ${filasExtras ? `
         <div style="font-size:.72rem;font-weight:800;color:var(--petrol);text-transform:uppercase;letter-spacing:.05em;margin:1rem 0 .3rem;">Horas extras</div>
