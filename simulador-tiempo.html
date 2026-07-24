@@ -92,7 +92,8 @@ nav.scrolled{box-shadow:0 2px 20px rgba(0,0,0,.08);}
 .tabla-wrap td.r{text-align:right;vertical-align:middle;}
 .tabla-wrap tr:last-child td{border-bottom:none;}
 .tabla-wrap tr:nth-child(even) td{background:var(--surface);}
-.c-nombre{font-size:.78rem;font-weight:700;color:var(--dark);display:flex;align-items:center;gap:5px;flex-wrap:wrap;}
+.c-nombre{font-size:.78rem;font-weight:700;color:var(--dark);display:flex;align-items:flex-start;gap:.4rem;flex-wrap:nowrap;}
+.c-nombre-text{flex:1;min-width:0;}
 .c-formula{font-size:.68rem;color:var(--muted);margin-top:2px;}
 .hm-wrap{display:flex;align-items:center;gap:3px;}
 .horas-input,.min-input{text-align:center;border:1px solid var(--border);border-radius:6px;padding:4px 4px;font-size:.78rem;background:white;font-family:'Raleway',sans-serif;}
@@ -105,7 +106,7 @@ nav.scrolled{box-shadow:0 2px 20px rgba(0,0,0,.08);}
 .v-cell{font-weight:700;color:var(--dark);font-size:.85rem;}
 
 /* tooltip "i" */
-.tip-btn{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;background:var(--petrol-pale);color:var(--petrol);font-size:.6rem;font-weight:800;cursor:pointer;border:none;flex-shrink:0;line-height:1;}
+.tip-btn{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;background:var(--petrol-pale);color:var(--petrol);font-size:.6rem;font-weight:800;cursor:pointer;border:none;flex-shrink:0;line-height:1;margin-top:1px;}
 .tip-btn:hover{background:var(--petrol);color:white;}
 .tip-panel{display:none;margin-top:.5rem;background:var(--petrol-pale);border-radius:8px;padding:.6rem .7rem;font-size:.68rem;color:var(--text);line-height:1.6;}
 .tip-panel.open{display:block;}
@@ -167,6 +168,20 @@ footer{background:var(--dark);color:rgba(255,255,255,0.45);padding:3rem 2rem;}
 @media(max-width:640px){
   .resumen-grid{grid-template-columns:1fr;}
   .footer-inner{grid-template-columns:1fr;gap:2rem;}
+
+  /* Tablas de extras/recargos → tarjeta apilada, nada de columnas apretadas */
+  .tabla-wrap thead{display:none;}
+  .tabla-wrap table, .tabla-wrap tbody, .tabla-wrap tr, .tabla-wrap td{display:block;width:auto;}
+  .tabla-wrap tr{padding:1rem;border-bottom:1px solid var(--border);}
+  .tabla-wrap tr:last-child{border-bottom:none;}
+  .tabla-wrap td{padding:0;border-bottom:none;}
+  .tabla-wrap td.r{text-align:left;}
+  .tabla-wrap td:nth-child(1){margin-bottom:.6rem;}
+  .tabla-wrap td:nth-child(2){display:flex;align-items:center;gap:.4rem;margin-bottom:.6rem;font-size:.8rem;font-weight:800;color:var(--petrol);}
+  .tabla-wrap td:nth-child(2)::before{content:'Factor';font-size:.64rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);background:var(--surface);border-radius:6px;padding:.15rem .5rem;}
+  .tabla-wrap td:nth-child(4){margin-top:.6rem;padding-top:.6rem;border-top:1px dashed var(--border);}
+  .tabla-wrap td:nth-child(4)::before{content:'Valor total: ';font-size:.68rem;font-weight:700;color:var(--muted);text-transform:none;}
+  .tabla-wrap .v-cell{display:inline;font-size:.95rem;}
 }
 </style>
 </head>
@@ -456,7 +471,7 @@ function renderFila(item, tbodyId){
   const tr = document.createElement('tr');
   tr.innerHTML = `
     <td>
-      <div class="c-nombre" style="justify-content:space-between">${item.label} ${tipBtn}</div>
+      <div class="c-nombre"><span class="c-nombre-text">${item.label}</span>${tipBtn}</div>
       <div class="c-formula">${item.formula}</div>
       ${tipPanel}
     </td>
