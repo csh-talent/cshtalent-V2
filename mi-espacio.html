@@ -148,6 +148,11 @@ const CONCEPTOS_TIEMPO = {
 function formatearFecha(iso){
   return new Date(iso).toLocaleDateString('es-CO', { day: '2-digit', month: 'short', year: 'numeric' });
 }
+function formatearFechaHora(iso){
+  const f = new Date(iso).toLocaleDateString('es-CO', { day: '2-digit', month: 'short', year: 'numeric' });
+  const h = new Date(iso).toLocaleTimeString('es-CO', { hour: 'numeric', minute: '2-digit' });
+  return `${f} · ${h}`;
+}
 
 async function cargarMiEspacio(){
   const { data: { user } } = await sb.auth.getUser();
@@ -206,7 +211,7 @@ async function cargarMiEspacio(){
             ${filas.map(f => `
               <tr>
                 <td>${f.title || 'Sin título'}</td>
-                <td>${formatearFecha(f.created_at)}</td>
+                <td>${formatearFechaHora(f.created_at)}</td>
                 <td><span class="estado-pill">Finalizado</span></td>
                 <td>
                   <a class="accion-link" onclick="verDetalle('${slug}','${f.record_id}')">Ver</a>

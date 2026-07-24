@@ -565,12 +565,13 @@ async function guardarSimulacion(){
     if(error) throw error;
 
     const fechaTitulo = new Date().toLocaleDateString('es-CO', { day:'2-digit', month:'short', year:'numeric' });
+    const horaTitulo = new Date().toLocaleTimeString('es-CO', { hour:'numeric', minute:'2-digit' });
     await sb.from('user_workspace').insert({
       user_id: user.id,
       tool_slug: 'tiempo-suplementario',
       record_type: 'simulacion',
       record_id: sim.id,
-      title: `Simulación del ${fechaTitulo}`
+      title: `Simulación del ${fechaTitulo}, ${horaTitulo}`
     });
 
     document.getElementById('guardarMsg').style.display = 'block';
