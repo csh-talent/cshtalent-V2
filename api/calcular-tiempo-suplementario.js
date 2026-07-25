@@ -6,17 +6,13 @@
 // El navegador nunca recibe esta tabla — solo envía horas/minutos y salario,
 // y recibe de vuelta los valores en pesos ya calculados.
 //
-// Requiere las mismas variables de entorno que el resto de /api (revisa que
-// coincidan con las que ya usan api/generate-report.js / api/wompi-webhook.js):
+// Nota: este archivo NO usa la librería @supabase/supabase-js (para no
+// depender de un paquete npm adicional) — verifica la sesión llamando
+// directamente al endpoint REST de autenticación de Supabase con fetch.
+//
+// Requiere las mismas variables de entorno que el resto de /api:
 //   SUPABASE_URL
-//   SUPABASE_SERVICE_ROLE_KEY
-
-const { createClient } = require('@supabase/supabase-js');
-
-const supabaseAdmin = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY
-);
+//   SUPABASE_SERVICE_ROLE_KEY   (o el ANON key, si es el que ya usas)
 
 // ══ Jornada legal (Ley 2101 de 2021 — 42h/semana → divisor mensual 210, vigente desde el 15 jul. 2026) ══
 const JORNADA = 210;
@@ -41,6 +37,24 @@ function validarHoraMinuto(valor, max){
   return Math.floor(n);
 }
 
+// ══ Verifica el token de sesión llamando directo a la API de Supabase (sin librería) ══
+async function verificarUsuario(token){
+  if (!token) return null;
+  try{
+    const resp = await fetch(`${process.env.SUPABASE_URL}/auth/v1/user`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'apikey': process.env.SUPABASE_SERVICE_ROLE_KEY
+      }
+    });
+    if (!resp.ok) return null;
+    return await resp.json(); // { id, email, ... }
+  }catch(e){
+    console.error('Error verificando usuario:', e);
+    return null;
+  }
+}
+
 module.exports = async function handler(req, res){
   if (req.method !== 'POST'){
     res.status(405).json({ error: 'Método no permitido' });
@@ -50,13 +64,9 @@ module.exports = async function handler(req, res){
   // ══ Autenticación: exige la misma sesión de Supabase que usa el resto del sitio ══
   const authHeader = req.headers.authorization || '';
   const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
-  if (!token){
-    res.status(401).json({ error: 'No autenticado' });
-    return;
-  }
 
-  const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token);
-  if (authError || !user){
+  const user = await verificarUsuario(token);
+  if (!user){
     res.status(401).json({ error: 'Sesión inválida o expirada' });
     return;
   }
