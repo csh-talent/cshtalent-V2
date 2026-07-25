@@ -10,9 +10,13 @@
 // depender de un paquete npm adicional) — verifica la sesión llamando
 // directamente al endpoint REST de autenticación de Supabase con fetch.
 //
-// Requiere las mismas variables de entorno que el resto de /api:
-//   SUPABASE_URL
-//   SUPABASE_SERVICE_ROLE_KEY   (o el ANON key, si es el que ya usas)
+// Requiere esta variable de entorno (SÍ es sensible, ya la tienes creada):
+//   SUPABASE_SERVICE_ROLE_KEY
+//
+// La URL del proyecto Supabase (csh-talent-v2) no es información sensible
+// — es pública, aparece en cualquier navegador que cargue el sitio — así
+// que va escrita directamente aquí en vez de depender de otra variable.
+const SUPABASE_URL = 'https://eiauimhrybdamjpntdwh.supabase.co';
 
 // ══ Jornada legal (Ley 2101 de 2021 — 42h/semana → divisor mensual 210, vigente desde el 15 jul. 2026) ══
 const JORNADA = 210;
@@ -41,7 +45,7 @@ function validarHoraMinuto(valor, max){
 async function verificarUsuario(token){
   if (!token) return null;
   try{
-    const resp = await fetch(`${process.env.SUPABASE_URL}/auth/v1/user`, {
+    const resp = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
       headers: {
         'Authorization': `Bearer ${token}`,
         'apikey': process.env.SUPABASE_SERVICE_ROLE_KEY
