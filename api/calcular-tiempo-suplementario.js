@@ -11,7 +11,7 @@
 //   SUPABASE_URL
 //   SUPABASE_SERVICE_ROLE_KEY
 
-import { createClient } from '@supabase/supabase-js';
+const { createClient } = require('@supabase/supabase-js');
 
 const supabaseAdmin = createClient(
   process.env.SUPABASE_URL,
@@ -41,7 +41,7 @@ function validarHoraMinuto(valor, max){
   return Math.floor(n);
 }
 
-export default async function handler(req, res){
+module.exports = async function handler(req, res){
   if (req.method !== 'POST'){
     res.status(405).json({ error: 'Método no permitido' });
     return;
