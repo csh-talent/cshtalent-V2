@@ -1,0 +1,10 @@
+{
+  "name": "CSH Talent — Codespace",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:20",
+  "postCreateCommand": "npm install -g vercel",
+  "customizations": {
+    "vscode": {
+      "extensions": []
+    }
+  }
+}
