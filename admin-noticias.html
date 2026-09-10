@@ -42,9 +42,29 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 
 <script src="csh-auth.js"></script>
 <script>
-const sb = window.getCSHSupabaseClient();
+function esperarSupabaseClient(intentosRestantes = 30) {
+  return new Promise((resolve, reject) => {
+    (function check(intentos) {
+      if (typeof window.getCSHSupabaseClient === 'function') {
+        resolve(window.getCSHSupabaseClient());
+      } else if (intentos <= 0) {
+        reject(new Error('No se pudo inicializar la sesión'));
+      } else {
+        setTimeout(() => check(intentos - 1), 150);
+      }
+    })(intentosRestantes);
+  });
+}
 
 async function iniciar() {
+  let sb;
+  try {
+    sb = await esperarSupabaseClient();
+  } catch (e) {
+    document.getElementById('contenido').innerHTML = '<div class="estado-msg">No se pudo cargar la sesión. Intenta recargar la página.</div>';
+    return;
+  }
+
   const { data: { session } } = await sb.auth.getSession();
   if (!session) {
     document.getElementById('contenido').innerHTML = '<div class="estado-msg">Inicia sesión con tu cuenta de administradora para ver esta página.</div>';
