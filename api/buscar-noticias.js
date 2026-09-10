@@ -119,12 +119,14 @@ Si no encuentras ninguna noticia nueva que cumpla los criterios, responde exacta
       .map((b) => b.text)
       .join('\n');
     const limpio = textoRespuesta.replace(/```json|```/g, '').trim();
+    const match = limpio.match(/\[[\s\S]*\]/);
+    const jsonCandidato = match ? match[0] : limpio;
 
     let candidatas = [];
     try {
-      candidatas = JSON.parse(limpio);
+      candidatas = JSON.parse(jsonCandidato);
     } catch (e) {
-      console.error('No se pudo parsear la respuesta de Claude:', limpio);
+      console.error('No se pudo parsear la respuesta de Claude:', textoRespuesta);
       return res.status(200).json({ ok: true, insertadas: 0, motivo: 'respuesta_no_parseable' });
     }
 
