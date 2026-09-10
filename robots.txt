@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /mi-espacio.html
+Disallow: /admin-noticias.html
+Disallow: /sanap/
+
+Sitemap: https://www.cshtalent.com/sitemap.xml
