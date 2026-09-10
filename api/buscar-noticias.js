@@ -11,11 +11,32 @@
 // - ANTHROPIC_API_KEY   -> ya existe
 // - RESEND_API_KEY      -> ya existe
 
-import { createClient } from '@supabase/supabase-js';
-
 const SUPABASE_URL = 'https://eiauimhrybdamjpntdwh.supabase.co';
+const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-const supabase = createClient(SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
+function sbHeaders(extra = {}) {
+  return {
+    apikey: SERVICE_KEY,
+    Authorization: `Bearer ${SERVICE_KEY}`,
+    'Content-Type': 'application/json',
+    ...extra,
+  };
+}
+
+async function sbSelect(path) {
+  const r = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, { headers: sbHeaders() });
+  if (!r.ok) throw new Error(`Supabase select falló: ${await r.text()}`);
+  return r.json();
+}
+
+async function sbInsert(table, rows) {
+  const r = await fetch(`${SUPABASE_URL}/rest/v1/${table}`, {
+    method: 'POST',
+    headers: sbHeaders({ Prefer: 'return=minimal' }),
+    body: JSON.stringify(rows),
+  });
+  if (!r.ok) throw new Error(`Supabase insert falló: ${await r.text()}`);
+}
 
 export default async function handler(req, res) {
   if (req.method !== 'GET') {
@@ -39,11 +60,7 @@ export default async function handler(req, res) {
   try {
     // 1. Contexto: últimas 20 noticias ya publicadas o pendientes, para que
     //    Claude no proponga el mismo tema dos veces.
-    const { data: existentes } = await supabase
-      .from('actualidad_laboral')
-      .select('titular, medio, fecha')
-      .order('fecha', { ascending: false })
-      .limit(20);
+    const existentes = await sbSelect('actualidad_laboral?select=titular,medio,fecha&order=fecha.desc&limit=20');
 
     const contextoExistentes = (existentes || [])
       .map((n) => `- [${n.medio}] ${n.titular} (${n.fecha})`)
@@ -116,7 +133,7 @@ Si no encuentras ninguna noticia nueva que cumpla los criterios, responde exacta
     }
 
     // 2. Filtrar: url ya existente en la tabla, o medio repetido dentro del propio lote.
-    const { data: urlsExistentes } = await supabase.from('actualidad_laboral').select('url');
+    const urlsExistentes = await sbSelect('actualidad_laboral?select=url');
     const setUrls = new Set((urlsExistentes || []).map((r) => r.url));
     const mediosUsados = new Set();
     const nuevas = [];
@@ -140,8 +157,9 @@ Si no encuentras ninguna noticia nueva que cumpla los criterios, responde exacta
       return res.status(200).json({ ok: true, insertadas: 0, motivo: 'todas_duplicadas' });
     }
 
-    const { error: insertError } = await supabase.from('actualidad_laboral').insert(nuevas);
-    if (insertError) {
+    try {
+      await sbInsert('actualidad_laboral', nuevas);
+    } catch (insertError) {
       console.error('Error insertando noticias:', insertError);
       return res.status(500).json({ ok: false, error: 'Error al guardar en la base de datos' });
     }

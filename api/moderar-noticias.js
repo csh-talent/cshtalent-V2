@@ -2,30 +2,36 @@
 // Usado por admin-noticias.html. Requiere sesión de un usuario que exista
 // en la tabla `admins`. GET lista las pendientes; POST aprueba o descarta.
 
-import { createClient } from '@supabase/supabase-js';
-
 const SUPABASE_URL = 'https://eiauimhrybdamjpntdwh.supabase.co';
+const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-const supabaseAdmin = createClient(SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
+function sbHeaders(extra = {}) {
+  return {
+    apikey: SERVICE_KEY,
+    Authorization: `Bearer ${SERVICE_KEY}`,
+    'Content-Type': 'application/json',
+    ...extra,
+  };
+}
 
 async function getUsuarioAdmin(req) {
   const authHeader = req.headers['authorization'];
   if (!authHeader) return null;
   const token = authHeader.replace('Bearer ', '');
 
-  const {
-    data: { user },
-    error,
-  } = await supabaseAdmin.auth.getUser(token);
-  if (error || !user) return null;
+  const userRes = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
+    headers: { apikey: SERVICE_KEY, Authorization: `Bearer ${token}` },
+  });
+  if (!userRes.ok) return null;
+  const user = await userRes.json();
+  if (!user?.id) return null;
 
-  const { data: fila } = await supabaseAdmin
-    .from('admins')
-    .select('user_id')
-    .eq('user_id', user.id)
-    .maybeSingle();
-
-  return fila ? user : null;
+  const adminRes = await fetch(`${SUPABASE_URL}/rest/v1/admins?select=user_id&user_id=eq.${user.id}`, {
+    headers: sbHeaders(),
+  });
+  if (!adminRes.ok) return null;
+  const filas = await adminRes.json();
+  return filas.length > 0 ? user : null;
 }
 
 export default async function handler(req, res) {
@@ -35,16 +41,15 @@ export default async function handler(req, res) {
   }
 
   if (req.method === 'GET') {
-    const { data, error } = await supabaseAdmin
-      .from('actualidad_laboral')
-      .select('id, titular, medio, fecha, url, estado, created_at')
-      .eq('estado', 'pendiente')
-      .order('created_at', { ascending: false });
-
-    if (error) {
+    const r = await fetch(
+      `${SUPABASE_URL}/rest/v1/actualidad_laboral?select=id,titular,medio,fecha,url,estado,created_at&estado=eq.pendiente&order=created_at.desc`,
+      { headers: sbHeaders() }
+    );
+    if (!r.ok) {
       return res.status(500).json({ ok: false, error: 'Error al consultar pendientes' });
     }
-    return res.status(200).json({ ok: true, pendientes: data });
+    const pendientes = await r.json();
+    return res.status(200).json({ ok: true, pendientes });
   }
 
   if (req.method === 'POST') {
@@ -56,8 +61,12 @@ export default async function handler(req, res) {
     const update =
       accion === 'aprobar' ? { estado: 'aprobada', activo: true } : { estado: 'descartada', activo: false };
 
-    const { error } = await supabaseAdmin.from('actualidad_laboral').update(update).eq('id', id);
-    if (error) {
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/actualidad_laboral?id=eq.${id}`, {
+      method: 'PATCH',
+      headers: sbHeaders({ Prefer: 'return=minimal' }),
+      body: JSON.stringify(update),
+    });
+    if (!r.ok) {
       return res.status(500).json({ ok: false, error: 'Error al actualizar' });
     }
     return res.status(200).json({ ok: true });
