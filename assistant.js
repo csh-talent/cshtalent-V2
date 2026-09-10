@@ -1,4 +1,21 @@
 /* ═══════════════════════════════════════════════════════════════
+   Google Analytics (GA4)
+   Se inyecta aquí porque assistant.js ya se carga en todas las páginas —
+   así no hay que tocar cada archivo .html por separado.
+   ═══════════════════════════════════════════════════════════════ */
+(function(){
+  var gaScript = document.createElement('script');
+  gaScript.async = true;
+  gaScript.src = 'https://www.googletagmanager.com/gtag/js?id=G-GJB5M8PRZ2';
+  document.head.appendChild(gaScript);
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){ dataLayer.push(arguments); }
+  window.gtag = gtag;
+  gtag('js', new Date());
+  gtag('config', 'G-GJB5M8PRZ2');
+})();
+
+/* ═══════════════════════════════════════════════════════════════
    CSH TALENT — Asistente CSH (componente reutilizable)
    Incluir con una sola línea en cualquier página del ecosistema:
    <script src="assistant.js"></script>
