@@ -25,8 +25,14 @@ export default async function handler(req, res) {
   // Vercel envía automáticamente "Authorization: Bearer <CRON_SECRET>" en
   // las invocaciones de cron cuando la variable de entorno CRON_SECRET
   // está configurada en el proyecto. Esto bloquea llamadas externas.
+  // También se acepta ?secret=... por query param, únicamente para poder
+  // probar el endpoint manualmente desde el navegador (Vercel Cron nunca
+  // usa esta vía).
   const authHeader = req.headers['authorization'];
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+  const secretQuery = req.query?.secret;
+  const autorizado =
+    authHeader === `Bearer ${process.env.CRON_SECRET}` || secretQuery === process.env.CRON_SECRET;
+  if (!autorizado) {
     return res.status(401).json({ ok: false, error: 'No autorizado' });
   }
 
