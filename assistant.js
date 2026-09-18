@@ -65,9 +65,6 @@
   }
   const currentPage = detectPage();
 
-  /* Prioridad de herramientas según la puerta, sin dejar de conocer
-     el resto del ecosistema (regla: "sin importar la página, el
-     asistente debe conocer TODO el ecosistema CSH Talent"). */
   const PAGE_PRIORITY = {
     empresas: 'simuladores, diagnósticos (como el Diagnóstico CIMA®) y herramientas de gestión para empresas',
     profesionales: 'cursos, metodologías, indicadores y plantillas para profesionales de Gestión Humana',
@@ -75,10 +72,6 @@
     home: 'todas las herramientas disponibles en el ecosistema CSH Talent'
   };
 
-  /* ─── Configuración e identidad del Asistente CSH ───
-     Este objeto es el que se usará como contexto/system prompt
-     cuando se conecte la API de IA real. Por ahora solo describe
-     el comportamiento esperado; no ejecuta ninguna lógica de IA. */
   window.CSHAssistantConfig = {
     name: 'Asistente CSH',
     scope: 'Todo el ecosistema CSH Talent (Empresas, Profesionales GH, Trabajadores y futuras herramientas), no una página aislada.',
@@ -106,10 +99,6 @@
       'Corte Constitucional',
       'Leyes y decretos vigentes'
     ],
-    /* Catálogo real de productos y metodologías propias de CSH Talent.
-       Existe para que el modelo nunca confunda estos nombres con
-       términos externos no relacionados (ej. CIMA no es un trámite
-       de tránsito) ni invente qué hace cada herramienta. */
     ownProducts: [
       { nombre: 'Diagnóstico CIMA®', puerta: 'Empresas', descripcion: 'Metodología propia de CSH Talent (marca de Carolina Salazar Hernández) que evalúa de forma integral el estado de la gestión humana de una organización.' },
       { nombre: 'Calculadora de liquidaciones con IA', puerta: 'Empresas', descripcion: 'Liquida contratos conforme a la legislación laboral colombiana con apoyo de inteligencia artificial.' },
@@ -125,13 +114,6 @@
     ]
   };
 
-  /* ─── Conexión real con la IA (Claude Haiku 4.5, vía /api/chat) ───
-     El endpoint /api/chat es un simple puente seguro hacia la API de
-     Anthropic: la API key vive como variable de entorno en Vercel,
-     nunca en este archivo ni en el navegador. Aquí solo se arma el
-     contexto (system prompt) a partir de CSHAssistantConfig y se
-     mantiene la memoria de la conversación en memoria (no persiste
-     entre recargas de página todavía — eso llegará con user_workspace). */
   const MODEL_NAME = 'claude-haiku-4-5-20251001';
   const MAX_TOKENS = 1024;
   let conversationHistory = [];
@@ -150,6 +132,21 @@
       'IMPORTANTE: CIMA®, CRECE® y PULSO® son marcas y metodologías propias de Carolina Salazar Hernández dentro de CSH Talent, definidas únicamente como se describe arriba. Nunca las confundas con trámites, certificados o significados externos no relacionados (ej. CIMA no tiene nada que ver con tránsito, licencias de conducción ni ningún otro trámite gubernamental). Si te preguntan por un producto o funcionalidad que no está en este catálogo, dilo explícitamente en vez de inventar qué podría ser.',
       'Regla de oro: ' + config.goldenRule,
       'Fuentes oficiales permitidas para fundamentar temas legales: ' + config.officialSources.join(', ') + '.',
+      'Estamos en el año 2026. La legislación laboral colombiana ha tenido cambios recientes (por ejemplo, la Ley 2466 de 2025). Cuando respondas sobre cifras, porcentajes o normas que puedan haber cambiado, prioriza siempre la normativa vigente en 2026 sobre cualquier dato más antiguo que recuerdes, y si no estás segura de si un dato sigue vigente, dilo explícitamente en vez de asumir.',
+      'DATOS VIGENTES EN 2026 (usa siempre estos valores exactos):',
+      '- Salario mínimo mensual (SMMLV): $1.750.905, vigente desde el 1 de enero de 2026.',
+      '- Auxilio de transporte: $249.095, vigente desde el 1 de enero de 2026.',
+      '- Jornada laboral máxima: 42 horas semanales, vigente en su totalidad desde el 15 de julio de 2026 (Ley 2101 de 2021).',
+      '- Valor de la hora ordinaria: NO es un número fijo para todos los trabajadores — se calcula dividiendo el salario mensual de cada persona entre las horas de su jornada mensual (con la jornada de 42 horas semanales desde el 15 de julio de 2026). Para quien devenga exactamente el salario mínimo, la hora ordinaria equivale a $8.338 desde esa fecha (antes $7.959); para cualquier otro salario, se debe aplicar la misma fórmula con el salario correspondiente de esa persona. Nunca uses $8.338 como si fuera universal.',
+      '- Recargo por trabajo en domingo y festivo: 90% (subió del 80% al 90% desde el 1 de julio de 2026, por la Ley 2466 de 2025).',
+      '- Recargo nocturno: aplica desde las 7:00 p.m. (se amplió el horario nocturno por la Ley 2466 de 2025).',
+      'Si te preguntan por otra cifra laboral vigente que no esté en esta lista, acláralo explícitamente en vez de inventar un número, ya que no tienes forma de consultar fuentes en tiempo real.',
+      'DATOS VIGENTES (usa siempre estos valores exactos, nunca una cifra distinta que recuerdes de tu entrenamiento, ya que la normativa laboral colombiana cambió recientemente):',
+      '- Jornada laboral máxima: 42 horas semanales (Ley 2101 de 2021), vigente en su totalidad desde el 15 de julio de 2026.',
+      '- Recargo por trabajo en domingo y festivo: 90% (subió del 80% al 90% desde el 1 de julio de 2026, por la Ley 2466 de 2025).',
+      '- Valor de la hora ordinaria del salario mínimo: $8.338 desde el 15 de julio de 2026 (antes $7.959).',
+      '- Recargo nocturno: aplica desde las 7:00 p.m. (se amplió el horario nocturno por la Ley 2466 de 2025).',
+      'Si te preguntan por otra cifra laboral vigente que no esté en esta lista (ej. salario mínimo del año, otros recargos), acláralo explícitamente en vez de inventar un número, ya que no tienes forma de consultar fuentes en tiempo real.',
       'Responde siempre en español, de forma clara, cálida y profesional, en el contexto de la legislación laboral colombiana.',
       'Formato: el panel de chat SÍ interpreta **texto** como negrita real, así que puedes usarlo con naturalidad para dar énfasis. Pero no uses ningún otro símbolo de Markdown: nada de # para títulos, nada de guiones ni viñetas para listas, nada de cursiva con asteriscos simples. Si necesitas enumerar algo, hazlo con números seguidos de punto (1. 2. 3.) en líneas separadas, o simplemente en prosa.',
       'Los emojis SÍ están permitidos y son bienvenidos: úsalos con naturalidad para hacer la conversación más amena y cercana, igual que lo harías en un chat normal.'
@@ -193,7 +190,6 @@
   let isOpen = false;
   let welcomed = false;
 
-  /* ─── Estilos ─── */
   const style = document.createElement('style');
   style.textContent = `
     .csh-a-launcher {
@@ -282,7 +278,6 @@
   `;
   document.head.appendChild(style);
 
-  /* ─── Marcado ─── */
   const wrap = document.createElement('div');
   wrap.innerHTML = `
     <div class="csh-a-launcher" id="cshAssistantLauncher">
@@ -318,9 +313,6 @@
     return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   }
 
-  /* Convierte **negrita** en <strong> real, después de escapar HTML
-     por seguridad. Solo se usa para mensajes del asistente; los
-     mensajes del usuario se muestran siempre como texto plano. */
   function formatAssistantText(text) {
     const escaped = escapeHtml(text);
     return escaped.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
@@ -399,7 +391,6 @@
     setTimeout(wireEvents, 0);
   }
 
-  /* ─── Estado de autenticación (visitante vs. usuario registrado) ─── */
   async function initAuth() {
     try {
       const client = window.getCSHSupabaseClient();
